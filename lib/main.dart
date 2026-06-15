@@ -495,7 +495,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       ),
                       scaffoldMessengerKey: SnackbarService.messengerKey,
                       routerConfig: GlobalRoutes.globalRouter,
-                      theme: Default_Theme().defaultThemeData,
+                      theme: AppTheme.themeDataFor(
+                          NasBeatTheme.fromKey(settingsState.appTheme)),
                       scrollBehavior: CustomScrollBehavior(),
                       debugShowCheckedModeBanner: false,
                     ),

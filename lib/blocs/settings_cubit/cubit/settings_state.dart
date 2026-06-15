@@ -35,6 +35,9 @@ class SettingsState extends Equatable {
   final List<String> lyricsPriority; // lyrics provider plugin priority order
   final String suggestionPluginId; // search suggestion provider plugin
 
+  /// Selected visual theme key. See [NasBeatTheme.fromKey].
+  final String appTheme;
+
   const SettingsState({
     required this.settingsReady,
     required this.autoUpdateNotify,
@@ -64,6 +67,7 @@ class SettingsState extends Equatable {
     required this.resolverPriority,
     required this.lyricsPriority,
     required this.suggestionPluginId,
+    required this.appTheme,
   });
 
   SettingsState copyWith({
@@ -95,6 +99,7 @@ class SettingsState extends Equatable {
     List<String>? resolverPriority,
     List<String>? lyricsPriority,
     String? suggestionPluginId,
+    String? appTheme,
   }) {
     return SettingsState(
       settingsReady: settingsReady ?? this.settingsReady,
@@ -132,6 +137,7 @@ class SettingsState extends Equatable {
           ? List<String>.from(lyricsPriority)
           : List<String>.from(this.lyricsPriority),
       suggestionPluginId: suggestionPluginId ?? this.suggestionPluginId,
+      appTheme: appTheme ?? this.appTheme,
     );
   }
 
@@ -165,6 +171,7 @@ class SettingsState extends Equatable {
         resolverPriority,
         lyricsPriority,
         suggestionPluginId,
+        appTheme,
       ];
 }
 
@@ -199,5 +206,6 @@ class SettingsInitial extends SettingsState {
           resolverPriority: const [],
           lyricsPriority: const [],
           suggestionPluginId: '',
+          appTheme: 'default',
         );
 }

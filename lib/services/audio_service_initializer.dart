@@ -80,8 +80,8 @@ class PlayerInitializer {
       builder: () => BloomeeMusicPlayer(),
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'com.BloomeePlayer.notification.status',
-        androidNotificationChannelName: 'BloomeTunes',
-        androidNotificationIcon: 'mipmap/ic_launcher',
+        androidNotificationChannelName: 'NasBeat',
+        androidNotificationIcon: 'drawable/ic_stat_nasbeat',
         androidResumeOnClick: true,
         androidShowNotificationBadge: true,
         // Keep foreground service alive while paused — reduces OEM process kills.

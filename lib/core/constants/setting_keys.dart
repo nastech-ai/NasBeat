@@ -67,6 +67,10 @@ class SettingKeys {
   static const String countryCode = "countryCode";
   static const String chartShowMap = "chartShowMap";
 
+  // ── Theme ───────────────────────────────────────────────────────────────────
+  /// Selected visual theme key. See [NasBeatTheme].
+  static const String appTheme = "appTheme";
+
   // ── Lyrics ──────────────────────────────────────────────────────────────────
   static const String autoSaveLyrics = "autoSaveLyrics";
 

@@ -169,6 +169,12 @@ class SettingsCubit extends Cubit<SettingsState> {
             defaultValue: ''),
         SettingKeys.suggestionPluginId,
       ),
+      // [27] appTheme
+      _readSetting(
+        () => _settingsRepo.getSettingStr(SettingKeys.appTheme,
+            defaultValue: 'default'),
+        SettingKeys.appTheme,
+      ),
     ]);
 
     // Normalize stream quality labels.
@@ -280,6 +286,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       resolverPriority: resolverPriority,
       lyricsPriority: lyricsPriority,
       suggestionPluginId: (results[26] as String?) ?? '',
+      appTheme: (results[27] as String?) ?? 'default',
     ));
   }
 
@@ -494,6 +501,11 @@ class SettingsCubit extends Cubit<SettingsState> {
             (await getApplicationDocumentsDirectory()))
         .path;
     setDownPath(path);
+  }
+
+  void setAppTheme(String key) {
+    _settingsRepo.putSettingStr(SettingKeys.appTheme, key);
+    emit(state.copyWith(appTheme: key));
   }
 
   Future<void> putSettingStr(String key, String value) async =>
