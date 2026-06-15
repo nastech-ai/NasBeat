@@ -8,6 +8,11 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	base: dev ? '/' : '/BloomeeTunes/',
 	build: {
-		outDir: 'build', // Ensure this matches your output directory
+		outDir: 'build',
+	},
+	server: {
+		host: '0.0.0.0',
+		port: 5000,
+		allowedHosts: true,
 	},
 });
