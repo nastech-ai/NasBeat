@@ -60,26 +60,34 @@ jobs:
       - name: Check signing secrets
         id: signing
         shell: powershell
+        env:
+          _KEY_STORE:   ${{ secrets.KEY_STORE }}
+          _SECRET_KEY:  ${{ secrets.SECRET_KEY }}
         run: |
-          # Accept KEY_STORE (preferred) or SECRET_KEY (legacy name) as the keystore source.
-          $ks = "${{ secrets.KEY_STORE }}"
-          if ($ks -eq "") { $ks = "${{ secrets.SECRET_KEY }}" }
-          $has = ($ks -ne "")
-          echo "available=$($has.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          # Secrets are read from env vars — never interpolated into script text.
+          # Accept KEY_STORE (preferred) or SECRET_KEY (legacy alias).
+          $ks = $env:_KEY_STORE
+          if ([string]::IsNullOrEmpty($ks)) { $ks = $env:_SECRET_KEY }
+          $has = (-not [string]::IsNullOrEmpty($ks))
+          $val = if ($has) { "true" } else { "false" }
+          "available=$val" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           if ($has) {
             Write-Host "✅ Signing secrets found — will produce release-signed APKs"
           } else {
-            Write-Host "⚠️  No signing secrets (KEY_STORE / SECRET_KEY) — APKs will use debug signing"
-            Write-Host "    Add KEY_STORE, KEY_ALIAS, KEY_PASSWORD, STORE_PASSWORD to repo secrets for release signing."
+            Write-Host "⚠️  No signing secrets found (KEY_STORE / SECRET_KEY not set)"
+            Write-Host "    APKs will be built with debug signing — fully functional for testing."
+            Write-Host "    Add KEY_STORE, KEY_ALIAS, KEY_PASSWORD, STORE_PASSWORD to produce release-signed APKs."
           }
 
       - name: Decode Android keystore
         if: steps.signing.outputs.available == 'true'
         shell: powershell
+        env:
+          _KEY_STORE:  ${{ secrets.KEY_STORE }}
+          _SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          # Accept KEY_STORE or SECRET_KEY as keystore source.
-          $ks = "${{ secrets.KEY_STORE }}"
-          if ($ks -eq "") { $ks = "${{ secrets.SECRET_KEY }}" }
+          $ks = $env:_KEY_STORE
+          if ([string]::IsNullOrEmpty($ks)) { $ks = $env:_SECRET_KEY }
           # Strip ALL whitespace — secrets encoded without -w 0 have newlines every 76 chars
           # which corrupt the binary and cause "Tag number over 30 is not supported".
           $b64 = $ks -replace '[^A-Za-z0-9+/=]', ''
@@ -92,13 +100,19 @@ jobs:
       - name: Write key.properties
         if: steps.signing.outputs.available == 'true'
         shell: powershell
+        env:
+          _KEY_PASSWORD:   ${{ secrets.KEY_PASSWORD }}
+          _STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          _KEY_ALIAS:      ${{ secrets.KEY_ALIAS }}
+          _STORE_TYPE:     ${{ secrets.STORE_TYPE }}
         run: |
           # Java 17+ keytool defaults to PKCS12. Set STORE_TYPE secret to "JKS" for legacy keystores.
-          $storeType = if ("${{ secrets.STORE_TYPE }}" -ne "") { "${{ secrets.STORE_TYPE }}" } else { "PKCS12" }
-          "keyPassword=${{ secrets.KEY_PASSWORD }}"     | Out-File -FilePath ./android/key.properties -Encoding utf8
-          "storePassword=${{ secrets.STORE_PASSWORD }}" | Out-File -FilePath ./android/key.properties -Encoding utf8 -Append
-          "keyAlias=${{ secrets.KEY_ALIAS }}"           | Out-File -FilePath ./android/key.properties -Encoding utf8 -Append
-          "storeType=$storeType"                         | Out-File -FilePath ./android/key.properties -Encoding utf8 -Append
+          $storeType = $env:_STORE_TYPE
+          if ([string]::IsNullOrEmpty($storeType)) { $storeType = "PKCS12" }
+          "keyPassword=$($env:_KEY_PASSWORD)"     | Out-File -FilePath ./android/key.properties -Encoding utf8
+          "storePassword=$($env:_STORE_PASSWORD)" | Out-File -FilePath ./android/key.properties -Encoding utf8 -Append
+          "keyAlias=$($env:_KEY_ALIAS)"           | Out-File -FilePath ./android/key.properties -Encoding utf8 -Append
+          "storeType=$storeType"                   | Out-File -FilePath ./android/key.properties -Encoding utf8 -Append
           Write-Host "✅ key.properties written (storeType=$storeType)"
 
       - name: Build Android APKs (split-per-abi)
