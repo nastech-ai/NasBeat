@@ -1,4 +1,78 @@
 
+## v3.0.4+95  2026-06-16
+
+ed408f9 feat(mini-player): hide on scroll-down, reveal on scroll-up via NotificationListener
+eeadf8f feat(mini-player): add scrollHidden flag + hideForScroll/revealAfterScroll
+398a4b1 feat(about): add Made with love by Nsamba Naswif credit
+207fdc1 fix(updater): gut sourceforgeUpdate dead code — CI green
+f847b20 fix: remove dead code in sourceforgeUpdate — fixes flutter analyze warning
+94bd69a docs: auto-update CHANGELOG.md and ghpage changelog [skip ci]
+f938d78 ci: auto-publish changelog to ghpage on v* tags
+1bef656 ci: NasTech master weekly summary bot
+1305969 ci: NasTech upstream features diff bot
+462c380 ci: add NasTech dependency health bot
+1a92bbb ci: add NasTech build health bot
+4acea76 ci: add NasTech branding verifier bot
+b0c3767 feat: add theme selector with AMOLED black to App UI settings
+39aae51 feat: add nastech_tree.png to flutter assets
+35b2de2 fix: replace all Bloomee strings with NasBeat in en.arb
+6b5d281 fix: rebrand about page — NasBeat branding, tree logo, NasTech links
+3c4d4fd fix: wire update checker to nastech-ai/NasBeat releases
+15f37d6 feat: add NasTech tree logo asset
+7e12511 fix(ci): replace invalid job-level secrets condition with env-var pattern
+4067bc6 ci: pin Windows runner to windows-2022 to fix CMake VS generator error
+
+## v3.0.4+94  2026-06-16
+
+ed408f9 feat(mini-player): hide on scroll-down, reveal on scroll-up via NotificationListener
+eeadf8f feat(mini-player): add scrollHidden flag + hideForScroll/revealAfterScroll
+398a4b1 feat(about): add Made with love by Nsamba Naswif credit
+207fdc1 fix(updater): gut sourceforgeUpdate dead code — CI green
+f847b20 fix: remove dead code in sourceforgeUpdate — fixes flutter analyze warning
+94bd69a docs: auto-update CHANGELOG.md and ghpage changelog [skip ci]
+
+## v3.0.4+93  2026-06-16
+
+f938d78 ci: auto-publish changelog to ghpage on v* tags
+1bef656 ci: NasTech master weekly summary bot
+1305969 ci: NasTech upstream features diff bot
+462c380 ci: add NasTech dependency health bot
+1a92bbb ci: add NasTech build health bot
+4acea76 ci: add NasTech branding verifier bot
+b0c3767 feat: add theme selector with AMOLED black to App UI settings
+
+## v3.0.4+11  2026-06-16
+
+39aae51 feat: add nastech_tree.png to flutter assets
+35b2de2 fix: replace all Bloomee strings with NasBeat in en.arb
+6b5d281 fix: rebrand about page — NasBeat branding, tree logo, NasTech links
+3c4d4fd fix: wire update checker to nastech-ai/NasBeat releases
+15f37d6 feat: add NasTech tree logo asset
+
+## v3.0.4+12  2026-06-16
+
+
+
+## v3.0.4+13  2026-06-16
+
+
+
+## v3.0.4+14  2026-06-16
+
+
+
+## v3.0.4+15  2026-06-16
+
+
+
+## v3.0.4+16  2026-06-16
+
+
+
+## v3.0.4+17  2026-06-16
+
+
+
 ## v3.0.4+94  2026-06-16
 
 f938d78 ci: auto-publish changelog to ghpage on v* tags
