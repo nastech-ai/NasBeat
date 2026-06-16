@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:isar_community/isar.dart';
-import 'package:Bloomee/services/db/global_db.dart';
+import 'package:nasbeat/services/db/global_db.dart';
 
 /// Data access object for [PluginStorageEntity].
 ///
