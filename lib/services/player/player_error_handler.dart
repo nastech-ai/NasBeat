@@ -2,8 +2,8 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:async';
 import 'dart:math';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
+import 'package:nasbeat/core/models/exported.dart';
+import 'package:nasbeat/screens/widgets/snackbar.dart';
 import 'package:rxdart/rxdart.dart';
 
 enum PlayerErrorType {
