@@ -82,6 +82,7 @@ class _AppUISettingsState extends State<AppUISettings> {
       ),
       body: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (prev, curr) =>
+            prev.appTheme != curr.appTheme ||
             prev.autoSlideCharts != curr.autoSlideCharts ||
             prev.lFMPicks != curr.lFMPicks ||
             prev.chartMap != curr.chartMap,
@@ -90,6 +91,20 @@ class _AppUISettingsState extends State<AppUISettings> {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             children: [
+                            SettingSectionHeader(label: 'Theme'),
+              SettingCard(
+                children: [
+                  for (final theme in NasBeatTheme.values) ...[
+                    if (theme != NasBeatTheme.values.first) const SettingDivider(),
+                    _ThemeTile(
+                      theme: theme,
+                      isSelected: state.appTheme == theme.key,
+                      onTap: () => context.read<SettingsCubit>().setAppTheme(theme.key),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 28),
               SettingSectionHeader(label: l10n.settingsHomeScreen),
               SettingCard(
                 children: [
@@ -178,6 +193,75 @@ class _AppUISettingsState extends State<AppUISettings> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _ThemeTile extends StatelessWidget {
+  final NasBeatTheme theme;
+  final bool isSelected;
+  final VoidCallback onTap;
+  const _ThemeTile({required this.theme, required this.isSelected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = theme.accent;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: theme.background,
+                border: Border.all(
+                  color: isSelected ? accent : Colors.white.withValues(alpha: 0.08),
+                  width: isSelected ? 2.5 : 1,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: isSelected
+                  ? Icon(Icons.check_rounded, size: 18, color: accent)
+                  : null,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    theme.displayName,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (theme.isAmoled)
+                    Text(
+                      'True black — best for OLED screens',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.45),
+                        fontSize: 11,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: accent,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
