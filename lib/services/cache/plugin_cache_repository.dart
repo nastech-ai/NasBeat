@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
-import 'package:Bloomee/services/cache/plugin_cache_store.dart';
-import 'package:Bloomee/services/cache/plugin_cache_writer.dart';
-import 'package:Bloomee/services/db/dao/cache_dao.dart';
-import 'package:Bloomee/services/db/global_db.dart' show CacheEntryDB;
+import 'package:nasbeat/services/cache/plugin_cache_store.dart';
+import 'package:nasbeat/services/cache/plugin_cache_writer.dart';
+import 'package:nasbeat/services/db/dao/cache_dao.dart';
+import 'package:nasbeat/services/db/global_db.dart' show CacheEntryDB;
 
-export 'package:Bloomee/services/cache/plugin_cache_store.dart' show CacheType;
+export 'package:nasbeat/services/cache/plugin_cache_store.dart' show CacheType;
 
 // ═════════════════════════════════════════════════════════════════════════════
 // PluginCacheRepository — unified L1+L2 cache facade used by blocs
