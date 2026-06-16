@@ -1,0 +1,66 @@
+name: "📋 Changelog → GH Page"
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Build changelog from git tags
+        id: build
+        run: |
+          # Collect last 10 releases from tags
+          TAGS=$(git tag --sort=-creatordate | grep "^v" | head -10)
+          echo "Latest tags: $TAGS"
+
+          OUT=""
+          PREV=""
+          for TAG in $TAGS; do
+            DATE=$(git log -1 --format="%ai" "$TAG" 2>/dev/null | cut -d" " -f1 || echo "")
+            if [ -n "$PREV" ]; then
+              COMMITS=$(git log --oneline --no-merges "$TAG".."$PREV" 2>/dev/null | head -20 || true)
+            else
+              COMMITS=$(git log --oneline --no-merges "$TAG" 2>/dev/null | head -20 || true)
+            fi
+            OUT="${OUT}\n## ${TAG}  ${DATE}\n\n${COMMITS}\n"
+            PREV="$TAG"
+          done
+
+          printf "$OUT" > /tmp/CHANGELOG_GENERATED.md
+          cat /tmp/CHANGELOG_GENERATED.md
+
+      - name: Merge with existing CHANGELOG.md (if present)
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            cat /tmp/CHANGELOG_GENERATED.md CHANGELOG.md > /tmp/CHANGELOG_MERGED.md
+          else
+            cp /tmp/CHANGELOG_GENERATED.md /tmp/CHANGELOG_MERGED.md
+          fi
+          cp /tmp/CHANGELOG_MERGED.md CHANGELOG.md
+
+      - name: Write changelog to ghpage
+        run: |
+          # Make it available as a JSON snippet for the SvelteKit landing page
+          node -e "
+            const fs = require(\"fs\");
+            const md = fs.readFileSync(\"CHANGELOG.md\",\"utf8\");
+            const json = JSON.stringify({generated: new Date().toISOString(), content: md});
+            fs.mkdirSync(\"ghpage/static\", {recursive:true});
+            fs.writeFileSync(\"ghpage/static/changelog.json\", json);
+          "
+
+      - name: Commit updated changelog
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-update CHANGELOG.md and ghpage changelog [skip ci]"
+          file_pattern: "CHANGELOG.md ghpage/static/changelog.json"
+          branch: main
