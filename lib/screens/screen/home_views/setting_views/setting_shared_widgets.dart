@@ -1,5 +1,5 @@
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/screens/screen/home_views/setting_views/custom_switch.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/screens/screen/home_views/setting_views/custom_switch.dart';
 import 'package:flutter/material.dart';
 
 class SettingSectionHeader extends StatelessWidget {
