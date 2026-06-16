@@ -1,4 +1,4 @@
-import 'package:Bloomee/services/bloomee_player.dart';
+import 'package:nasbeat/services/bloomee_player.dart';
 import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
 part 'bloomee_player_state.dart';
