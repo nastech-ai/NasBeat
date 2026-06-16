@@ -6,15 +6,15 @@ import 'package:isar_community/isar.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import 'package:Bloomee/core/models/exported.dart' as models;
-import 'package:Bloomee/services/db/global_db.dart';
-import 'package:Bloomee/services/db/dao/cache_dao.dart';
-import 'package:Bloomee/services/db/dao/history_dao.dart';
-import 'package:Bloomee/services/db/legacy/legacy_media_id_mapper.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/search_history_dao.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
+import 'package:nasbeat/core/models/exported.dart' as models;
+import 'package:nasbeat/services/db/global_db.dart';
+import 'package:nasbeat/services/db/dao/cache_dao.dart';
+import 'package:nasbeat/services/db/dao/history_dao.dart';
+import 'package:nasbeat/services/db/legacy/legacy_media_id_mapper.dart';
+import 'package:nasbeat/services/db/dao/playlist_dao.dart';
+import 'package:nasbeat/services/db/dao/search_history_dao.dart';
+import 'package:nasbeat/services/db/dao/settings_dao.dart';
+import 'package:nasbeat/services/db/dao/track_dao.dart';
 
 /// Centralised Isar lifecycle manager.
 ///
