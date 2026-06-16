@@ -1,4 +1,4 @@
-package ls.bloomee.musicplayer
+package ai.nastech.nasbeat
 
 import io.flutter.embedding.android.FlutterActivity
 
