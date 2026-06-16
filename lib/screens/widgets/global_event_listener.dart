@@ -126,8 +126,43 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
               icon: Icons.system_update_rounded,
               actions: [
                 BloomeeDialogAction.text(l10n.buttonLater),
+                // On mobile: download in-background. On desktop: open browser.
                 BloomeeDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
-                  openURL(s.downloadUrl);
+                  if (s.downloadUrl.endsWith('.apk') ||
+                      s.downloadUrl.endsWith('.exe')) {
+                    context
+                        .read<GlobalEventsCubit>()
+                        .downloadUpdate(s.downloadUrl);
+                  } else {
+                    openURL(s.downloadUrl);
+                  }
+                }),
+              ],
+            );
+            break;
+          case UpdateDownloadProgress:
+            final dp = state as UpdateDownloadProgress;
+            final pct = (dp.progress * 100).toStringAsFixed(0);
+            SnackbarService.showMessage('Downloading update… $pct%');
+            break;
+          case UpdateDownloadComplete:
+            final dc = state as UpdateDownloadComplete;
+            log('Update ready at: ${dc.filePath}', name: 'GlobalEventListener');
+            SnackbarService.showMessage(
+                'Download complete! Install from: ${dc.filePath}');
+            break;
+          case UpdateDownloadError:
+            final de = state as UpdateDownloadError;
+            log('Download error: ${de.message}', name: 'GlobalEventListener');
+            showBloomeeDialog(
+              context: dialogContext,
+              title: 'Download Failed',
+              subtitle: 'Could not download the update.\n${de.message}',
+              icon: Icons.error_outline_rounded,
+              actions: [
+                BloomeeDialogAction.text('Cancel'),
+                BloomeeDialogAction.filled('Open in Browser', onPressed: () {
+                  openURL(de.downloadUrl);
                 }),
               ],
             );

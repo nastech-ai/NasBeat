@@ -1,0 +1,54 @@
+name: "🤖 Bot — Plugin Registry Sync"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ghpage/static/repositories.json"
+      - "ghpage/static/plugins/**"
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  validate-registry:
+    name: "🔌 Validate repositories.json"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON
+        run: |
+          python3 -c "
+          import json, sys
+          with open('ghpage/static/repositories.json') as f:
+              data = json.load(f)
+          assert isinstance(data, list), 'Root must be a JSON array'
+          for i, entry in enumerate(data):
+              assert 'url' in entry, f'Entry {i} missing url'
+              assert entry['url'].startswith('https://'), f'Entry {i} url must use HTTPS'
+          print(f'✅ {len(data)} plugin repository entries validated')
+          "
+
+      - name: Post summary
+        run: |
+          echo "### 🔌 Plugin Registry" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+          import json
+          data = json.load(open('ghpage/static/repositories.json'))
+          print(f'**{len(data)} entries** in repositories.json')
+          print()
+          print('| # | URL | Auto-install |')
+          print('|---|-----|:---:|')
+          for i, e in enumerate(data, 1):
+              auto = '✅' if e.get('install') else '❌'
+              print(f'| {i} | {e[\"url\"]} | {auto} |')
+          " >> $GITHUB_STEP_SUMMARY

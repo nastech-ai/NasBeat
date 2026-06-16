@@ -75,7 +75,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
 
   void _startHideControlsTimer() {
     _hideControlsTimer?.cancel();
-    _hideControlsTimer = Timer(const Duration(seconds: 4), () {
+    _hideControlsTimer = Timer(const Duration(seconds: 6), () {
       if (mounted && _showControls && !_isSyncMode) {
         setState(() => _showControls = false);
       }
@@ -721,7 +721,7 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
     widget.onInteraction?.call();
     _userScrolling = true;
     _userScrollTimer?.cancel();
-    _userScrollTimer = Timer(const Duration(seconds: 4), () {
+    _userScrollTimer = Timer(const Duration(seconds: 6), () {
       _userScrolling = false;
       _scrollToCurrentLyric();
     });

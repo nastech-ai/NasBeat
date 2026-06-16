@@ -65,6 +65,8 @@ import 'package:nasbeat/services/onboarding_service.dart';
 import 'package:nasbeat/services/plugin_bootstrap_service.dart';
 import 'package:nasbeat/plugins/services/plugin_repository_service.dart';
 import 'package:nasbeat/services/shared_url_resolver_service.dart';
+import 'package:nasbeat/services/listening_analytics_service.dart';
+import 'package:nasbeat/screens/widgets/particle_background.dart';
 
 void processIncomingIntent(SharedMedia sharedMedia) {
   if (sharedMedia.content != null && isUrl(sharedMedia.content!)) {
@@ -157,6 +159,10 @@ Future<void> main() async {
   setHighRefreshRate();
   await setupPlayerCubit();
   DiscordService.initialize();
+  // Start listening analytics (fire-and-forget — never blocks startup).
+  unawaited(ListeningAnalyticsService.instance.init(
+    bloomeePlayerCubit.bloomeePlayer.mediaItem.stream,
+  ));
   runApp(const MyApp());
 }
 
@@ -488,9 +494,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           const Breakpoint(
                               start: 1921, end: double.infinity, name: '4K'),
                         ],
-                        child: GlobalEventListener(
-                          navigatorKey: GlobalRoutes.globalRouterKey,
-                          child: child!,
+                        child: ParticleBackground(
+                          enabled: settingsState.appTheme ==
+                              NasBeatTheme.glassmorphism.key,
+                          child: GlobalEventListener(
+                            navigatorKey: GlobalRoutes.globalRouterKey,
+                            child: child!,
+                          ),
                         ),
                       ),
                       scaffoldMessengerKey: SnackbarService.messengerKey,

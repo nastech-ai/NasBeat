@@ -1,0 +1,97 @@
+name: "🤖 Bot — APK Size Check"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "android/**"
+      - "rust_lib/**"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  apk-size:
+    name: "📦 Measure APK size delta"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: oracle
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.4"
+          channel: stable
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build APK (PR branch)
+        run: flutter build apk --release --split-per-abi 2>&1 | tail -20
+        continue-on-error: true
+
+      - name: Report APK sizes
+        run: |
+          echo "### 📦 APK Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if ls build/app/outputs/flutter-apk/*.apk 1>/dev/null 2>&1; then
+            echo "| ABI | Size |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----|------|" >> $GITHUB_STEP_SUMMARY
+            for apk in build/app/outputs/flutter-apk/*.apk; do
+              size=$(du -sh "$apk" | cut -f1)
+              name=$(basename "$apk")
+              echo "| $name | $size |" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "⚠️ APK build did not produce output files." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment APK sizes on PR
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            const lines = [];
+            lines.push('### 📦 NasBeat APK Size Report');
+            lines.push('');
+            const apkDir = 'build/app/outputs/flutter-apk/';
+            try {
+              const files = fs.readdirSync(apkDir).filter(f => f.endsWith('.apk'));
+              if (files.length > 0) {
+                lines.push('| APK | Size |');
+                lines.push('|-----|------|');
+                for (const f of files) {
+                  const stats = fs.statSync(`${apkDir}${f}`);
+                  const mb = (stats.size / 1_048_576).toFixed(2);
+                  lines.push(`| ${f} | ${mb} MB |`);
+                }
+              } else {
+                lines.push('⚠️ No APKs found — build may have failed.');
+              }
+            } catch {
+              lines.push('⚠️ APK directory not found — build may have failed.');
+            }
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: lines.join('\n'),
+            });

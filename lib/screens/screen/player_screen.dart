@@ -42,22 +42,45 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final UpNextPanelController _upNextPanelController = UpNextPanelController();
+  Timer? _idleTimer;
+
+  void _startIdleTimer() {
+    _idleTimer?.cancel();
+    _idleTimer = Timer(const Duration(seconds: 6), () {
+      if (!mounted) return;
+      final lyricsState = context.read<LyricsCubit>().state;
+      if (lyricsState is LyricsLoaded && _tabController.index == 0) {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => const FullscreenLyricsView(),
+          ),
+        );
+      }
+    });
+  }
+
+  void _resetIdleTimer() => _startIdleTimer();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // Reset idle timer whenever user swipes between player/lyrics tabs.
+    _tabController.addListener(_resetIdleTimer);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<PlayerOverlayCubit>().registerUpNextPanelCollapse(
               () => _upNextPanelController.collapse(),
             );
+        _startIdleTimer();
       }
     });
   }
 
   @override
   void dispose() {
+    _idleTimer?.cancel();
+    _tabController.removeListener(_resetIdleTimer);
     context.read<PlayerOverlayCubit>().unregisterUpNextPanelCollapse();
     _tabController.dispose();
     super.dispose();

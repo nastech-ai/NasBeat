@@ -1,0 +1,71 @@
+name: "🤖 Bot — Release Notifications"
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to announce (e.g. v2.8.0)"
+        required: false
+        default: ""
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  notify:
+    name: "📣 Announce release"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Resolve release info
+        id: info
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+            NAME="${{ github.event.release.name }}"
+            URL="${{ github.event.release.html_url }}"
+          else
+            TAG="${{ github.event.inputs.tag }}"
+            NAME="Manual notification for $TAG"
+            URL="https://github.com/nastech-ai/NasBeat/releases/tag/$TAG"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "url=$URL"   >> $GITHUB_OUTPUT
+
+      - name: Post Discord webhook
+        if: env.DISCORD_WEBHOOK_URL != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+        run: |
+          TAG="${{ steps.info.outputs.tag }}"
+          NAME="${{ steps.info.outputs.name }}"
+          URL="${{ steps.info.outputs.url }}"
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"username\": \"NasBeat Releases\",
+              \"avatar_url\": \"https://nastech-ai.github.io/NasBeat/nasbeat-logo-red.png\",
+              \"embeds\": [{
+                \"title\": \"🎵 $NAME\",
+                \"description\": \"A new version of **NasBeat** is available!\\n\\nDownload → [GitHub Releases]($URL)\",
+                \"color\": 15548997,
+                \"footer\": {\"text\": \"NasBeat · nastech-ai/NasBeat\"},
+                \"url\": \"$URL\"
+              }]
+            }"
+
+      - name: Write step summary
+        run: |
+          echo "### 📣 Release Announced" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ steps.info.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Name**: ${{ steps.info.outputs.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: ${{ steps.info.outputs.url }}" >> $GITHUB_STEP_SUMMARY

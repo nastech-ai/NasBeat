@@ -5,7 +5,8 @@ enum NasBeatTheme {
   defaultDark('default'),
   amoledBlack('amoled_black'),
   blueDark('blue_dark'),
-  niceGrey('nice_grey');
+  niceGrey('nice_grey'),
+  glassmorphism('glassmorphism');
 
   const NasBeatTheme(this.key);
   final String key;
@@ -20,6 +21,7 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => 'Super AMOLED Black',
         NasBeatTheme.blueDark => 'Blue Dark',
         NasBeatTheme.niceGrey => 'Nice Grey',
+        NasBeatTheme.glassmorphism => 'Glassmorphism (iOS)',
       };
 
   Color get background => switch (this) {
@@ -27,6 +29,7 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => Colors.black,
         NasBeatTheme.blueDark => const Color(0xFF050C1A),
         NasBeatTheme.niceGrey => const Color(0xFF151515),
+        NasBeatTheme.glassmorphism => const Color(0xFF060A10),
       };
 
   Color get surface => switch (this) {
@@ -34,6 +37,7 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => const Color(0xFF0D0D0D),
         NasBeatTheme.blueDark => const Color(0xFF0D1B2A),
         NasBeatTheme.niceGrey => const Color(0xFF252525),
+        NasBeatTheme.glassmorphism => const Color(0x18FFFFFF),
       };
 
   Color get accent => switch (this) {
@@ -41,6 +45,7 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => const Color(0xFFFF5252),
         NasBeatTheme.blueDark => const Color(0xFF00B4D8),
         NasBeatTheme.niceGrey => const Color(0xFF64FFDA),
+        NasBeatTheme.glassmorphism => const Color(0xFF60C0F0),
       };
 
   Color get accentSecondary => switch (this) {
@@ -48,6 +53,7 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => const Color(0xFFFF1744),
         NasBeatTheme.blueDark => const Color(0xFF0077B6),
         NasBeatTheme.niceGrey => const Color(0xFF26C6DA),
+        NasBeatTheme.glassmorphism => const Color(0xFF93D5F5),
       };
 
   Color get primaryText => switch (this) {
@@ -55,6 +61,7 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => const Color(0xFFFFFFFF),
         NasBeatTheme.blueDark => const Color(0xFFE0F4FF),
         NasBeatTheme.niceGrey => const Color(0xFFEEEEEE),
+        NasBeatTheme.glassmorphism => const Color(0xFFF0F9FF),
       };
 
   Color get secondaryText => switch (this) {
@@ -62,9 +69,12 @@ enum NasBeatTheme {
         NasBeatTheme.amoledBlack => const Color(0xFFE0E0E0),
         NasBeatTheme.blueDark => const Color(0xFFB2D9FF),
         NasBeatTheme.niceGrey => const Color(0xFFBDBDBD),
+        NasBeatTheme.glassmorphism => const Color(0xFFBAE6FD),
       };
 
   bool get isAmoled => this == NasBeatTheme.amoledBlack;
+
+  bool get isGlass => this == NasBeatTheme.glassmorphism;
 
   ThemeData buildThemeData() {
     final bg = background;
@@ -111,9 +121,9 @@ enum NasBeatTheme {
         thickness: WidgetStateProperty.all(5),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: bg,
+        backgroundColor: isGlass ? Colors.transparent : bg,
         foregroundColor: pText,
-        surfaceTintColor: bg,
+        surfaceTintColor: Colors.transparent,
         iconTheme: IconThemeData(color: pText),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: acc),
@@ -151,8 +161,16 @@ enum NasBeatTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: bg,
+        color: isGlass ? surf : bg,
         surfaceTintColor: Colors.transparent,
+        elevation: isGlass ? 0 : null,
+        shape: isGlass
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.12), width: 0.8),
+              )
+            : null,
       ),
     );
   }

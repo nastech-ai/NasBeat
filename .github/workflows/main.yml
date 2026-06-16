@@ -74,8 +74,8 @@ jobs:
           }
           $b64 = $env:_KS -replace '[^A-Za-z0-9+/=]', ''
           $bytes = [Convert]::FromBase64String($b64)
-          [IO.File]::WriteAllBytes("android/bloomee.jks", $bytes)
-          $sz = (Get-Item "android/bloomee.jks").Length
+          [IO.File]::WriteAllBytes("android/nasbeat.jks", $bytes)
+          $sz = (Get-Item "android/nasbeat.jks").Length
           if ($sz -lt 200) { Write-Error "Keystore too small ($sz bytes) — KEY_STORE may be corrupt"; exit 1 }
           Write-Host "✅ Keystore written: $sz bytes (PKCS12)"
 
@@ -470,7 +470,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
-          packageName: ls.bloomee.musicplayer
+          packageName: ai.nastech.nasbeat
           releaseFiles: ${{ steps.apk.outputs.path }}
           track: internal
           status: draft

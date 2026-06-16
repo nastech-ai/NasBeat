@@ -61,3 +61,9 @@ jobs:
 
       - name: Run Cargo check
         run: cargo check --manifest-path rust/Cargo.toml
+
+      - name: Run Cargo clippy
+        run: cargo clippy --manifest-path rust/Cargo.toml -- -D warnings
+
+      - name: Run Cargo tests
+        run: cargo test --manifest-path rust/Cargo.toml

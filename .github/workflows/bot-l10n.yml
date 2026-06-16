@@ -1,0 +1,60 @@
+name: "🤖 Bot — Localization Validator"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "lib/l10n/**"
+      - "l10n.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "lib/l10n/**"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  l10n-check:
+    name: "🌍 ARB validation"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.4"
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      - name: Check for missing keys vs en baseline
+        run: |
+          echo "### 🌍 Localization Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          BASE=lib/l10n/app_en.arb
+          EN_KEYS=$(python3 -c "import json,sys; d=json.load(open('$BASE')); print(len([k for k in d if not k.startswith('@')]))")
+          echo "English keys: **$EN_KEYS**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Locale | Keys | Missing |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|------|---------|" >> $GITHUB_STEP_SUMMARY
+          for f in lib/l10n/app_*.arb; do
+            locale=$(basename $f .arb | sed 's/app_//')
+            [ "$locale" = "en" ] && continue
+            count=$(python3 -c "import json; d=json.load(open('$f')); print(len([k for k in d if not k.startswith('@')]))")
+            missing=$(( EN_KEYS - count ))
+            echo "| $locale | $count | $missing |" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: Fail on codegen errors
+        run: flutter gen-l10n 2>&1 | grep -i error && exit 1 || echo "No codegen errors"

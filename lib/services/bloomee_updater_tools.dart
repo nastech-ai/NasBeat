@@ -6,6 +6,7 @@ import 'package:nasbeat/services/db/db_provider.dart';
 import 'package:nasbeat/services/db/dao/settings_dao.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 bool isUpdateAvailable(
     String currentVer, String currentBuild, String newVer, String newBuild,
@@ -114,29 +115,22 @@ Future<Map<String, dynamic>> getAppUpdates() async {
   try {
     updates = await githubUpdate();
   } catch (e) {
-    log('GitHub check failed, trying SourceForge: $e', name: 'UpdaterTools');
+    log('Update check failed: $e', name: 'UpdaterTools');
     try {
-      updates = await sourceforgeUpdate();
-    } catch (e2) {
-      log('SourceForge check failed: $e2', name: 'UpdaterTools');
-      // Final fallback: return structured failure map with current info
-      try {
-        final packageInfo = await PackageInfo.fromPlatform();
-        updates = {
-          'results': false,
-          'error': 'Failed to check remote releases',
-          'currVer': packageInfo.version,
-          'currBuild': packageInfo.buildNumber,
-          'source': 'none',
-        };
-      } catch (e3) {
-        updates = {
-          'results': false,
-          'error':
-              'Failed to check remote releases and failed to read local package info',
-          'source': 'none',
-        };
-      }
+      final packageInfo = await PackageInfo.fromPlatform();
+      updates = {
+        'results': false,
+        'error': 'Failed to check for updates',
+        'currVer': packageInfo.version,
+        'currBuild': packageInfo.buildNumber,
+        'source': 'none',
+      };
+    } catch (e3) {
+      updates = {
+        'results': false,
+        'error': 'Failed to check for updates',
+        'source': 'none',
+      };
     }
   }
 
@@ -209,4 +203,38 @@ String? extractUpUrl(Map<String, dynamic> data) {
     }
   }
   return null;
+}
+
+/// Downloads the update file at [url] to the device's temp directory.
+///
+/// Reports 0.0–1.0 progress via [onProgress] as bytes arrive.
+/// Returns the local file path when finished.
+Future<String> downloadUpdateFile(
+  String url, {
+  void Function(double progress)? onProgress,
+}) async {
+  final dir = await getTemporaryDirectory();
+  final ext = Platform.isAndroid
+      ? '.apk'
+      : Platform.isWindows
+          ? '.exe'
+          : '';
+  final file = File('${dir.path}/nasbeat_update$ext');
+
+  final client = http.Client();
+  try {
+    final request = http.Request('GET', Uri.parse(url));
+    final response = await client.send(request);
+    final total = response.contentLength ?? 0;
+    int received = 0;
+    final sink = file.openWrite();
+    await response.stream.map((chunk) {
+      received += chunk.length;
+      if (total > 0) onProgress?.call(received / total);
+      return chunk;
+    }).pipe(sink);
+    return file.path;
+  } finally {
+    client.close();
+  }
 }

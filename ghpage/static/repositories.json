@@ -1,0 +1,18 @@
+[
+  {
+    "url": "https://nastech-ai.github.io/NasBeat/plugins/youtube/manifest.json",
+    "install": true
+  },
+  {
+    "url": "https://nastech-ai.github.io/NasBeat/plugins/jiosaavn/manifest.json",
+    "install": true
+  },
+  {
+    "url": "https://nastech-ai.github.io/NasBeat/plugins/gaana/manifest.json",
+    "install": true
+  },
+  {
+    "url": "https://nastech-ai.github.io/NasBeat/plugins/spotify-meta/manifest.json",
+    "install": true
+  }
+]
