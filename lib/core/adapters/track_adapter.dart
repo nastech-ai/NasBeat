@@ -9,8 +9,8 @@ library track_adapter;
 
 import 'dart:io';
 
-import 'package:Bloomee/core/models/exported.dart' hide MediaItem;
-import 'package:Bloomee/core/models/media_playlist_model.dart';
+import 'package:nasbeat/core/models/exported.dart' hide MediaItem;
+import 'package:nasbeat/core/models/media_playlist_model.dart';
 import 'package:audio_service/audio_service.dart';
 
 /// Convert a plugin [Track] to an audio_service [MediaItem].
