@@ -1,4 +1,4 @@
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:nasbeat/l10n/app_localizations.dart';
 
 class LanguageOption {
   final String code;
