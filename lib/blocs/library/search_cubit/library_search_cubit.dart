@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:Bloomee/core/models/library_search_result.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/blocs/library/cubit/library_items_cubit.dart';
+import 'package:nasbeat/core/models/library_search_result.dart';
+import 'package:nasbeat/core/models/exported.dart';
+import 'package:nasbeat/blocs/library/cubit/library_items_cubit.dart';
 
 part 'library_search_state.dart';
 
