@@ -1,8 +1,8 @@
-import 'package:Bloomee/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/utils/download_types.dart';
-import 'package:Bloomee/utils/load_image.dart';
+import 'package:nasbeat/blocs/downloader/cubit/downloader_cubit.dart';
+import 'package:nasbeat/core/models/exported.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/utils/download_types.dart';
+import 'package:nasbeat/utils/load_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
