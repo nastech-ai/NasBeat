@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/plugins/utils/media_id.dart';
-import 'package:Bloomee/services/db/dao/lyrics_dao.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/meta_resolver/cross_plugin_resolver.dart';
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
-import 'package:Bloomee/src/rust/api/plugin/plugin_info.dart';
-import 'package:Bloomee/src/rust/api/plugin/types.dart';
+import 'package:nasbeat/core/constants/setting_keys.dart';
+import 'package:nasbeat/plugins/utils/media_id.dart';
+import 'package:nasbeat/services/db/dao/lyrics_dao.dart';
+import 'package:nasbeat/services/db/dao/playlist_dao.dart';
+import 'package:nasbeat/services/db/dao/settings_dao.dart';
+import 'package:nasbeat/services/db/dao/track_dao.dart';
+import 'package:nasbeat/services/db/db_provider.dart';
+import 'package:nasbeat/services/meta_resolver/cross_plugin_resolver.dart';
+import 'package:nasbeat/services/plugin/plugin_service.dart';
+import 'package:nasbeat/src/rust/api/plugin/models.dart';
+import 'package:nasbeat/src/rust/api/plugin/plugin_info.dart';
+import 'package:nasbeat/src/rust/api/plugin/types.dart';
 
 class SmartTrackReplacementCandidate {
   final Track track;
