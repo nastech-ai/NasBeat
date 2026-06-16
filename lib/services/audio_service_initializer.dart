@@ -1,5 +1,5 @@
-import 'package:Bloomee/services/bloomee_player.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:nasbeat/services/bloomee_player.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 
