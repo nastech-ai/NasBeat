@@ -6,7 +6,7 @@
 ///
 /// Usage:
 /// ```dart
-/// import 'package:Bloomee/services/db/legacy/legacy_db_opener.dart' as legacyOpener;
+/// import 'package:nasbeat/services/db/legacy/legacy_db_opener.dart' as legacyOpener;
 ///
 /// final isar = await legacyOpener.openLegacyDB(appSuppDir);
 /// // read data …
