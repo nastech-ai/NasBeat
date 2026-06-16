@@ -1,0 +1,39 @@
+name: "🔭 NasTech Features Bot"
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+permissions:
+  issues: write
+  contents: read
+jobs:
+  upstream-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compare with upstream BloomeeTunes
+        id: diff
+        run: |
+          git remote add upstream https://github.com/HemantKArya/BloomeeTunes.git || true
+          git fetch upstream main --depth=50 2>&1 | tail -3
+          git log HEAD..upstream/main --oneline --no-merges 2>/dev/null | head -30 > /tmp/upstream_commits.txt || true
+          AHEAD=$(git rev-list --count HEAD..upstream/main 2>/dev/null || echo "0")
+          echo "ahead=$AHEAD" >> $GITHUB_OUTPUT
+      - name: Report new upstream commits
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const commits = fs.existsSync("/tmp/upstream_commits.txt") ? fs.readFileSync("/tmp/upstream_commits.txt","utf8").trim() : "";
+            const ahead = "${{ steps.diff.outputs.ahead }}";
+            if (!commits) { console.log("NasBeat up-to-date."); return; }
+            const title = `🔭 [NasTech Bot] ${ahead} upstream commit(s) not yet in NasBeat`;
+            const body = `## Upstream Feature Diff\n\n**BloomeeTunes is ${ahead} commit(s) ahead of NasBeat**\n\n### Commits\n\`\`\`\n${commits}\n\`\`\`\n\nReview and cherry-pick beneficial changes.\n\n---\n*NasTech Features Bot — weekly*`;
+            const open = await github.rest.issues.listForRepo({owner:context.repo.owner,repo:context.repo.repo,labels:"nastech-bot,upstream-diff",state:"open"});
+            if (open.data.length>0) {
+              await github.rest.issues.update({owner:context.repo.owner,repo:context.repo.repo,issue_number:open.data[0].number,title,body});
+            } else {
+              await github.rest.issues.create({owner:context.repo.owner,repo:context.repo.repo,title,body,labels:["nastech-bot","upstream-diff"]});
+            }
