@@ -1,6 +1,6 @@
-﻿import 'package:Bloomee/core/models/lyrics_models.dart';
-import 'package:Bloomee/services/db/global_db.dart';
-import 'package:Bloomee/services/db/mappers/lyrics_mapper.dart';
+﻿import 'package:nasbeat/core/models/lyrics_models.dart';
+import 'package:nasbeat/services/db/global_db.dart';
+import 'package:nasbeat/services/db/mappers/lyrics_mapper.dart';
 import 'package:isar_community/isar.dart';
 
 /// DAO for cached lyrics. Uses [lyricsToLyricsDB] and [lyricsDBToLyrics]
