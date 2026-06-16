@@ -1,4 +1,4 @@
-import 'package:Bloomee/services/db/global_db.dart';
+import 'package:nasbeat/services/db/global_db.dart';
 import 'package:isar_community/isar.dart';
 
 /// DAO for settings (string & bool) persistence.
