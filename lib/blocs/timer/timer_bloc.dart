@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/utils/ticker.dart';
+import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/utils/ticker.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
