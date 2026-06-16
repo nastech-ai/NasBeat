@@ -1,10 +1,10 @@
 import 'dart:ui';
-import 'package:Bloomee/services/shortcut_indicator_service.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:nasbeat/services/shortcut_indicator_service.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:Bloomee/services/player/player_engine.dart';
+import 'package:nasbeat/services/player/player_engine.dart';
 
 class ShortcutIndicatorOverlay extends StatelessWidget {
   final Widget child;
