@@ -60,9 +60,8 @@ Future<Map<String, dynamic>> sourceforgeUpdate(
     // normalize unknowns to win for SourceForge naming
     platform = 'win';
   }
-  // SourceForge disabled for NasBeat — GitHub is the only release source
+  // SourceForge not used by NasBeat — GitHub releases are the only source
   throw Exception('SourceForge not used by NasBeat');
-  const url = 'https://sourceforge.net/projects/bloomee/best_release.json'; // dead
   final userAgent = {
     'win':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
