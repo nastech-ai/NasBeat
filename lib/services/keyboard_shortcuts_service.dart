@@ -1,21 +1,21 @@
 import 'dart:io' as io;
 import 'dart:async';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/blocs/player_overlay/player_overlay_cubit.dart';
-import 'package:Bloomee/screens/screen/home_views/timer_view.dart';
-import 'package:Bloomee/core/constants/sentinel_values.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/services/bloomee_player.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/shortcut_indicator_service.dart';
+import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/player_overlay/player_overlay_cubit.dart';
+import 'package:nasbeat/screens/screen/home_views/timer_view.dart';
+import 'package:nasbeat/core/constants/sentinel_values.dart';
+import 'package:nasbeat/screens/widgets/snackbar.dart';
+import 'package:nasbeat/services/bloomee_player.dart';
+import 'package:nasbeat/services/db/dao/playlist_dao.dart';
+import 'package:nasbeat/services/db/dao/track_dao.dart';
+import 'package:nasbeat/services/db/db_provider.dart';
+import 'package:nasbeat/services/shortcut_indicator_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/services/player/player_engine.dart';
-import 'package:Bloomee/routes/app_router.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:nasbeat/services/player/player_engine.dart';
+import 'package:nasbeat/routes/app_router.dart';
+import 'package:nasbeat/l10n/app_localizations.dart';
 
 class KeyboardShortcutsHandler extends StatefulWidget {
   final Widget child;
