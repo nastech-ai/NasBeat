@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart'; // compute()
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:nasbeat/src/rust/api/plugin/models.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Internal encode / decode helpers (private, sync, zero-allocation-friendly)
