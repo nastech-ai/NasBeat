@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Bloomee/services/meta_resolver/cross_plugin_resolver.dart';
+import 'package:nasbeat/services/meta_resolver/cross_plugin_resolver.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:Bloomee/core/di/service_locator.dart';
-import 'package:Bloomee/plugins/blocs/import/content_import_state.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
-import 'package:Bloomee/src/rust/api/plugin/types.dart';
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:nasbeat/core/di/service_locator.dart';
+import 'package:nasbeat/plugins/blocs/import/content_import_state.dart';
+import 'package:nasbeat/services/db/dao/playlist_dao.dart';
+import 'package:nasbeat/services/db/dao/track_dao.dart';
+import 'package:nasbeat/services/db/db_provider.dart';
+import 'package:nasbeat/services/plugin/plugin_service.dart';
+import 'package:nasbeat/src/rust/api/plugin/commands.dart';
+import 'package:nasbeat/src/rust/api/plugin/types.dart';
+import 'package:nasbeat/src/rust/api/plugin/models.dart';
 
 const int _kResolutionConcurrency = 5;
 const Duration _kPluginTimeout = Duration(seconds: 10);
