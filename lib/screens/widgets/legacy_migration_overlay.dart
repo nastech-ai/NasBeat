@@ -13,8 +13,8 @@ library;
 
 import 'dart:math' as math;
 
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/services/db/legacy/legacy_migration_service.dart'
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/services/db/legacy/legacy_migration_service.dart'
     as migration_service;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
