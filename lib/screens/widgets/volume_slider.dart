@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
