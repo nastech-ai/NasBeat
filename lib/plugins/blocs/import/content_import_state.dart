@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:nasbeat/src/rust/api/plugin/models.dart';
 
 enum ImportPhase {
   idle,
