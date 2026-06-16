@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/plugins/models/plugin_repository.dart';
-import 'package:Bloomee/plugins/services/plugin_repository_service.dart';
+import 'package:nasbeat/plugins/models/plugin_repository.dart';
+import 'package:nasbeat/plugins/services/plugin_repository_service.dart';
 
 abstract class PluginRepositoryState {}
 
