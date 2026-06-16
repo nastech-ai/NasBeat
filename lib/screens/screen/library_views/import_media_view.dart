@@ -1,21 +1,21 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:Bloomee/core/constants/route_paths.dart';
-import 'package:Bloomee/plugins/blocs/import/content_import_cubit.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_bloc.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_state.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/services/import_export_service.dart';
-import 'package:Bloomee/services/m3u_processor.dart';
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:nasbeat/core/constants/route_paths.dart';
+import 'package:nasbeat/plugins/blocs/import/content_import_cubit.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_bloc.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_state.dart';
+import 'package:nasbeat/screens/widgets/snackbar.dart';
+import 'package:nasbeat/services/import_export_service.dart';
+import 'package:nasbeat/services/m3u_processor.dart';
+import 'package:nasbeat/src/rust/api/plugin/models.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/l10n/app_localizations.dart';
 
 class ImportMediaFromPlatformsView extends StatefulWidget {
   const ImportMediaFromPlatformsView({super.key});
