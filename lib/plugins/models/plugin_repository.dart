@@ -1,4 +1,4 @@
-import 'package:Bloomee/utils/country_info.dart';
+import 'package:nasbeat/utils/country_info.dart';
 
 class RemotePluginModel {
   final String assetName;
