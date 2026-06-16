@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
 
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
+import 'package:nasbeat/core/constants/setting_keys.dart';
+import 'package:nasbeat/services/db/dao/settings_dao.dart';
 
 class PluginLoadStateService {
   final SettingsDAO _settingsDao;
