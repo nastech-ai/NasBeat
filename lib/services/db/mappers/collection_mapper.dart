@@ -1,6 +1,6 @@
-﻿import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/services/db/global_db.dart';
-import 'package:Bloomee/services/db/mappers/media_item_mapper.dart';
+﻿import 'package:nasbeat/core/models/exported.dart';
+import 'package:nasbeat/services/db/global_db.dart';
+import 'package:nasbeat/services/db/mappers/media_item_mapper.dart';
 
 /// Higher-level collection mappers: compose [ArtistSummary], [AlbumSummary],
 /// [PlaylistSummary] <-> [PlaylistDB].
