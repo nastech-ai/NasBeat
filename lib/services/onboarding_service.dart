@@ -1,5 +1,5 @@
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
+import 'package:nasbeat/core/constants/setting_keys.dart';
+import 'package:nasbeat/services/db/dao/settings_dao.dart';
 
 class OnboardingService {
   static bool _onboardingDone = false;
