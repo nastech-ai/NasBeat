@@ -1,25 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:Bloomee/core/di/service_locator.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_bloc.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_event.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_state.dart';
-import 'package:Bloomee/screens/widgets/animated_list_item.dart';
-import 'package:Bloomee/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
-import 'package:Bloomee/screens/widgets/sign_board_widget.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/src/rust/api/plugin/manifest.dart';
-import 'package:Bloomee/src/rust/api/plugin/plugin_info.dart';
-import 'package:Bloomee/src/rust/api/plugin/types.dart';
+import 'package:nasbeat/core/di/service_locator.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_bloc.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_event.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_state.dart';
+import 'package:nasbeat/screens/widgets/animated_list_item.dart';
+import 'package:nasbeat/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:nasbeat/screens/widgets/sign_board_widget.dart';
+import 'package:nasbeat/screens/widgets/snackbar.dart';
+import 'package:nasbeat/src/rust/api/plugin/manifest.dart';
+import 'package:nasbeat/src/rust/api/plugin/plugin_info.dart';
+import 'package:nasbeat/src/rust/api/plugin/types.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:nasbeat/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:Bloomee/screens/screen/home_views/plugin_repository_view.dart';
-import 'package:Bloomee/plugins/blocs/repository/plugin_repository_cubit.dart';
-import 'package:Bloomee/plugins/utils/plugin_constants.dart';
+import 'package:nasbeat/screens/screen/home_views/plugin_repository_view.dart';
+import 'package:nasbeat/plugins/blocs/repository/plugin_repository_cubit.dart';
+import 'package:nasbeat/plugins/utils/plugin_constants.dart';
 
 class PluginManagerScreen extends StatefulWidget {
   const PluginManagerScreen({super.key});
