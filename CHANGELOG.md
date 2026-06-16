@@ -1,4 +1,73 @@
 
+## v3.0.4+94  2026-06-16
+
+f938d78 ci: auto-publish changelog to ghpage on v* tags
+1bef656 ci: NasTech master weekly summary bot
+1305969 ci: NasTech upstream features diff bot
+462c380 ci: add NasTech dependency health bot
+1a92bbb ci: add NasTech build health bot
+4acea76 ci: add NasTech branding verifier bot
+b0c3767 feat: add theme selector with AMOLED black to App UI settings
+39aae51 feat: add nastech_tree.png to flutter assets
+35b2de2 fix: replace all Bloomee strings with NasBeat in en.arb
+6b5d281 fix: rebrand about page — NasBeat branding, tree logo, NasTech links
+3c4d4fd fix: wire update checker to nastech-ai/NasBeat releases
+15f37d6 feat: add NasTech tree logo asset
+7e12511 fix(ci): replace invalid job-level secrets condition with env-var pattern
+4067bc6 ci: pin Windows runner to windows-2022 to fix CMake VS generator error
+3fab618 feat(ci): tag-trigger + Google Play upload job + Issue Templates
+faf748a fix(ci): bulletproof Android signing — continue-on-error + single env var
+d70dc42 fix(ci): pass all secrets via env vars — never interpolate into PowerShell
+abeb980 fix(ci): make Android signing gracefully optional — never blocks Windows/build
+b6b00a3 fix(android): resolve "Tag number over 30" keystore signing failure
+55523f7 Bump the npm_and_yarn group across 1 directory with 5 updates
+
+## v3.0.4+93  2026-06-16
+
+f938d78 ci: auto-publish changelog to ghpage on v* tags
+1bef656 ci: NasTech master weekly summary bot
+1305969 ci: NasTech upstream features diff bot
+462c380 ci: add NasTech dependency health bot
+1a92bbb ci: add NasTech build health bot
+4acea76 ci: add NasTech branding verifier bot
+b0c3767 feat: add theme selector with AMOLED black to App UI settings
+
+## v3.0.4+11  2026-06-16
+
+39aae51 feat: add nastech_tree.png to flutter assets
+35b2de2 fix: replace all Bloomee strings with NasBeat in en.arb
+6b5d281 fix: rebrand about page — NasBeat branding, tree logo, NasTech links
+3c4d4fd fix: wire update checker to nastech-ai/NasBeat releases
+15f37d6 feat: add NasTech tree logo asset
+
+## v3.0.4+12  2026-06-16
+
+
+
+## v3.0.4+13  2026-06-16
+
+
+
+## v3.0.4+14  2026-06-16
+
+
+
+## v3.0.4+15  2026-06-16
+
+
+
+## v3.0.4+16  2026-06-16
+
+
+
+## v3.0.4+17  2026-06-16
+
+
+
+## v3.0.4+18  2026-06-16
+
+
+
 ## [3.0.4] - 2026-05-29
 
 ### Fixed
