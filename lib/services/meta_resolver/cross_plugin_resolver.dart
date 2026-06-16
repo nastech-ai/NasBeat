@@ -19,9 +19,9 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
 
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:nasbeat/services/plugin/plugin_service.dart';
+import 'package:nasbeat/src/rust/api/plugin/commands.dart';
+import 'package:nasbeat/src/rust/api/plugin/models.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart' as fw;
 
 // ══════════════════════════════════════════════════════════════════════════════
