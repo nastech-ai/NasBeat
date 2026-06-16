@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:Bloomee/core/models/exported.dart';
+import 'package:nasbeat/core/models/exported.dart';
 
 /// State for [ChartBloc].
 ///
