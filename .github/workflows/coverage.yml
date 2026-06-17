@@ -1,0 +1,49 @@
+name: Coverage Upload
+
+on:
+  push:
+    branches: [ main, SmartBot ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FLUTTER_VERSION: "3.35.4"
+
+jobs:
+  upload-coverage:
+    name: Collect and upload coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Run tests (collect coverage)
+        run: |
+          flutter pub get
+          flutter test --coverage || true
+
+      - name: Upload to Codecov (skipped if no token)
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
+          flags: flutter
+          name: nasbeat-coverage
+        continue-on-error: true
+
+      - name: Coverage summary
+        run: |
+          if [ -f coverage/lcov.info ]; then
+            LINES=$(grep -c "^DA:" coverage/lcov.info || echo "0")
+            HIT=$(grep -c "^DA:.*,[^0]" coverage/lcov.info || echo "0")
+            echo "### 📊 Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "- Lines instrumented: **$LINES**" >> $GITHUB_STEP_SUMMARY
+            echo "- Lines hit: **$HIT**" >> $GITHUB_STEP_SUMMARY
+          fi

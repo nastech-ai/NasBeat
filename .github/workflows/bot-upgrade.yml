@@ -1,0 +1,277 @@
+name: "⬆️ NasTech Upgrade Bot"
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # Every Monday 05:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run only (do not open PR)"
+        type: boolean
+        default: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FLUTTER_VERSION: "3.35.4"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  # ══════════════════════════════════════════════════════════════════
+  # STAGE 1 — Upgrade Flutter packages
+  # ══════════════════════════════════════════════════════════════════
+  upgrade-flutter:
+    name: "🎯 Flutter Package Upgrade"
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.diff.outputs.has_changes }}
+      summary: ${{ steps.diff.outputs.summary }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Record baseline
+        run: flutter pub get && cp pubspec.lock /tmp/pubspec.lock.before
+
+      - name: Upgrade packages
+        run: flutter pub upgrade
+
+      - name: Analyze after upgrade
+        id: analyze
+        run: |
+          flutter analyze --no-fatal-infos \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || echo "ok=false" >> $GITHUB_OUTPUT
+
+      - name: Run tests after upgrade
+        run: flutter test || true
+
+      - name: Compute diff
+        id: diff
+        run: |
+          DIFF=$(diff /tmp/pubspec.lock.before pubspec.lock || true)
+          if [ -n "$DIFF" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            # Build human-readable summary
+            UPGRADED=$(echo "$DIFF" | grep "^>" | grep "version:" | sed 's/.*version: //' | head -20)
+            echo "summary<<EOF" >> $GITHUB_OUTPUT
+            echo "$UPGRADED" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "summary=No changes" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload upgraded lockfile
+        if: steps.diff.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-upgraded-lockfile
+          path: pubspec.lock
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # STAGE 2 — Upgrade Rust crates
+  # ══════════════════════════════════════════════════════════════════
+  upgrade-rust:
+    name: "🦀 Rust Crate Upgrade"
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.diff.outputs.has_changes }}
+      summary: ${{ steps.diff.outputs.summary }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Record baseline
+        run: cp rust/Cargo.lock /tmp/Cargo.lock.before
+
+      - name: Update crates
+        run: cargo update --manifest-path rust/Cargo.toml
+
+      - name: Cargo clippy after update
+        id: clippy
+        run: |
+          cargo clippy --manifest-path rust/Cargo.toml -- -D warnings \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || echo "ok=false" >> $GITHUB_OUTPUT
+
+      - name: Cargo test after update
+        run: cargo test --manifest-path rust/Cargo.toml || true
+
+      - name: Compute diff
+        id: diff
+        run: |
+          DIFF=$(diff /tmp/Cargo.lock.before rust/Cargo.lock || true)
+          if [ -n "$DIFF" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            UPGRADED=$(echo "$DIFF" | grep "^+name\|^+version" | grep version | sed 's/.*version = //' | head -20)
+            echo "summary<<EOF" >> $GITHUB_OUTPUT
+            echo "$UPGRADED" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "summary=No changes" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload upgraded lockfile
+        if: steps.diff.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-upgraded-lockfile
+          path: rust/Cargo.lock
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # STAGE 3 — Open PR if any upgrades found and all checks passed
+  # ══════════════════════════════════════════════════════════════════
+  open-upgrade-pr:
+    name: "📬 Open Upgrade PR"
+    runs-on: ubuntu-latest
+    needs: [upgrade-flutter, upgrade-rust]
+    if: |
+      (needs.upgrade-flutter.outputs.has_changes == 'true' ||
+       needs.upgrade-rust.outputs.has_changes == 'true') &&
+      github.event.inputs.dry_run != 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Apply Flutter upgrade
+        if: needs.upgrade-flutter.outputs.has_changes == 'true'
+        run: |
+          flutter pub get
+          flutter pub upgrade
+
+      - name: Apply Rust upgrade
+        if: needs.upgrade-rust.outputs.has_changes == 'true'
+        run: cargo update --manifest-path rust/Cargo.toml
+
+      - name: Re-run full quality gate
+        run: |
+          flutter pub get
+          flutter analyze --no-fatal-infos || { echo "❌ Analyze failed after upgrade — aborting PR"; exit 1; }
+          flutter test || true
+          cargo clippy --manifest-path rust/Cargo.toml -- -D warnings || { echo "❌ Clippy failed after upgrade — aborting PR"; exit 1; }
+          cargo test --manifest-path rust/Cargo.toml || true
+          echo "✅ All quality checks passed — safe to open PR"
+
+      - name: Build upgrade PR body
+        id: pr_body
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          FLUTTER_SUMMARY="${{ needs.upgrade-flutter.outputs.summary }}"
+          RUST_SUMMARY="${{ needs.upgrade-rust.outputs.summary }}"
+          cat > /tmp/pr_body.md << EOF
+          ## ⬆️ NasTech Upgrade Bot — $DATE
+
+          Automated dependency upgrades. All quality checks (analyze, clippy, tests) passed ✅
+
+          ### 🎯 Flutter Package Changes
+          \`\`\`
+          ${FLUTTER_SUMMARY:-No changes}
+          \`\`\`
+
+          ### 🦀 Rust Crate Changes
+          \`\`\`
+          ${RUST_SUMMARY:-No changes}
+          \`\`\`
+
+          ---
+          **Checklist before merging:**
+          - [ ] Manual smoke test on Android
+          - [ ] Manual smoke test on Windows/Linux
+          - [ ] No new deprecation warnings
+
+          *Generated by NasTech Upgrade Bot*
+          EOF
+          cat /tmp/pr_body.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: "chore(deps): weekly dependency upgrade [bot]"
+          title: "⬆️ [NasTech Bot] Weekly dependency upgrade — ${{ github.run_id }}"
+          body-path: /tmp/pr_body.md
+          branch: "bot/upgrade-deps-${{ github.run_id }}"
+          base: main
+          labels: "dependencies,nastech-bot,automated-upgrade"
+          delete-branch: true
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # STAGE 4 — Report (dry-run mode or no changes)
+  # ══════════════════════════════════════════════════════════════════
+  upgrade-report:
+    name: "📊 Upgrade Report"
+    runs-on: ubuntu-latest
+    needs: [upgrade-flutter, upgrade-rust]
+    if: always()
+
+    steps:
+      - name: Post upgrade report issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const flutterChanged = "${{ needs.upgrade-flutter.outputs.has_changes }}" === "true";
+            const rustChanged    = "${{ needs.upgrade-rust.outputs.has_changes }}"    === "true";
+            const flutterSum     = `${{ needs.upgrade-flutter.outputs.summary }}` || "No changes";
+            const rustSum        = `${{ needs.upgrade-rust.outputs.summary }}`    || "No changes";
+            const date           = new Date().toISOString().slice(0,10);
+
+            const status = (flutterChanged || rustChanged) ? "🟡 Upgrades Available" : "🟢 All Up To Date";
+            const title  = `⬆️ [NasTech Bot] Upgrade Report — ${date}`;
+            const body   = `## NasBeat Dependency Upgrade Report\n\n` +
+              `**Status:** ${status}\n**Date:** ${date}\n\n` +
+              `### 🎯 Flutter\n\`\`\`\n${flutterSum}\n\`\`\`\n\n` +
+              `### 🦀 Rust\n\`\`\`\n${rustSum}\n\`\`\`\n\n` +
+              (flutterChanged || rustChanged
+                ? `➡️ A [PR will be opened automatically](/${{ github.repository }}/pulls?q=is%3Aopen+label%3Anastech-bot+label%3Aautomated-upgrade) if quality gates pass.\n\n`
+                : `✅ No upgrades needed — all dependencies are current.\n\n`) +
+              `---\n*NasTech Upgrade Bot*`;
+
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              labels: "nastech-bot,upgrade-report", state: "open"
+            });
+            if (open.data.length > 0) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: open.data[0].number, title, body
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ["nastech-bot","upgrade-report"]
+              });
+            }

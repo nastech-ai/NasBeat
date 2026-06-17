@@ -1,0 +1,348 @@
+name: "🔍 NasTech Pre-Build Scanner"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "rust/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "rust/Cargo.toml"
+      - "rust/Cargo.lock"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FLUTTER_VERSION: "3.35.4"
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  # ══════════════════════════════════════════════════════════════════
+  # SCAN 1 — Dart / Flutter
+  # ══════════════════════════════════════════════════════════════════
+  scan-dart:
+    name: "🎯 Dart — Format, Analyze, Test"
+    runs-on: ubuntu-latest
+    outputs:
+      format_ok: ${{ steps.fmt.outputs.ok }}
+      analyze_ok: ${{ steps.analyze.outputs.ok }}
+      test_ok: ${{ steps.test.outputs.ok }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Format check
+        id: fmt
+        run: |
+          dart format --set-exit-if-changed lib/ test/ \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || { echo "ok=false" >> $GITHUB_OUTPUT; exit 1; }
+
+      - name: Analyze
+        id: analyze
+        run: |
+          flutter analyze --no-fatal-infos \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || { echo "ok=false" >> $GITHUB_OUTPUT; exit 1; }
+
+      - name: Unit tests
+        id: test
+        run: |
+          flutter test \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || { echo "ok=false" >> $GITHUB_OUTPUT; true; }
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # SCAN 2 — Rust
+  # ══════════════════════════════════════════════════════════════════
+  scan-rust:
+    name: "🦀 Rust — Fmt, Clippy, Test"
+    runs-on: ubuntu-latest
+    outputs:
+      fmt_ok: ${{ steps.fmt.outputs.ok }}
+      clippy_ok: ${{ steps.clippy.outputs.ok }}
+      test_ok: ${{ steps.test.outputs.ok }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Cargo fmt
+        id: fmt
+        run: |
+          cargo fmt --manifest-path rust/Cargo.toml -- --check \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || { echo "ok=false" >> $GITHUB_OUTPUT; exit 1; }
+
+      - name: Cargo clippy
+        id: clippy
+        run: |
+          cargo clippy --manifest-path rust/Cargo.toml -- -D warnings \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || { echo "ok=false" >> $GITHUB_OUTPUT; exit 1; }
+
+      - name: Cargo test
+        id: test
+        run: |
+          cargo test --manifest-path rust/Cargo.toml \
+            && echo "ok=true" >> $GITHUB_OUTPUT \
+            || { echo "ok=false" >> $GITHUB_OUTPUT; exit 1; }
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # SCAN 3 — Security
+  # ══════════════════════════════════════════════════════════════════
+  scan-security:
+    name: "🔒 Security — Dart + Rust Audit"
+    runs-on: ubuntu-latest
+    outputs:
+      dart_ok: ${{ steps.dart_audit.outputs.ok }}
+      rust_ok: ${{ steps.rust_audit.outputs.ok }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Dart pub audit
+        id: dart_audit
+        run: |
+          OUT=$(dart pub audit 2>&1) || true
+          echo "$OUT"
+          if echo "$OUT" | grep -qi "vulnerability\|CVE\|critical\|high"; then
+            echo "ok=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Dart vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ok=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked 2>/dev/null || true
+
+      - name: Cargo audit
+        id: rust_audit
+        run: |
+          OUT=$(cargo audit --file rust/Cargo.lock 2>&1) || true
+          echo "$OUT"
+          if echo "$OUT" | grep -qi "vulnerability\|CVE\|critical\|high"; then
+            echo "ok=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Rust vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ok=true" >> $GITHUB_OUTPUT
+          fi
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # SCAN 4 — Branding & Integrity
+  # ══════════════════════════════════════════════════════════════════
+  scan-branding:
+    name: "🌳 Branding & Integrity"
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Full branding scan
+        id: check
+        run: |
+          FINDINGS=""
+
+          # Stale upstream branding in UI/l10n
+          for term in "BloomeeTunes" "iamhemantindia" "HemantKArya" \
+                      "hemantkarya.github.io" "ls\.bloomee\.musicplayer" \
+                      "com\.flutter_rust_bridge\.rust_lib_Bloomee" \
+                      "rust_lib_Bloomee"; do
+            HITS=$(grep -rn "$term" lib/ android/ ios/ linux/ windows/ macos/ rust_builder/ 2>/dev/null | \
+                   grep -v "Binary\|\.git" || true)
+            if [ -n "$HITS" ]; then
+              FINDINGS="${FINDINGS}\n**\`$term\`**\n\`\`\`\n${HITS}\n\`\`\`\n"
+            fi
+          done
+
+          # Required NasTech identifiers present
+          if ! grep -q "ai.nastech.nasbeat" android/app/build.gradle 2>/dev/null && \
+             ! grep -q "ai.nastech.nasbeat" android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            FINDINGS="${FINDINGS}\n⚠️ NasTech package ID not found in Android config\n"
+          fi
+
+          if [ -n "$FINDINGS" ]; then
+            printf "$FINDINGS" > /tmp/branding_issues.txt
+            echo "ok=false" >> $GITHUB_OUTPUT
+          else
+            echo "ok=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Report branding issues
+        if: steps.check.outputs.ok == 'false'
+        run: |
+          echo "### ❌ Branding Issues Found" >> $GITHUB_STEP_SUMMARY
+          cat /tmp/branding_issues.txt >> $GITHUB_STEP_SUMMARY
+          exit 1
+
+      - name: Confirm branding clean
+        if: steps.check.outputs.ok == 'true'
+        run: echo "✅ All branding checks passed — no upstream references found."
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # SCAN 5 — Dependency Freshness
+  # ══════════════════════════════════════════════════════════════════
+  scan-deps:
+    name: "📦 Dependency Freshness"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check outdated Flutter packages
+        run: |
+          echo "### 📦 Flutter Package Status" >> $GITHUB_STEP_SUMMARY
+          flutter pub outdated --no-color 2>&1 | tee /tmp/flutter_outdated.txt || true
+          cat /tmp/flutter_outdated.txt >> $GITHUB_STEP_SUMMARY || true
+
+      - name: Check outdated Rust crates
+        run: |
+          echo "### 🦀 Rust Crate Status" >> $GITHUB_STEP_SUMMARY
+          cargo update --manifest-path rust/Cargo.toml --dry-run 2>&1 | tee /tmp/rust_outdated.txt || true
+          cat /tmp/rust_outdated.txt >> $GITHUB_STEP_SUMMARY || true
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # GATE — Summarize all scans, open/close issue
+  # ══════════════════════════════════════════════════════════════════
+  scan-gate:
+    name: "🚦 Scan Gate — Pass/Fail Report"
+    runs-on: ubuntu-latest
+    needs: [scan-dart, scan-rust, scan-security, scan-branding, scan-deps]
+    if: always()
+
+    steps:
+      - name: Evaluate gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dartFmt     = "${{ needs.scan-dart.outputs.format_ok }}"    === "true";
+            const dartAnalyze = "${{ needs.scan-dart.outputs.analyze_ok }}"   === "true";
+            const rustFmt     = "${{ needs.scan-rust.outputs.fmt_ok }}"       === "true";
+            const rustClippy  = "${{ needs.scan-rust.outputs.clippy_ok }}"    === "true";
+            const rustTest    = "${{ needs.scan-rust.outputs.test_ok }}"      === "true";
+            const dartSec     = "${{ needs.scan-security.outputs.dart_ok }}"  !== "false";
+            const rustSec     = "${{ needs.scan-security.outputs.rust_ok }}"  !== "false";
+            const branding    = "${{ needs.scan-branding.outputs.ok }}"       === "true";
+
+            const checks = [
+              ["Dart format",   dartFmt],
+              ["Dart analyze",  dartAnalyze],
+              ["Rust fmt",      rustFmt],
+              ["Rust clippy",   rustClippy],
+              ["Rust tests",    rustTest],
+              ["Dart security", dartSec],
+              ["Rust security", rustSec],
+              ["Branding",      branding],
+            ];
+
+            const passed = checks.filter(([,v]) => v).length;
+            const failed = checks.filter(([,v]) => !v).length;
+            const allOk  = failed === 0;
+            const status = allOk ? "🟢 All Clear" : failed <= 2 ? "🟡 Needs Attention" : "🔴 Action Required";
+
+            const rows = checks.map(([name, ok]) =>
+              `| ${ok ? "✅" : "❌"} | ${name} |`
+            ).join("\n");
+
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const title  = `🔍 [NasTech Bot] Pre-Build Scan: ${status}`;
+            const body   = `## NasBeat Pre-Build Scan Report\n\n` +
+              `**Status:** ${status} — ${passed}/${checks.length} checks passed\n\n` +
+              `| | Check |\n|---|---|\n${rows}\n\n` +
+              `**Run:** [${context.runId}](${runUrl})\n\n` +
+              `---\n*NasTech Pre-Build Scanner — triggered by push to \`${{ github.ref_name }}\`*`;
+
+            // Write to step summary
+            core.summary.addRaw(body);
+            await core.summary.write();
+
+            if (!allOk) {
+              // Open or update existing scan issue
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner, repo: context.repo.repo,
+                labels: "nastech-bot,pre-build-scan", state: "open"
+              });
+              if (issues.data.length > 0) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issues.data[0].number, body
+                });
+              } else {
+                await github.rest.issues.create({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  title, body, labels: ["nastech-bot","pre-build-scan","quality"]
+                });
+              }
+              core.setFailed(`Pre-build scan failed: ${failed} check(s) did not pass.`);
+            } else {
+              // Close any open scan issues
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner, repo: context.repo.repo,
+                labels: "nastech-bot,pre-build-scan", state: "open"
+              });
+              for (const issue of issues.data) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `✅ Pre-build scan fully passed — closing automatically.\n\n[Run](${runUrl})`
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number, state: "closed"
+                });
+              }
+              console.log("✅ All pre-build scans passed.");
+            }

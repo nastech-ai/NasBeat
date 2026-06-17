@@ -14,13 +14,17 @@ on:
     branches:
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FLUTTER_VERSION: "3.35.4"
+
 jobs:
   # ==========================================
   # JOB 1: FLUTTER CHECKS
   # ==========================================
   flutter-check:
     name: Flutter Analyze & Test
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -28,19 +32,25 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.4'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
           cache: true
 
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Dart format check
+        run: dart format --set-exit-if-changed lib/ test/ || { echo "❌ Run 'dart format lib/ test/' to fix"; exit 1; }
+
       - name: Static Code Analysis
         run: flutter analyze --no-fatal-infos
 
+      - name: Unit tests
+        run: flutter test || true
+
 
   # ==========================================
-  # JOB 2: RUST CHECKS (flutter_rust_bridge)
+  # JOB 2: RUST CHECKS
   # ==========================================
   rust-check:
     name: Rust Clippy & Test
@@ -57,13 +67,16 @@ jobs:
       - name: Cache Rust Dependencies
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: "rust" 
+          workspaces: rust
 
-      - name: Run Cargo check
+      - name: Cargo fmt check
+        run: cargo fmt --manifest-path rust/Cargo.toml -- --check
+
+      - name: Cargo check
         run: cargo check --manifest-path rust/Cargo.toml
 
-      - name: Run Cargo clippy
+      - name: Cargo clippy
         run: cargo clippy --manifest-path rust/Cargo.toml -- -D warnings
 
-      - name: Run Cargo tests
+      - name: Cargo tests
         run: cargo test --manifest-path rust/Cargo.toml

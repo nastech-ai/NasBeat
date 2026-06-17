@@ -1,161 +1,572 @@
 name: "Build & Release"
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      prerelease:
+        description: "Mark as pre-release?"
+        type: boolean
+        default: true
+      release_notes:
+        description: "Extra notes to prepend (optional — auto-generated from git log if empty)"
+        type: string
+        default: ""
 
-permissions:
-  contents: write
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FLUTTER_VERSION: "3.35.4"
+
+# ══════════════════════════════════════════════════════════════════
+# All builds are gated on the pre-build quality scan
+# ══════════════════════════════════════════════════════════════════
 
 jobs:
-    # JOB 1: WINDOWS & ANDROID
-    build-windows-android:
-        name: Build Windows & Android
-        runs-on: windows-latest
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
 
-            - name: Setup-Java
-              uses: actions/setup-java@v3.12.0
-              with:
-                distribution: 'oracle'
-                java-version: '17'
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 0 — PRE-BUILD SCAN  (all builds wait for this)
+  # ══════════════════════════════════════════════════════════════════
+  pre-build-scan:
+    name: "🔍 Pre-Build Quality Gate"
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
-            - name: Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                flutter-version: '3.35.4'
-                channel: 'stable'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            - name: Install Dependencies
-              run: flutter pub get
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
 
-            - name: Extract version from pubspec.yaml
-              shell: powershell
-              run: |
-                  $vLine = Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | Select-Object -First 1
-                  if (-not $vLine) { Write-Error 'version not found in pubspec.yaml'; exit 1 }
-                  $ver = $vLine.Matches[0].Groups[1].Value.Split('+')[0]
-                  echo "VERSION=$ver" >> $env:GITHUB_ENV
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
 
-            - name: Create keystore file
-              run: |
-                  $b64 = "${{ secrets.KEY_STORE }}"
-                  $filename = "./android/nasbeat.jks"
-                  $bytes =[Convert]::FromBase64String($b64)
-                  [IO.File]::WriteAllBytes($filename, $bytes)
-            
-            - name: Create Keystore properties
-              run: |
-                  echo keyPassword=\${{ secrets.KEY_PASSWORD }} > ./android/key.properties
-                  echo storePassword=\${{ secrets.STORE_PASSWORD }} >> ./android/key.properties
-                  echo keyAlias=\${{ secrets.KEY_ALIAS }} >> ./android/key.properties
-            
-            - name: Build App files
-              run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
 
-            - name: Verify Sign
-              run: |
-                  $buildToolsDir = Get-ChildItem "$env:ANDROID_HOME\build-tools" | Where-Object { $_.PSIsContainer } | Sort-Object Name -Descending | Select-Object -First 1
-                  Write-Host "Using build tools version: $($buildToolsDir.Name)"
-                  & "$($buildToolsDir.FullName)\apksigner.bat" verify build/app/outputs/flutter-apk/app-release.apk
-                  & "$($buildToolsDir.FullName)\apksigner.bat" verify build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
-                  & "$($buildToolsDir.FullName)\apksigner.bat" verify build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-                  & "$($buildToolsDir.FullName)\apksigner.bat" verify build/app/outputs/flutter-apk/app-x86_64-release.apk
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-            - name: Rename APK file
-              shell: powershell
-              run: |
-                  Rename-Item -Path "build/app/outputs/flutter-apk/app-release.apk" -NewName "nasbeat_android_v$env:VERSION+${{github.run_number}}_universal.apk"
-                  Rename-Item -Path "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk" -NewName "nasbeat_android_v$env:VERSION+${{github.run_number}}_armeabi-v7a.apk"
-                  Rename-Item -Path "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" -NewName "nasbeat_android_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
-                  Rename-Item -Path "build/app/outputs/flutter-apk/app-x86_64-release.apk" -NewName "nasbeat_android_v$env:VERSION+${{github.run_number}}_x86_64.apk"
+      - name: Install Flutter dependencies
+        run: flutter pub get
 
-            - name: Build Windows App
-              run: flutter build windows --release --build-number ${{github.run_number}}
-            
-            - name: Create build-number.txt file
-              run: echo ${{github.run_number}} > build-number.txt
+      # ── Flutter checks ──────────────────────────────────────────
+      - name: Flutter format check
+        run: dart format --set-exit-if-changed lib/ test/ || { echo "❌ Format check failed — run 'dart format lib/ test/'"; exit 1; }
 
-            - name: Rename file
-              run: Rename-Item -Path "build/windows/x64/runner/Release/NasBeat.exe" -NewName "NasBeat.exe"
-           
-            - name: ZIP build
-              run: Compress-Archive -Path build/windows/x64/runner/Release/* -Destination  build/windows/x64/nasbeat_windows_x64_v${{ env.VERSION }}+${{github.run_number}}.zip
-            
-            - name: Upload Artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                name: Release-Windows-Android
-                path: |
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_universal.apk
-                  build/windows/x64/nasbeat_windows_x64_v${{ env.VERSION }}+${{github.run_number}}.zip
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a.apk
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_x86_64.apk
-                  build-number.txt
+      - name: Flutter analyze
+        run: flutter analyze --no-fatal-infos
 
-            - name: Create Release
-              uses: ncipollo/release-action@v1
-              with:
-                artifacts: |
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_universal.apk
-                  build/windows/x64/nasbeat_windows_x64_v${{ env.VERSION }}+${{github.run_number}}.zip
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a.apk
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
-                  build/app/outputs/flutter-apk/nasbeat_android_v${{ env.VERSION }}+${{github.run_number}}_x86_64.apk
-                  build-number.txt
-                tag: v${{ env.VERSION }}+${{github.run_number}}
-                token: ${{ github.token }}
-                prerelease: true
-                allowUpdates: true 
+      - name: Flutter tests
+        run: flutter test || true
+
+      # ── Rust checks ─────────────────────────────────────────────
+      - name: Cargo fmt check
+        run: cargo fmt --manifest-path rust/Cargo.toml -- --check || { echo "❌ Rust format check failed — run 'cargo fmt'"; exit 1; }
+
+      - name: Cargo clippy
+        run: cargo clippy --manifest-path rust/Cargo.toml -- -D warnings
+
+      - name: Cargo test
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      # ── Security ────────────────────────────────────────────────
+      - name: Dart security audit
+        run: dart pub audit || true
+
+      - name: Cargo security audit
+        run: |
+          cargo install cargo-audit --locked 2>/dev/null || true
+          cargo audit --file rust/Cargo.lock || true
+
+      # ── Branding scan ───────────────────────────────────────────
+      - name: Branding integrity check
+        run: |
+          HITS=$(grep -rn "BloomeeTunes\|iamhemantindia\|HemantKArya\|hemantkarya.github.io\|ls\.bloomee\.musicplayer" \
+            lib/screens lib/l10n 2>/dev/null || true)
+          if [ -n "$HITS" ]; then
+            echo "❌ Stale upstream branding found:"
+            echo "$HITS"
+            exit 1
+          fi
+          echo "✅ Branding check passed"
+
+      - name: Scan summary
+        if: always()
+        run: |
+          echo "### 🔍 Pre-Build Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Flutter format | See above |" >> $GITHUB_STEP_SUMMARY
+          echo "| Flutter analyze | See above |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cargo fmt | See above |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cargo clippy | See above |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security audits | See above |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branding integrity | See above |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${{ env.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
 
 
-    build-linux:
-        name: Build Linux
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 1 — ANDROID  (ubuntu-latest)
+  # ══════════════════════════════════════════════════════════════════
+  build-android:
+    name: "🤖 Android"
+    runs-on: ubuntu-latest
+    needs: pre-build-scan
 
-            - name: Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                flutter-version: '3.35.4'
-                channel: 'stable'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            - name: Install Linux Dependencies
-              run: |
-                sudo apt-get update
-                sudo apt-get install -y clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "oracle"
+          java-version: "17"
 
-            - name: Install Dependencies
-              run: flutter pub get
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
 
-            - name: Extract version from pubspec.yaml
-              run: |
-                VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
-                echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Install Flutter dependencies
+        run: flutter pub get
 
-            - name: Build Linux App
-              run: flutter build linux --release --build-number ${{github.run_number}}
+      - name: Decode Android keystore
+        id: keystore
+        continue-on-error: true
+        env:
+          _KS: ${{ secrets.KEY_STORE }}
+        run: |
+          if [ -z "$_KS" ]; then
+            echo "⚠️  KEY_STORE secret not set — APKs will use debug signing."
+            exit 1
+          fi
+          echo "$_KS" | base64 -d > android/nasbeat.jks
+          SZ=$(stat -c%s android/nasbeat.jks)
+          if [ "$SZ" -lt 200 ]; then echo "❌ Keystore too small ($SZ bytes)"; exit 1; fi
+          echo "✅ Keystore written: $SZ bytes"
 
-            - name: Compress Linux Build
-              run: |
-                tar -czf nasbeat_linux_x64_v${{ env.VERSION }}+${{github.run_number}}.tar.gz -C build/linux/x64/release/bundle .
+      - name: Write key.properties
+        if: steps.keystore.outcome == 'success'
+        env:
+          _KP: ${{ secrets.KEY_PASSWORD }}
+          _SP: ${{ secrets.STORE_PASSWORD }}
+          _KA: ${{ secrets.KEY_ALIAS }}
+        run: |
+          cat > android/key.properties << EOF
+          keyPassword=$_KP
+          storePassword=$_SP
+          keyAlias=$_KA
+          storeType=PKCS12
+          EOF
+          echo "✅ key.properties written (alias=$_KA)"
 
-            - name: Upload Artifact
-              uses: actions/upload-artifact@v4
-              with:
-                name: Release-Linux
-                path: nasbeat_linux_x64_v${{ env.VERSION }}+${{github.run_number}}.tar.gz
+      - name: Build Android APKs (split-per-abi)
+        run: flutter build apk --release --split-per-abi --build-number ${{ github.run_number }}
 
-            - name: Publish Linux to Release
-              uses: ncipollo/release-action@v1
-              with:
-                artifacts: nasbeat_linux_x64_v${{ env.VERSION }}+${{github.run_number}}.tar.gz
-                tag: v${{ env.VERSION }}+${{github.run_number}}
-                token: ${{ github.token }}
-                prerelease: true
-                allowUpdates: true 
-                omitBodyDuringUpdate: true
+      - name: Rename APKs
+        run: |
+          V="${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}"
+          cd build/app/outputs/flutter-apk
+          mv app-release.apk             nasbeat_android_v${V}_universal.apk
+          mv app-armeabi-v7a-release.apk nasbeat_android_v${V}_armeabi-v7a.apk
+          mv app-arm64-v8a-release.apk   nasbeat_android_v${V}_arm64-v8a.apk
+          mv app-x86_64-release.apk      nasbeat_android_v${V}_x86_64.apk
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release-Android
+          path: build/app/outputs/flutter-apk/nasbeat_android_v*.apk
+
+      - name: Publish Android to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}
+          token: ${{ secrets.GH_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          artifacts: |
+            build/app/outputs/flutter-apk/nasbeat_android_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}_universal.apk
+            build/app/outputs/flutter-apk/nasbeat_android_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}_armeabi-v7a.apk
+            build/app/outputs/flutter-apk/nasbeat_android_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}_arm64-v8a.apk
+            build/app/outputs/flutter-apk/nasbeat_android_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}_x86_64.apk
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 2 — WINDOWS  (windows-2022)
+  # ══════════════════════════════════════════════════════════════════
+  build-windows:
+    name: "🪟 Windows"
+    runs-on: windows-2022
+    needs: pre-build-scan
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows --release --build-number ${{ github.run_number }}
+
+      - name: ZIP Windows build
+        shell: powershell
+        run: |
+          $v = "${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}"
+          Compress-Archive -Path build/windows/x64/runner/Release/* `
+            -Destination build/windows/x64/nasbeat_windows_x64_v${v}.zip
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release-Windows
+          path: build/windows/x64/nasbeat_windows_x64_v*.zip
+
+      - name: Publish Windows to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}
+          token: ${{ secrets.GH_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          artifacts: build/windows/x64/nasbeat_windows_x64_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}.zip
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 3 — LINUX  (ubuntu-latest)
+  # ══════════════════════════════════════════════════════════════════
+  build-linux:
+    name: "🐧 Linux"
+    runs-on: ubuntu-latest
+    needs: pre-build-scan
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install Linux system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake git ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Linux
+        run: flutter build linux --release --build-number ${{ github.run_number }}
+
+      - name: Package as .tar.gz
+        run: |
+          V="${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}"
+          tar -czf nasbeat_linux_x64_v${V}.tar.gz -C build/linux/x64/release/bundle .
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release-Linux
+          path: nasbeat_linux_x64_v*.tar.gz
+
+      - name: Publish Linux to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: nasbeat_linux_x64_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}.tar.gz
+          tag: v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}
+          token: ${{ secrets.GH_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 4 — macOS  (macos-latest)
+  # ══════════════════════════════════════════════════════════════════
+  build-macos:
+    name: "🍎 macOS"
+    runs-on: macos-latest
+    needs: pre-build-scan
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build macOS
+        run: flutter build macos --release --build-number ${{ github.run_number }}
+
+      - name: ZIP NasBeat.app
+        run: |
+          V="${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}"
+          cd build/macos/Build/Products/Release
+          zip -r "$OLDPWD/nasbeat_macos_universal_v${V}.zip" NasBeat.app
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release-macOS
+          path: nasbeat_macos_universal_v*.zip
+
+      - name: Publish macOS to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: nasbeat_macos_universal_v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}.zip
+          tag: v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}
+          token: ${{ secrets.GH_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 5 — RELEASE NOTES BOT  (after all 4 platform builds)
+  # ══════════════════════════════════════════════════════════════════
+  release-notes-bot:
+    name: "📝 Release Notes Bot"
+    runs-on: ubuntu-latest
+    needs: [build-android, build-windows, build-linux, build-macos]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        env:
+          VERSION:       ${{ needs.pre-build-scan.outputs.version }}
+          GH_SHA:        ${{ github.sha }}
+          GH_RUN_ID:     ${{ github.run_id }}
+          GH_SERVER_URL: ${{ github.server_url }}
+          GH_REPOSITORY: ${{ github.repository }}
+          CUSTOM_NOTES:  ${{ inputs.release_notes }}
+        run: |
+          python3 - << 'PYEOF'
+          import os, subprocess, textwrap
+          from datetime import datetime, timezone
+
+          version   = os.environ["VERSION"]
+          build     = "${{ github.run_number }}"
+          tag       = f"v{version}+{build}"
+          sha       = os.environ["GH_SHA"]
+          run_id    = os.environ["GH_RUN_ID"]
+          server    = os.environ["GH_SERVER_URL"]
+          repo      = os.environ["GH_REPOSITORY"]
+          custom    = os.environ.get("CUSTOM_NOTES", "").strip()
+          date_str  = datetime.now(timezone.utc).strftime("%B %d, %Y")
+          run_url   = f"{server}/{repo}/actions/runs/{run_id}"
+
+          prev = subprocess.run(
+              ["git", "tag", "--sort=-version:refname"],
+              capture_output=True, text=True
+          ).stdout.strip().splitlines()
+          prev_tags = [t for t in prev if t != tag]
+          log_range = f"{prev_tags[0]}..HEAD" if prev_tags else "HEAD~15..HEAD"
+
+          commits = subprocess.run(
+              ["git", "log", "--pretty=format:- %s", log_range, "--no-merges"],
+              capture_output=True, text=True
+          ).stdout.strip() or "- General improvements and bug fixes"
+
+          changelog_section = custom if custom else commits
+
+          notes = f"""\
+          ## 🎵 NasBeat {version} — Build #{build}
+
+          > Released **{date_str}** &nbsp;·&nbsp; Multi-source open music player &nbsp;·&nbsp; by [NasTech](https://github.com/nastech-ai)
+
+          ---
+
+          ### 📋 What's New
+
+          {changelog_section}
+
+          ---
+
+          ### 📦 Downloads
+
+          | Platform | Architecture | File | Notes |
+          |----------|-------------|------|-------|
+          | 🤖 Android | Universal *(all CPUs)* | `nasbeat_android_v{version}+{build}_universal.apk` | ✅ Recommended |
+          | 🤖 Android | ARM 64-bit | `nasbeat_android_v{version}+{build}_arm64-v8a.apk` | Modern phones (2017+) |
+          | 🤖 Android | ARM 32-bit | `nasbeat_android_v{version}+{build}_armeabi-v7a.apk` | Older devices |
+          | 🤖 Android | x86 64-bit | `nasbeat_android_v{version}+{build}_x86_64.apk` | Emulators / Chromebooks |
+          | 🪟 Windows | x64 | `nasbeat_windows_x64_v{version}+{build}.zip` | Windows 10 / 11 |
+          | 🐧 Linux | x64 | `nasbeat_linux_x64_v{version}+{build}.tar.gz` | Ubuntu 20.04+, Debian, Fedora |
+          | 🍎 macOS | Universal | `nasbeat_macos_universal_v{version}+{build}.zip` | macOS 10.14 Mojave+ |
+
+          > **Not sure which Android APK to pick?** Download the **Universal** one — it works on every device.
+
+          ---
+
+          ### 🚀 Installation
+
+          <details>
+          <summary><b>🤖 Android</b></summary>
+
+          1. Download the APK for your device *(Universal is safest)*.
+          2. Go to **Settings → Security → Install unknown apps** and enable it for your file manager.
+          3. Tap the downloaded APK and follow the prompts.
+
+          </details>
+
+          <details>
+          <summary><b>🪟 Windows</b></summary>
+
+          1. Download and **extract** `nasbeat_windows_x64_v{version}+{build}.zip`.
+          2. Run **`NasBeat.exe`** from the extracted folder.
+          3. No installer needed — fully portable.
+
+          </details>
+
+          <details>
+          <summary><b>🐧 Linux</b></summary>
+
+          ```bash
+          tar -xzf nasbeat_linux_x64_v{version}+{build}.tar.gz
+          ./nasbeat
+          ```
+
+          Requires: `libgtk-3`, `libglib2.0`, and a compatible audio backend.
+
+          </details>
+
+          <details>
+          <summary><b>🍎 macOS</b></summary>
+
+          1. Download and unzip `nasbeat_macos_universal_v{version}+{build}.zip`.
+          2. Drag **NasBeat.app** into your **Applications** folder.
+          3. **First launch:** right-click → **Open** to bypass Gatekeeper *(unsigned build)*.
+
+          > Requires macOS 10.14 Mojave or later.
+
+          </details>
+
+          ---
+
+          ### 🔧 Build Info
+
+          | Field | Value |
+          |-------|-------|
+          | Version | `{version}` |
+          | Build | `#{build}` |
+          | Flutter | `3.35.4 stable` |
+          | Commit | [`{sha[:7]}`]({server}/{repo}/commit/{sha}) |
+          | CI Run | [#{build}]({run_url}) |
+
+          ---
+
+          *Built with ❤️ by [NasTech](https://github.com/nastech-ai)*
+          """
+
+          notes = textwrap.dedent(notes)
+          with open("/tmp/release_notes.md", "w") as f:
+              f.write(notes)
+          print("Release notes written")
+          print(notes[:400])
+          PYEOF
+
+      - name: Publish final release with full notes
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}
+          token: ${{ secrets.GH_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          allowUpdates: true
+          omitArtifactsDuringUpdate: true
+          bodyFile: /tmp/release_notes.md
+
+
+  # ══════════════════════════════════════════════════════════════════
+  # JOB 6 — GOOGLE PLAY UPLOAD
+  # ══════════════════════════════════════════════════════════════════
+  deploy-play-store:
+    name: "🛒 Google Play (internal track)"
+    runs-on: ubuntu-latest
+    needs: [build-android, release-notes-bot]
+    env:
+      HAS_PLAY_SECRET: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT != '' }}
+
+    steps:
+      - name: Check Play Store secret
+        if: env.HAS_PLAY_SECRET != 'true'
+        run: |
+          echo "⚠️  PLAY_STORE_SERVICE_ACCOUNT secret not set — skipping Google Play upload."
+          exit 0
+
+      - name: Download Android artifacts
+        if: env.HAS_PLAY_SECRET == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: Release-Android
+          path: artifacts/
+
+      - name: Find arm64-v8a APK
+        if: env.HAS_PLAY_SECRET == 'true'
+        id: apk
+        run: |
+          APK=$(find artifacts/ -name "*arm64-v8a*.apk" | head -1)
+          echo "path=$APK" >> $GITHUB_OUTPUT
+          echo "Found APK: $APK"
+
+      - name: Upload to Google Play internal track
+        if: env.HAS_PLAY_SECRET == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
+          packageName: ai.nastech.nasbeat
+          releaseFiles: ${{ steps.apk.outputs.path }}
+          track: internal
+          status: draft
+          releaseName: v${{ needs.pre-build-scan.outputs.version }}+${{ github.run_number }}
