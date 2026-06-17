@@ -10,7 +10,6 @@
 /// | wasmtime_runtime_layer   | 39.0.0  | ✅ Yes     | JIT, high performance           |
 /// | wasmer_runtime_layer     | 6.0.0   | ❌ No      | Uses wasm_runtime_layer 0.5.0   |
 /// | js_wasm_runtime_layer    | 0.6.0   | ✅ Yes     | Browser WebAssembly (wasm32)    |
-
 // ============================================================================
 // BACKEND SELECTION - CHANGE THIS TO SWITCH RUNTIMES
 // ============================================================================
