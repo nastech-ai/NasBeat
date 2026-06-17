@@ -42,10 +42,10 @@ String convertJsonToM3U(Map<String, dynamic> jsonData) {
     buffer.writeln();
 
     // Custom NasBeat metadata (ignored by standard M3U players).
-    buffer.writeln("#BLOOMEE-GENERATED_BY: $generatedBy");
-    buffer.writeln("#BLOOMEE-VERSION: $version");
-    buffer.writeln("#BLOOMEE-EXPORTEDAT: $exportedAt");
-    buffer.writeln("#BLOOMEE-NOTE: $note");
+    buffer.writeln("#NASBEAT-GENERATED_BY: $generatedBy");
+    buffer.writeln("#NASBEAT-VERSION: $version");
+    buffer.writeln("#NASBEAT-EXPORTEDAT: $exportedAt");
+    buffer.writeln("#NASBEAT-NOTE: $note");
     buffer.writeln();
 
     // Process each media item.
@@ -121,13 +121,13 @@ Map<String, dynamic> parseM3UToJson(String m3uContent) {
       if (line.isEmpty) continue;
 
       // Handle custom meta tags
-      if (line.startsWith('#BLOOMEE-GENERATED_BY:')) {
+      if (line.startsWith('#NASBEAT-GENERATED_BY:')) {
         meta['generated_by'] = line.split(':').last.trim();
-      } else if (line.startsWith('#BLOOMEE-VERSION:')) {
+      } else if (line.startsWith('#NASBEAT-VERSION:')) {
         meta['version'] = line.split(':').last.trim();
-      } else if (line.startsWith('#BLOOMEE-EXPORTEDAT:')) {
+      } else if (line.startsWith('#NASBEAT-EXPORTEDAT:')) {
         meta['exportedAt'] = line.split(':').last.trim();
-      } else if (line.startsWith('#BLOOMEE-NOTE:')) {
+      } else if (line.startsWith('#NASBEAT-NOTE:')) {
         meta['note'] = line.split(':').last.trim();
       } else if (line.startsWith('#PLAYLIST:')) {
         playlistName = line.split(':').last.trim();

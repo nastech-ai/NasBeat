@@ -389,7 +389,6 @@ class About extends StatelessWidget {
             ),
           ],
         ),
-        ],
       ),
     );
   }
@@ -700,7 +699,7 @@ class _GentleRotatingFlowerState extends State<GentleRotatingFlower>
             child: Transform.scale(
               scale: scale,
               child: Text(
-                "🌸",
+                "🎵",
                 style: TextStyle(fontSize: widget.size),
               ),
             ),

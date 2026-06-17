@@ -13,7 +13,7 @@ class DiscordService {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       try {
         DiscordRPC.initialize();
-        _discordRPC = DiscordRPC(applicationId: '1339113296405725235');
+        _discordRPC = DiscordRPC(applicationId: '1516382558173270108');
         _discordRPC?.start(autoRegister: true);
         log(" Discord RPC initialized successfully", name: "DiscordService");
       } catch (e) {

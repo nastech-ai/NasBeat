@@ -4,7 +4,7 @@ import 'package:nasbeat/utils/load_image.dart';
 
 Future<PaletteGenerator> getPalleteFromImage(String url) async {
   ImageProvider<Object> placeHolder =
-      const AssetImage("assets/icons/nasbeat_new_logo_c.png");
+      const AssetImage("assets/icons/nastech_tree.png");
 
   try {
     return await PaletteGenerator.fromImageProvider(

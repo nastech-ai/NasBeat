@@ -22,6 +22,7 @@ import 'package:nasbeat/services/player/player_engine.dart';
 import 'package:nasbeat/screens/widgets/like_widget.dart';
 import 'package:nasbeat/screens/widgets/play_pause_widget.dart';
 import 'package:nasbeat/screens/widgets/snackbar.dart';
+import 'package:nasbeat/blocs/lyrics/lyrics_cubit.dart';
 import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:nasbeat/utils/load_image.dart';
 import 'package:nasbeat/utils/pallete_generator.dart';

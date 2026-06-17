@@ -1,4 +1,4 @@
-/// Opens the legacy `default.isar` database (created by the old NasBeat ≤ v2
+/// Opens the legacy `default.isar` database (created by NasBeat ≤ v2
 /// codebase) using the original Isar file name `default`.
 ///
 /// This file is intentionally isolated so it can be deleted once no users

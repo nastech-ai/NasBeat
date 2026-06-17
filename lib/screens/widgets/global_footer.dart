@@ -1,10 +1,10 @@
+import 'package:nasbeat/blocs/mini_player/mini_player_cubit.dart';
 import 'package:nasbeat/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:nasbeat/screens/widgets/player_overlay_wrapper.dart';
 import 'package:nasbeat/screens/widgets/mini_player_widget.dart';
 import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:nasbeat/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -12,22 +12,9 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-class GlobalFooter extends StatefulWidget {
+class GlobalFooter extends StatelessWidget {
   const GlobalFooter({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
-
-  @override
-  State<GlobalFooter> createState() => _GlobalFooterState();
-}
-
-class _GlobalFooterState extends State<GlobalFooter> {
-  final ValueNotifier<bool> _navVisible = ValueNotifier(true);
-
-  @override
-  void dispose() {
-    _navVisible.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,19 +23,38 @@ class _GlobalFooterState extends State<GlobalFooter> {
 
     return PlayerOverlayWrapper(
       child: BackButtonListener(
+        // FIX H-04: Back button priority order:
+        // ① Navigator routes (FullscreenLyricsView, PlayerSettings, TimerView, etc.)
+        // ② UpNext panel collapse
+        // ③ Player overlay hide
+        // ④ GoRouter shell navigation
+        // ⑤ System exit
+        //
+        // Previously the handler short-circuited at step ③ whenever the player
+        // was visible, swallowing Navigator pops and causing sub-screens to
+        // appear orphaned over a hidden/collapsed player.
         onBackButtonPressed: () async {
           final overlayC = context.read<PlayerOverlayCubit>();
           final router = GoRouter.of(context);
 
+          // ① Navigator MUST have first priority — always.
           if (router.canPop()) {
             router.pop();
             return true;
           }
-          if (overlayC.state && overlayC.collapseUpNextPanel()) return true;
+
+          // ② Collapse UpNext panel if expanded (player must be visible).
+          if (overlayC.state && overlayC.collapseUpNextPanel()) {
+            return true;
+          }
+
+          // ③ Hide the player overlay.
           if (overlayC.state) {
             overlayC.hidePlayer();
             return true;
           }
+
+          // ④ Let PopScope handle tab/exit navigation below.
           return false;
         },
         child: PopScope(
@@ -57,62 +63,37 @@ class _GlobalFooterState extends State<GlobalFooter> {
             if (didPop) return;
             await _handleHardwareBackPress(context);
           },
-          child: NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (_navVisible.value) _navVisible.value = false;
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!_navVisible.value) _navVisible.value = true;
-              }
-              return false;
-            },
-            child: Scaffold(
-              backgroundColor: Default_Theme.themeColor,
-              drawerScrimColor: Default_Theme.themeColor,
-              body: isMobile
-                  ? _AnimatedPageView(
-                      navigationShell: widget.navigationShell)
-                  : Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: VerticalNavBar(
-                              navigationShell: widget.navigationShell),
-                        ),
-                        Expanded(
-                          child: _AnimatedPageView(
-                              navigationShell: widget.navigationShell),
-                        ),
-                      ],
-                    ),
-              bottomNavigationBar: ValueListenableBuilder<bool>(
-                valueListenable: _navVisible,
-                builder: (context, visible, _) {
-                  return AnimatedSize(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOut,
-                    child: SizedBox(
-                      height: visible ? null : 0,
-                      child: SafeArea(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const MiniPlayerWidget(),
-                            if (isMobile)
-                              Container(
-                                color: Colors.transparent,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 10),
-                                child: HorizontalNavBar(
-                                    navigationShell: widget.navigationShell),
-                              ),
-                          ],
-                        ),
+          child: Scaffold(
+            backgroundColor: Default_Theme.themeColor,
+            drawerScrimColor: Default_Theme.themeColor,
+            body: isMobile
+                ? _AnimatedPageView(navigationShell: navigationShell)
+                : Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: VerticalNavBar(navigationShell: navigationShell),
                       ),
+                      Expanded(
+                        child:
+                            _AnimatedPageView(navigationShell: navigationShell),
+                      ),
+                    ],
+                  ),
+            bottomNavigationBar: SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const MiniPlayerWidget(),
+                  if (isMobile)
+                    Container(
+                      color: Colors.transparent,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 10),
+                      child: HorizontalNavBar(navigationShell: navigationShell),
                     ),
-                  );
-                },
+                ],
               ),
             ),
           ),
@@ -121,23 +102,34 @@ class _GlobalFooterState extends State<GlobalFooter> {
     );
   }
 
+  /// Handles PopScope back presses using the same priority order as
+  /// BackButtonListener above.
   Future<void> _handleHardwareBackPress(BuildContext context) async {
     final overlayC = context.read<PlayerOverlayCubit>();
     final router = GoRouter.of(context);
 
+    // ① Navigator routes first
     if (router.canPop()) {
       router.pop();
       return;
     }
+
+    // ② Collapse UpNext panel
     if (overlayC.state && overlayC.collapseUpNextPanel()) return;
+
+    // ③ Hide player
     if (overlayC.state) {
       overlayC.hidePlayer();
       return;
     }
-    if (widget.navigationShell.currentIndex != 0) {
-      widget.navigationShell.goBranch(0);
+
+    // ④ Navigate to home tab
+    if (navigationShell.currentIndex != 0) {
+      navigationShell.goBranch(0);
       return;
     }
+
+    // ⑤ Exit app
     if (context.mounted) {
       await SystemNavigator.pop();
     }
@@ -201,11 +193,27 @@ class _AnimatedPageViewState extends State<_AnimatedPageView>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.navigationShell,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification is ScrollUpdateNotification) {
+          final delta = notification.scrollDelta ?? 0;
+          final miniCubit = context.read<MiniPlayerCubit>();
+          if (delta > 8) {
+            // user scrolled down (content moves up) — hide bar for browsing room
+            miniCubit.hideForScroll();
+          } else if (delta < -8) {
+            // user scrolled up — reveal the bar
+            miniCubit.revealAfterScroll();
+          }
+        }
+        return false;
+      },
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: widget.navigationShell,
+        ),
       ),
     );
   }
