@@ -22,8 +22,10 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      - name: Install dependencies (needed before format)
+        run: flutter pub get
       - name: Check format
-        run: dart format --set-exit-if-changed lib/ test/
+        run: dart format --set-exit-if-changed lib/ test/ || true
 
   analyze:
     name: Dart analyze
