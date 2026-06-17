@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:NasBeat/services/db/dao/library_dao.dart';
-import 'package:NasBeat/services/db/dao/playlist_dao.dart';
-import 'package:NasBeat/services/db/dao/track_dao.dart';
-import 'package:NasBeat/services/db/db_provider.dart';
-import 'package:NasBeat/services/db/global_db.dart';
-import 'package:NasBeat/services/db/legacy/legacy_global_db.dart' as legacy;
-import 'package:NasBeat/services/db/legacy/legacy_migration_service.dart'
+import 'package:nasbeat/services/db/dao/library_dao.dart';
+import 'package:nasbeat/services/db/dao/playlist_dao.dart';
+import 'package:nasbeat/services/db/dao/track_dao.dart';
+import 'package:nasbeat/services/db/db_provider.dart';
+import 'package:nasbeat/services/db/global_db.dart';
+import 'package:nasbeat/services/db/legacy/legacy_global_db.dart' as legacy;
+import 'package:nasbeat/services/db/legacy/legacy_migration_service.dart'
     as migration;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar_community/isar.dart';

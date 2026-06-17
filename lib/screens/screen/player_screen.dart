@@ -31,7 +31,7 @@ import '../../blocs/media_player/nasbeat_player_cubit.dart';
 import '../../blocs/mini_player/mini_player_cubit.dart';
 import 'player_views/fullscreen_lyrics_view.dart';
 import 'package:nasbeat/blocs/lyrics/lyrics_cubit.dart';
-import 'package:nasbeat/blocs/lyrics/lyrics_state.dart';
+
 
 class AudioPlayerView extends StatefulWidget {
   const AudioPlayerView({super.key});
