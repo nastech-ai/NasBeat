@@ -2103,7 +2103,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateUpToDate.
   ///
   /// In en, this message translates to:
-  /// **'NasBeat is up-to-date!!!'**
+  /// **'NasBeat🎵 is up-to-date!!!'**
   String get updateUpToDate;
 
   /// No description provided for @updateViewPreRelease.
@@ -2121,7 +2121,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateNewVersionAvailable.
   ///
   /// In en, this message translates to:
-  /// **'New Version of NasBeat is now available!!'**
+  /// **'New Version of NasBeat🎵 is now available!!'**
   String get updateNewVersionAvailable;
 
   /// No description provided for @updateVersion.
@@ -2679,7 +2679,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipQuote.
   ///
   /// In en, this message translates to:
-  /// **'Enjoying NasBeat? A small tip keeps it blooming. 🌸'**
+  /// **'Enjoying NasBeat? A small tip keeps it blooming.'**
   String get aboutTipQuote;
 
   /// No description provided for @aboutTipButton.
@@ -3549,7 +3549,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'New Version of NasBeat is now available!\n\nVersion: {ver}+{build}'**
+  /// **'New Version of NasBeat🎵 is now available!\n\nVersion: {ver}+{build}'**
   String updateAvailableBody(String ver, String build);
 
   /// No description provided for @pluginSnackbarInstalled.

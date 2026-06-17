@@ -288,7 +288,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                   label: AppLocalizations.of(context)!.localMusicShuffle,
                   onTap: () => context
                       .read<NasBeatPlayerCubit>()
-                      .nasbeatPlayer
+                      .nasBeatPlayer
                       .loadPlaylist(
                         Playlist(tracks: displayedTracks, title: 'Local Music'),
                         doPlay: true,
@@ -301,7 +301,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                   label: AppLocalizations.of(context)!.localMusicPlayAll,
                   onTap: () => context
                       .read<NasBeatPlayerCubit>()
-                      .nasbeatPlayer
+                      .nasBeatPlayer
                       .loadPlaylist(
                         Playlist(tracks: displayedTracks, title: 'Local Music'),
                         doPlay: true,
@@ -383,7 +383,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                 song: track,
                 showOptions: true,
                 onTap: () {
-                  context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
+                  context.read<NasBeatPlayerCubit>().nasBeatPlayer.loadPlaylist(
                         Playlist(tracks: displayedTracks, title: 'Local Music'),
                         idx: index,
                         doPlay: true,

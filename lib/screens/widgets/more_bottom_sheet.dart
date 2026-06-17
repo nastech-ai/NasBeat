@@ -159,7 +159,7 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                                     onTap: (ctx) {
                                       ctx
                                           .read<NasBeatPlayerCubit>()
-                                          .nasbeatPlayer
+                                          .nasBeatPlayer
                                           .updateQueueTracks([song],
                                               doPlay: true);
                                       Navigator.pop(ctx);
@@ -176,7 +176,7 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                                     onTap: (ctx) {
                                       ctx
                                           .read<NasBeatPlayerCubit>()
-                                          .nasbeatPlayer
+                                          .nasBeatPlayer
                                           .addPlayNextTrack(song);
                                       Navigator.pop(ctx);
                                       SnackbarService.showMessage(
@@ -192,7 +192,7 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                                     onTap: (ctx) {
                                       ctx
                                           .read<NasBeatPlayerCubit>()
-                                          .nasbeatPlayer
+                                          .nasBeatPlayer
                                           .addQueueTracks([song]);
                                       Navigator.pop(ctx);
                                       SnackbarService.showMessage(
@@ -240,7 +240,7 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                             title: l10n.songInfoUpdateMetadata,
                             onTap: (ctx) async {
                               final player =
-                                  ctx.read<NasBeatPlayerCubit>().nasbeatPlayer;
+                                  ctx.read<NasBeatPlayerCubit>().nasBeatPlayer;
                               Navigator.pop(ctx);
 
                               final result =

@@ -76,7 +76,7 @@ class _ImportMediaFromPlatformsViewState
                   ),
                   const SizedBox(height: 8),
                   _ImportFromBtn(
-                    btnName: AppLocalizations.of(context)!.importNasBeatFiles,
+                    btnName: AppLocalizations.of(context)!.importBloomeeFiles,
                     btnIcon: MingCute.file_import_fill,
                     onClickFunc: () => _importNasBeatFile(context),
                   ),

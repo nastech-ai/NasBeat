@@ -119,7 +119,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
                                 try {
                                   context
                                       .read<NasBeatPlayerCubit>()
-                                      .nasbeatPlayer
+                                      .nasBeatPlayer
                                       .loadPlaylist(
                                         Playlist(
                                           tracks: state.downloaded,

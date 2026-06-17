@@ -65,6 +65,8 @@ import 'package:nasbeat/services/onboarding_service.dart';
 import 'package:nasbeat/services/plugin_bootstrap_service.dart';
 import 'package:nasbeat/plugins/services/plugin_repository_service.dart';
 import 'package:nasbeat/services/shared_url_resolver_service.dart';
+import 'package:nasbeat/services/listening_analytics_service.dart';
+import 'package:nasbeat/screens/widgets/particle_background.dart';
 
 void processIncomingIntent(SharedMedia sharedMedia) {
   if (sharedMedia.content != null && isUrl(sharedMedia.content!)) {
@@ -142,11 +144,11 @@ Future<void> setHighRefreshRate() async {
   }
 }
 
-late NasBeatPlayerCubit nasbeatPlayerCubit;
+late NasBeatPlayerCubit nasBeatPlayerCubit;
 Future<void> setupPlayerCubit() async {
   await setupAudioSession();
   final player = await PlayerInitializer().getNasBeatMusicPlayer();
-  nasbeatPlayerCubit = NasBeatPlayerCubit(player);
+  nasBeatPlayerCubit = NasBeatPlayerCubit(player);
 }
 
 Future<void> main() async {
@@ -157,6 +159,10 @@ Future<void> main() async {
   setHighRefreshRate();
   await setupPlayerCubit();
   DiscordService.initialize();
+  // Start listening analytics (fire-and-forget — never blocks startup).
+  unawaited(ListeningAnalyticsService.instance.init(
+    nasBeatPlayerCubit.nasBeatPlayer.mediaItem.stream,
+  ));
   runApp(const MyApp());
 }
 
@@ -274,7 +280,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _intentSub?.cancel();
-    nasbeatPlayerCubit.close();
+    nasBeatPlayerCubit.close();
     if (io.Platform.isWindows || io.Platform.isLinux || io.Platform.isMacOS) {
       DiscordService.clearPresence();
     }
@@ -345,12 +351,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           lazy: false,
         ),
         BlocProvider(
-          create: (context) => nasbeatPlayerCubit,
+          create: (context) => nasBeatPlayerCubit,
           lazy: false,
         ),
         BlocProvider(
             create: (context) =>
-                MiniPlayerCubit(playerCubit: nasbeatPlayerCubit),
+                MiniPlayerCubit(playerCubit: nasBeatPlayerCubit),
             lazy: true),
         BlocProvider(
           create: (context) => SettingsCubit(
@@ -366,7 +372,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
             create: (context) => TimerBloc(
-                ticker: const Ticker(), nasbeatPlayer: nasbeatPlayerCubit)),
+                ticker: const Ticker(), nasBeatPlayer: nasBeatPlayerCubit)),
         BlocProvider(
           create: (context) => ConnectivityCubit(),
           lazy: false,
@@ -406,7 +412,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => LyricsCubit(
-            nasbeatPlayerCubit,
+            nasBeatPlayerCubit,
             lyricsDao: LyricsDAO(DBProvider.db),
             settingsDao: SettingsDAO(DBProvider.db),
             pluginService: ServiceLocator.pluginService,
@@ -414,7 +420,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => LastdotfmCubit(
-            playerCubit: nasbeatPlayerCubit,
+            playerCubit: nasBeatPlayerCubit,
             cacheDao: CacheDAO(DBProvider.db),
             settingsDao: SettingsDAO(DBProvider.db),
             pluginService: ServiceLocator.pluginService,
@@ -488,9 +494,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           const Breakpoint(
                               start: 1921, end: double.infinity, name: '4K'),
                         ],
-                        child: GlobalEventListener(
-                          navigatorKey: GlobalRoutes.globalRouterKey,
-                          child: child!,
+                        child: ParticleBackground(
+                          enabled: settingsState.appTheme ==
+                              NasBeatTheme.glassmorphism.key,
+                          child: GlobalEventListener(
+                            navigatorKey: GlobalRoutes.globalRouterKey,
+                            child: child!,
+                          ),
                         ),
                       ),
                       scaffoldMessengerKey: SnackbarService.messengerKey,

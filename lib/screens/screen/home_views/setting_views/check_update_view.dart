@@ -44,7 +44,7 @@ class CheckUpdateView extends StatelessWidget {
                       child: FilledButton(
                         onPressed: () {
                           launch_Url(Uri.parse(
-                              "https://github.com/HemantKArya/NasBeat/releases"));
+                              "https://github.com/nastech-ai/NasBeat/releases"));
                         },
                         child: SizedBox(
                           // width: 150,
@@ -114,8 +114,8 @@ class CheckUpdateView extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: FilledButton(
                         onPressed: () {
-                          launch_Url(
-                              Uri.parse("https://github.com/nastech-ai/NasBeat/"));
+                          launch_Url(Uri.parse(
+                              "https://github.com/nastech-ai/NasBeat/releases/latest"));
                         },
                         child: SizedBox(
                           width: 150,

@@ -12,10 +12,10 @@ part 'timer_state.dart';
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final Ticker _ticker;
   static const int _duration = 0;
-  final NasBeatPlayerCubit nasbeatPlayer;
+  final NasBeatPlayerCubit nasBeatPlayer;
   StreamSubscription<int>? _tickerSubscription;
 
-  TimerBloc({required Ticker ticker, required this.nasbeatPlayer})
+  TimerBloc({required Ticker ticker, required this.nasBeatPlayer})
       : _ticker = ticker,
         super(const TimerInitial(_duration)) {
     on<TimerStarted>(_onTimerStarted);
@@ -68,7 +68,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     } else {
       emit(const TimerRunComplete());
       try {
-        nasbeatPlayer.nasbeatPlayer.pause();
+        nasBeatPlayer.nasBeatPlayer.pause();
       } catch (e) {
         log(e.toString(), name: "TimerBloc");
       }

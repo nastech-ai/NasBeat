@@ -4,12 +4,12 @@ import 'package:rxdart/rxdart.dart';
 part 'nasbeat_player_state.dart';
 
 class NasBeatPlayerCubit extends Cubit<NasBeatPlayerState> {
-  final NasBeatMusicPlayer nasbeatPlayer;
+  final NasBeatMusicPlayer nasBeatPlayer;
   late ValueStream<ProgressBarStreams> progressStreams;
 
-  NasBeatPlayerCubit(this.nasbeatPlayer)
+  NasBeatPlayerCubit(this.nasBeatPlayer)
       : super(NasBeatPlayerState(isReady: true)) {
-    nasbeatPlayer.syncPublicState();
+    nasBeatPlayer.syncPublicState();
     _setupProgressStreams();
   }
 
@@ -20,10 +20,10 @@ class NasBeatPlayerCubit extends Cubit<NasBeatPlayerState> {
 
   void _setupProgressStreams() {
     progressStreams = Rx.combineLatest4(
-      Rx.defer(() => nasbeatPlayer.engine.positionStream, reusable: true),
-      Rx.defer(() => nasbeatPlayer.engine.durationStream, reusable: true),
-      Rx.defer(() => nasbeatPlayer.engine.bufferedStream, reusable: true),
-      Rx.defer(() => nasbeatPlayer.engine.playingStream, reusable: true),
+      Rx.defer(() => nasBeatPlayer.engine.positionStream, reusable: true),
+      Rx.defer(() => nasBeatPlayer.engine.durationStream, reusable: true),
+      Rx.defer(() => nasBeatPlayer.engine.bufferedStream, reusable: true),
+      Rx.defer(() => nasBeatPlayer.engine.playingStream, reusable: true),
       (Duration position, Duration duration, Duration buffered, bool playing) =>
           ProgressBarStreams(
         position: position,

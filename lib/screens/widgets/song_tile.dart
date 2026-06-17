@@ -56,7 +56,7 @@ class SongCardWidget extends StatelessWidget {
     final playerCubit = context.read<NasBeatPlayerCubit>();
 
     return StreamBuilder<MediaItem?>(
-      stream: playerCubit.nasbeatPlayer.mediaItem,
+      stream: playerCubit.nasBeatPlayer.mediaItem,
       builder: (context, snapshot) {
         final isPlaying = snapshot.data?.id == song.id;
         final l10n = AppLocalizations.of(context)!;
@@ -234,7 +234,7 @@ class SongCardWidget extends StatelessWidget {
                             iconColor: Colors.redAccent.withValues(alpha: 0.9),
                             onTap: () {
                               try {
-                                if (playerCubit.nasbeatPlayer.currentMedia.id !=
+                                if (playerCubit.nasBeatPlayer.currentMedia.id !=
                                     song.id) {
                                   context
                                       .read<DownloaderCubit>()

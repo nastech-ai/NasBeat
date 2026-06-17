@@ -36,7 +36,7 @@ class _SmartReplaceDialogState extends State<_SmartReplaceDialog> {
   void initState() {
     super.initState();
     _service = SmartTrackReplacementService.create(
-      context.read<NasBeatPlayerCubit>().nasbeatPlayer.pluginService,
+      context.read<NasBeatPlayerCubit>().nasBeatPlayer.pluginService,
     );
     _future = _service.searchCandidates(widget.track);
   }
@@ -148,7 +148,7 @@ class _SmartReplaceDialogState extends State<_SmartReplaceDialog> {
   ) async {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _applyingTrackId = candidate.track.id);
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
 
     try {
       final applyResult = await _service.applyReplacement(

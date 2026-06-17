@@ -1380,7 +1380,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutCreativeHighlights => 'アップデートとクリエイティブな活動';
 
   @override
-  String get aboutTipQuote => 'NasBeat を気に入っていただけましたか？応援が活動の励みになります。 🌸';
+  String get aboutTipQuote => 'NasBeat を気に入っていただけましたか？応援が活動の励みになります。';
 
   @override
   String get aboutTipButton => '応援する';

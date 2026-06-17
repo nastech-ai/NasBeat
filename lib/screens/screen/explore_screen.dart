@@ -215,7 +215,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         onTap: () {
                                           context
                                               .read<NasBeatPlayerCubit>()
-                                              .nasbeatPlayer
+                                              .nasBeatPlayer
                                               .loadPlaylist(
                                                 Playlist(
                                                   tracks: state.tracks,
@@ -260,7 +260,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           onTap: () {
                                             context
                                                 .read<NasBeatPlayerCubit>()
-                                                .nasbeatPlayer
+                                                .nasBeatPlayer
                                                 .loadPlaylist(
                                                   Playlist(
                                                     tracks: snapshot.data!,

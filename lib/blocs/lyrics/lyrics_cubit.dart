@@ -44,7 +44,7 @@ class LyricsCubit extends Cubit<LyricsState> {
         ),
         super(LyricsInitial()) {
     _mediaItemSubscription =
-        playerCubit.nasbeatPlayer.mediaItem.stream.listen((item) {
+        playerCubit.nasBeatPlayer.mediaItem.stream.listen((item) {
       if (item != null) {
         getLyrics(mediaItemToTrack(item));
       }

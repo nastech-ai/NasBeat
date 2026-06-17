@@ -79,7 +79,7 @@ class PlayerInitializer {
     final player = await AudioService.init(
       builder: () => NasBeatMusicPlayer(),
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.NasBeatPlayer.notification.status',
+        androidNotificationChannelId: 'ai.nastech.nasbeat.notification.status',
         androidNotificationChannelName: 'NasBeat',
         androidNotificationIcon: 'drawable/ic_stat_nasbeat',
         androidResumeOnClick: true,

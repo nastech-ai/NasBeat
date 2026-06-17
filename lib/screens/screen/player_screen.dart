@@ -30,8 +30,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../blocs/media_player/nasbeat_player_cubit.dart';
 import '../../blocs/mini_player/mini_player_cubit.dart';
 import 'player_views/fullscreen_lyrics_view.dart';
-import 'package:nasbeat/blocs/lyrics/lyrics_cubit.dart';
-
 
 class AudioPlayerView extends StatefulWidget {
   const AudioPlayerView({super.key});
@@ -91,8 +89,8 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final nasbeatPlayerCubit = context.read<NasBeatPlayerCubit>();
-    final musicPlayer = nasbeatPlayerCubit.nasbeatPlayer;
+    final nasBeatPlayerCubit = context.read<NasBeatPlayerCubit>();
+    final musicPlayer = nasBeatPlayerCubit.nasBeatPlayer;
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
 
     return Scaffold(
@@ -281,14 +279,14 @@ class CoverImageVolSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nasbeatPlayerCubit = context.read<NasBeatPlayerCubit>();
+    final nasBeatPlayerCubit = context.read<NasBeatPlayerCubit>();
 
     return VolumeDragController(
       child: StreamBuilder<MediaItem?>(
-        stream: nasbeatPlayerCubit.nasbeatPlayer.mediaItem,
+        stream: nasBeatPlayerCubit.nasBeatPlayer.mediaItem,
         builder: (context, snapshot) {
           final currentTrack =
-              nasbeatPlayerCubit.nasbeatPlayer.currentTrackInfo;
+              nasBeatPlayerCubit.nasBeatPlayer.currentTrackInfo;
           final highResUrl =
               currentTrack.thumbnail.urlHigh ?? currentTrack.thumbnail.url;
           final lowResUrl =
@@ -342,7 +340,7 @@ class _SongInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     return Row(
       children: [
         Expanded(
@@ -407,7 +405,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       if (mi?.id != _lastTrackId) {
         _lastTrackId = mi?.id;
@@ -473,7 +471,7 @@ class _LikeButtonState extends State<_LikeButton> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       if (mi?.id != _lastTrackId) {
         _lastTrackId = mi?.id;
@@ -506,7 +504,7 @@ class _LikeButtonState extends State<_LikeButton> {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     final l10n = AppLocalizations.of(context)!;
 
     return StreamBuilder<bool>(
@@ -555,7 +553,7 @@ class _PlayerProgressBar extends StatelessWidget {
             progress: data?.position ?? Duration.zero,
             total: data?.duration ?? Duration.zero,
             buffered: data?.buffered ?? Duration.zero,
-            onSeek: playerCubit.nasbeatPlayer.seek,
+            onSeek: playerCubit.nasBeatPlayer.seek,
             isPlaying: data?.isPlaying ?? false,
             activeAccentColor: Default_Theme.accentColor1,
             inactiveAccentColor: Default_Theme.accentColor2,
@@ -660,7 +658,7 @@ class _LoopControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<LoopMode>(
-      stream: context.read<NasBeatPlayerCubit>().nasbeatPlayer.loopMode,
+      stream: context.read<NasBeatPlayerCubit>().nasBeatPlayer.loopMode,
       builder: (context, snapshot) {
         final loopMode = snapshot.data ?? LoopMode.off;
         final l10n = AppLocalizations.of(context)!;
@@ -682,7 +680,7 @@ class _LoopControl extends StatelessWidget {
             size: 24,
           ),
           onSelected: (value) {
-            final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+            final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
             if (value == 0) player.setLoopMode(LoopMode.off);
             if (value == 1) player.setLoopMode(LoopMode.one);
             if (value == 2) player.setLoopMode(LoopMode.all);
@@ -698,7 +696,7 @@ class _ShuffleControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     return StreamBuilder<bool>(
       stream: player.shuffleMode,
       builder: (context, snapshot) {
@@ -723,7 +721,7 @@ class _ExternalLinkControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     return IconButton(
       icon: const Icon(MingCute.external_link_line,
           color: Default_Theme.primaryColor1, size: 24),
@@ -745,7 +743,7 @@ class _PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final musicPlayer = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final musicPlayer = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
       builder: (context, state) {
         Widget child;
@@ -823,7 +821,7 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       final artUri = mi?.artUri?.toString();
       if (artUri != _lastArtUri) {

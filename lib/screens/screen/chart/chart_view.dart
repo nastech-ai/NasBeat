@@ -229,7 +229,7 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
       return;
     }
 
-    context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
+    context.read<NasBeatPlayerCubit>().nasBeatPlayer.loadPlaylist(
           Playlist(tracks: [track], title: widget.chartTitle),
           doPlay: true,
         );

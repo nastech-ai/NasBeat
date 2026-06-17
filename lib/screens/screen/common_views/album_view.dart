@@ -302,7 +302,7 @@ class _AlbumViewState extends State<AlbumView> {
                             ),
                             onTap: () => context
                                 .read<NasBeatPlayerCubit>()
-                                .nasbeatPlayer
+                                .nasBeatPlayer
                                 .loadPlaylist(
                                   Playlist(
                                       tracks: tracks,
@@ -535,7 +535,7 @@ class _AlbumHeaderContent extends StatelessWidget {
         _PremiumPlayButton(
           isEmpty: tracks.isEmpty,
           onTap: () =>
-              context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
+              context.read<NasBeatPlayerCubit>().nasBeatPlayer.loadPlaylist(
                     Playlist(tracks: tracks, title: title),
                     doPlay: true,
                     idx: 0,

@@ -1481,7 +1481,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Gefällt dir NasBeat? Eine kleine Unterstützung lässt die App weiter blühen. 🌸';
+      'Gefällt dir NasBeat? Eine kleine Unterstützung lässt die App weiter blühen.';
 
   @override
   String get aboutTipButton => 'Ich möchte helfen';

@@ -67,7 +67,7 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
     try {
       final result = await SongMetadataRefreshService.refreshTrack(
         song,
-        player: context.read<NasBeatPlayerCubit>().nasbeatPlayer,
+        player: context.read<NasBeatPlayerCubit>().nasBeatPlayer,
       );
 
       if (!result.isSuccess || result.track == null) {

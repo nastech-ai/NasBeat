@@ -62,7 +62,7 @@ class HistoryView extends StatelessWidget {
                         onTap: () {
                           context
                               .read<NasBeatPlayerCubit>()
-                              .nasbeatPlayer
+                              .nasBeatPlayer
                               .loadPlaylist(
                                   Playlist(
                                       tracks: state.tracks, title: 'History'),

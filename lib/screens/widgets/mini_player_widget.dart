@@ -130,7 +130,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
 
   void _onHorizontalDragEnd(DragEndDetails details) {
     final velocity = details.primaryVelocity ?? 0;
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
 
     if (_dragOffset < -_swipeThreshold || velocity < -600) {
       HapticFeedback.mediumImpact();
@@ -202,7 +202,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                               HapticFeedback.lightImpact();
                               context
                                   .read<NasBeatPlayerCubit>()
-                                  .nasbeatPlayer
+                                  .nasBeatPlayer
                                   .skipToPrevious();
                             },
                           ),
@@ -215,7 +215,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                               HapticFeedback.lightImpact();
                               context
                                   .read<NasBeatPlayerCubit>()
-                                  .nasbeatPlayer
+                                  .nasBeatPlayer
                                   .skipToNext();
                             },
                           ),
@@ -481,7 +481,7 @@ class _PlayPauseButton extends StatelessWidget {
         size: 22,
         onPressed: () {
           HapticFeedback.mediumImpact();
-          context.read<NasBeatPlayerCubit>().nasbeatPlayer.rewind();
+          context.read<NasBeatPlayerCubit>().nasBeatPlayer.rewind();
         },
       );
     }
@@ -490,8 +490,8 @@ class _PlayPauseButton extends StatelessWidget {
       onTap: () {
         HapticFeedback.lightImpact();
         state.isPlaying
-            ? context.read<NasBeatPlayerCubit>().nasbeatPlayer.pause()
-            : context.read<NasBeatPlayerCubit>().nasbeatPlayer.play();
+            ? context.read<NasBeatPlayerCubit>().nasBeatPlayer.pause()
+            : context.read<NasBeatPlayerCubit>().nasBeatPlayer.play();
       },
       child: Container(
         width: 42,

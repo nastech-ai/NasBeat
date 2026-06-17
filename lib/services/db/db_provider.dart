@@ -167,7 +167,7 @@ class DBProvider {
   static Future<String> getDbBackupFilePath() async {
     String backupPath = (await getDownloadsDirectory())?.path ?? appDocDir;
     backupPath =
-        p.join(backupPath, 'nasbeatBackup', 'nasbeat_backup_dbv3.json');
+        p.join(backupPath, 'nasBeatBackup', 'nasbeat_backup_dbv3.json');
     return backupPath;
   }
 

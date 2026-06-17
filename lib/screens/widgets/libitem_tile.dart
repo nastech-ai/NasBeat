@@ -61,7 +61,7 @@ class LibItemCard extends StatelessWidget {
                   ? StreamBuilder<String>(
                       stream: context
                           .watch<NasBeatPlayerCubit>()
-                          .nasbeatPlayer
+                          .nasBeatPlayer
                           .queueTitle,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data == title) {

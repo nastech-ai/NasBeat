@@ -371,7 +371,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                 if (playlist != null && context.mounted) {
                   final songIdx =
                       playlist.tracks.indexWhere((s) => s.id == result.song.id);
-                  context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
+                  context.read<NasBeatPlayerCubit>().nasBeatPlayer.loadPlaylist(
                         playlist,
                         idx: songIdx >= 0 ? songIdx : 0,
                         doPlay: true,

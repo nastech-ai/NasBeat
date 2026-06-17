@@ -78,7 +78,7 @@ class _EqualizerViewState extends State<EqualizerView>
   @override
   void initState() {
     super.initState();
-    _engine = context.read<NasBeatPlayerCubit>().nasbeatPlayer.engine;
+    _engine = context.read<NasBeatPlayerCubit>().nasBeatPlayer.engine;
     _settingsCubit = context.read<SettingsCubit>();
 
     _eqSource = _settingsCubit.state.eqSource;

@@ -36,7 +36,7 @@ class _VolumeDragControllerState extends State<VolumeDragController> {
   void volumeStrm() {
     _volumeSubscription = context
         .read<NasBeatPlayerCubit>()
-        .nasbeatPlayer
+        .nasBeatPlayer
         .engine
         .volumeStream
         .listen((event) {
@@ -50,7 +50,7 @@ class _VolumeDragControllerState extends State<VolumeDragController> {
     setState(() {
       _volume = volume;
     });
-    context.read<NasBeatPlayerCubit>().nasbeatPlayer.engine.setVolume(volume);
+    context.read<NasBeatPlayerCubit>().nasBeatPlayer.engine.setVolume(volume);
   }
 
   void _onDragStart(DragStartDetails details) {

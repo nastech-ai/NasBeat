@@ -183,7 +183,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
         }
         if (tracks.isEmpty) return;
         final idx = tracks.indexWhere((t) => t.id == track.id);
-        context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
+        context.read<NasBeatPlayerCubit>().nasBeatPlayer.loadPlaylist(
               Playlist(tracks: tracks, title: widget.section.title),
               idx: idx >= 0 ? idx : 0,
               doPlay: true,

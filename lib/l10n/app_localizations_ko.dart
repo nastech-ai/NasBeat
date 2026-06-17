@@ -1382,7 +1382,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutCreativeHighlights => '업데이트 및 주요 소식';
 
   @override
-  String get aboutTipQuote => 'NasBeat가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다. 🌸';
+  String get aboutTipQuote => 'NasBeat가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다.';
 
   @override
   String get aboutTipButton => '후원하기';

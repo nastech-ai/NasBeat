@@ -151,7 +151,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
                                       final list = await libraryCubit
                                           .getPlaylistTracks(title);
                                       if (list != null && list.isNotEmpty) {
-                                        playerCubit.nasbeatPlayer.loadPlaylist(
+                                        playerCubit.nasBeatPlayer.loadPlaylist(
                                             Playlist(
                                                 tracks: list, title: title),
                                             doPlay: true);
@@ -171,7 +171,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
                                       final list = await libraryCubit
                                           .getPlaylistTracks(title);
                                       if (list != null && list.isNotEmpty) {
-                                        playerCubit.nasbeatPlayer
+                                        playerCubit.nasBeatPlayer
                                             .addQueueTracks(list);
                                         SnackbarService.showMessage(
                                             l10n.snackbarPlaylistAddedToQueue(

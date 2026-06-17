@@ -286,7 +286,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
 
   String _targetMediaId() {
     final current =
-        context.read<NasBeatPlayerCubit>().nasbeatPlayer.currentTrackInfo.id;
+        context.read<NasBeatPlayerCubit>().nasBeatPlayer.currentTrackInfo.id;
     return current.isNotEmpty ? current : widget.mediaID;
   }
 
@@ -541,7 +541,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
   String _targetMediaId() {
     final current = widget.parentContext
         .read<NasBeatPlayerCubit>()
-        .nasbeatPlayer
+        .nasBeatPlayer
         .currentTrackInfo
         .id;
     return current.isNotEmpty ? current : widget.mediaID;

@@ -1300,7 +1300,7 @@ class _SliverSearchResults extends StatelessWidget {
                       song: track,
                       onTap: () => context
                           .read<NasBeatPlayerCubit>()
-                          .nasbeatPlayer
+                          .nasBeatPlayer
                           .updateQueueTracks([track], doPlay: true),
                       onOptionsTap: () => showMoreBottomSheet(context, track,
                           showSinglePlay: true),

@@ -1376,7 +1376,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutCreativeHighlights => '更新与创作亮点';
 
   @override
-  String get aboutTipQuote => '喜欢 NasBeat 吗？小小的打赏能让它持续绽放。🌸';
+  String get aboutTipQuote => '喜欢 NasBeat 吗？小小的打赏能让它持续绽放。';
 
   @override
   String get aboutTipButton => '我要赞赏';

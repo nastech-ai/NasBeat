@@ -34,6 +34,9 @@ class MiniPlayerState extends Equatable {
   /// Whether the engine is in an error state.
   final bool hasError;
 
+  /// True while the mini-player is hidden because the user scrolled down.
+  final bool scrollHidden;
+
   const MiniPlayerState({
     this.track,
     this.isPlaying = false,
@@ -41,10 +44,11 @@ class MiniPlayerState extends Equatable {
     this.isResolving = false,
     this.isCompleted = false,
     this.hasError = false,
+    this.scrollHidden = false,
   });
 
   /// Mini player is visible whenever there's a track to show.
-  bool get isVisible => track != null && track!.id != 'Null';
+  bool get isVisible => track != null && track!.id != 'Null' && !scrollHidden;
 
   const MiniPlayerState.hidden()
       : track = null,
@@ -52,7 +56,8 @@ class MiniPlayerState extends Equatable {
         isLoading = false,
         isResolving = false,
         isCompleted = false,
-        hasError = false;
+        hasError = false,
+        scrollHidden = false;
 
   MiniPlayerState copyWith({
     Track? track,
@@ -61,6 +66,7 @@ class MiniPlayerState extends Equatable {
     bool? isResolving,
     bool? isCompleted,
     bool? hasError,
+    bool? scrollHidden,
   }) {
     return MiniPlayerState(
       track: track ?? this.track,
@@ -69,12 +75,13 @@ class MiniPlayerState extends Equatable {
       isResolving: isResolving ?? this.isResolving,
       isCompleted: isCompleted ?? this.isCompleted,
       hasError: hasError ?? this.hasError,
+      scrollHidden: scrollHidden ?? this.scrollHidden,
     );
   }
 
   @override
   List<Object?> get props =>
-      [track, isPlaying, isLoading, isResolving, isCompleted, hasError];
+      [track, isPlaying, isLoading, isResolving, isCompleted, hasError, scrollHidden];
 }
 
 // ─── Cubit ───────────────────────────────────────────────────────────────────
@@ -102,12 +109,12 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
   void _listen() {
     _sub = Rx.combineLatest4<MediaItem?, EngineState, bool, bool,
         (MediaItem?, EngineState, bool, bool)>(
-      _playerCubit.nasbeatPlayer.mediaItem,
-      Rx.defer(() => _playerCubit.nasbeatPlayer.engine.stateStream,
+      _playerCubit.nasBeatPlayer.mediaItem,
+      Rx.defer(() => _playerCubit.nasBeatPlayer.engine.stateStream,
           reusable: true),
-      Rx.defer(() => _playerCubit.nasbeatPlayer.engine.playingStream,
+      Rx.defer(() => _playerCubit.nasBeatPlayer.engine.playingStream,
           reusable: true),
-      _playerCubit.nasbeatPlayer.isResolving,
+      _playerCubit.nasBeatPlayer.isResolving,
       (media, engineState, playing, resolving) =>
           (media, engineState, playing, resolving),
     ).listen((record) {
@@ -130,6 +137,16 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
         hasError: engineState == EngineState.error,
       ));
     });
+  }
+
+  /// Called by scroll listeners when the user scrolls down through content.
+  void hideForScroll() {
+    if (!state.scrollHidden) emit(state.copyWith(scrollHidden: true));
+  }
+
+  /// Called by scroll listeners when the user scrolls back up.
+  void revealAfterScroll() {
+    if (state.scrollHidden) emit(state.copyWith(scrollHidden: false));
   }
 
   @override

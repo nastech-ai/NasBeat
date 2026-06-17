@@ -1478,7 +1478,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'NasBeat पसंद आ रहा है? आपका छोटा-सा सहयोग इसे और बेहतर बनाने में मदद करेगा। 🌸';
+      'NasBeat पसंद आ रहा है? आपका छोटा-सा सहयोग इसे और बेहतर बनाने में मदद करेगा।';
 
   @override
   String get aboutTipButton => 'मैं सहायता करना चाहता/चाहती हूँ';

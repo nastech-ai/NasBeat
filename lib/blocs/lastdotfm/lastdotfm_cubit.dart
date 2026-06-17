@@ -68,7 +68,7 @@ class LastdotfmCubit extends Cubit<LastdotfmState> {
   }
 
   void _onProgressTick() {
-    final player = playerCubit.nasbeatPlayer;
+    final player = playerCubit.nasBeatPlayer;
     final current = player.currentMedia;
     final isPlaying = player.engine.playing;
 

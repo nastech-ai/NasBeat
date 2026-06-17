@@ -382,7 +382,7 @@ class _ArtistViewState extends State<ArtistView> {
                       onTap: () {
                         context
                             .read<NasBeatPlayerCubit>()
-                            .nasbeatPlayer
+                            .nasBeatPlayer
                             .loadPlaylist(
                               Playlist(tracks: topTracks, title: artistName),
                               doPlay: true,
@@ -636,7 +636,7 @@ class _ArtistHeaderContent extends StatelessWidget {
                   ? null
                   : () => context
                       .read<NasBeatPlayerCubit>()
-                      .nasbeatPlayer
+                      .nasBeatPlayer
                       .loadPlaylist(
                         Playlist(tracks: topTracks, title: title),
                         doPlay: true,

@@ -110,7 +110,7 @@ class PlayerSettings extends StatelessWidget {
                       context.read<SettingsCubit>().setCrossfadeDuration(v);
                       context
                           .read<NasBeatPlayerCubit>()
-                          .nasbeatPlayer
+                          .nasBeatPlayer
                           .setCrossfadeDuration(Duration(seconds: v));
                     },
                   ),

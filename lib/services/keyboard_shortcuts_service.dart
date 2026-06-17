@@ -112,7 +112,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   bool _handleMediaKey(LogicalKeyboardKey key) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
 
     if (key == LogicalKeyboardKey.mediaPlayPause) {
       _togglePlayPause(player);
@@ -132,7 +132,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   bool _handleAltShortcut(LogicalKeyboardKey key) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
 
     if (key == LogicalKeyboardKey.arrowRight) {
       player.seekNSecForward(const Duration(seconds: 5));
@@ -146,7 +146,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   bool _handleSimpleShortcut(LogicalKeyboardKey key) {
-    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasBeatPlayer;
 
     if (key == LogicalKeyboardKey.space) {
       _togglePlayPause(player);

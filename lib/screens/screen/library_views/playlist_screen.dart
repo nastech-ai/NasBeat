@@ -100,7 +100,7 @@ class _PlaylistViewState extends State<PlaylistView> {
         await context.read<CurrentPlaylistCubit>().ensureAllTracksLoaded();
     if (!mounted || fullPlaylist.tracks.isEmpty) return;
 
-    context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
+    context.read<NasBeatPlayerCubit>().nasBeatPlayer.loadPlaylist(
           Playlist(tracks: fullPlaylist.tracks, title: fullPlaylist.title),
           idx: index ?? 0,
           doPlay: true,
@@ -589,14 +589,14 @@ class _PlaylistViewState extends State<PlaylistView> {
           // Big Center Play Button
           StreamBuilder<String>(
               stream:
-                  context.watch<NasBeatPlayerCubit>().nasbeatPlayer.queueTitle,
+                  context.watch<NasBeatPlayerCubit>().nasBeatPlayer.queueTitle,
               builder: (context, snapshot) {
                 final isCurrent =
                     snapshot.hasData && snapshot.data == state.playlist.title;
                 return StreamBuilder<bool>(
                     stream: context
                         .read<NasBeatPlayerCubit>()
-                        .nasbeatPlayer
+                        .nasBeatPlayer
                         .engine
                         .playingStream,
                     builder: (context, playingSnapshot) {
@@ -621,12 +621,12 @@ class _PlaylistViewState extends State<PlaylistView> {
                               : () => isCurrent
                                   ? context
                                       .read<NasBeatPlayerCubit>()
-                                      .nasbeatPlayer
+                                      .nasBeatPlayer
                                       .play()
                                   : _playFromPlaylist(context, state),
                           onPause: () => context
                               .read<NasBeatPlayerCubit>()
-                              .nasbeatPlayer
+                              .nasBeatPlayer
                               .pause(),
                         ),
                       );
