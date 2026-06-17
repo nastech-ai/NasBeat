@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/adapters/track_adapter.dart';
 import 'package:nasbeat/l10n/app_localizations.dart';
 import 'package:nasbeat/core/theme/app_theme.dart';
@@ -90,12 +90,12 @@ class _UpNextPanelState extends State<UpNextPanel> {
   late bool _isExpanded;
   double _minSheetSize = 0.1;
   double _maxSheetSize = 0.9;
-  late final BloomeePlayerCubit _playerCubit;
+  late final NasBeatPlayerCubit _playerCubit;
 
   @override
   void initState() {
     super.initState();
-    _playerCubit = context.read<BloomeePlayerCubit>();
+    _playerCubit = context.read<NasBeatPlayerCubit>();
     _isExpanded = widget.startExpanded;
 
     widget.controller?._attach(
@@ -211,7 +211,7 @@ class _PanelContent extends StatelessWidget {
   final bool isExpanded;
   final VoidCallback onHeaderTap;
   final ScrollController scrollController;
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   final DraggableScrollableController sheetController;
   final double minSize;
   final double maxSize;
@@ -333,7 +333,7 @@ class _CompactHeader extends StatelessWidget {
 }
 
 class _QueueInfoRow extends StatelessWidget {
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   const _QueueInfoRow({required this.playerCubit});
 
   @override
@@ -345,7 +345,7 @@ class _QueueInfoRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           StreamBuilder<List<MediaItem>>(
-            stream: playerCubit.bloomeePlayer.queue,
+            stream: playerCubit.nasbeatPlayer.queue,
             builder: (context, snapshot) {
               return Text(l10n.upNextItemsInQueue(snapshot.data?.length ?? 0),
                   style: _UpNextStyles.queueCountStyle);
@@ -361,13 +361,13 @@ class _QueueInfoRow extends StatelessWidget {
 /// Pill-styled "Clear Queue" button that keeps only the currently
 /// playing track and removes everything else from the queue.
 class _ClearQueueButton extends StatelessWidget {
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   const _ClearQueueButton({required this.playerCubit});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => playerCubit.bloomeePlayer.clearQueue(),
+      onTap: () => playerCubit.nasbeatPlayer.clearQueue(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
@@ -403,7 +403,7 @@ class _ClearQueueButton extends StatelessWidget {
 }
 
 class _DesktopLayout extends StatelessWidget {
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   const _DesktopLayout({required this.playerCubit});
 
   @override
@@ -435,7 +435,7 @@ class _DesktopLayout extends StatelessWidget {
 }
 
 class _DesktopSongList extends StatefulWidget {
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   const _DesktopSongList({required this.playerCubit});
 
   @override
@@ -474,7 +474,7 @@ class _DesktopSongListState extends State<_DesktopSongList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<MediaItem>>(
-      stream: widget.playerCubit.bloomeePlayer.queue,
+      stream: widget.playerCubit.nasbeatPlayer.queue,
       builder: (context, queueSnapshot) {
         if (!queueSnapshot.hasData) {
           return const Center(
@@ -484,7 +484,7 @@ class _DesktopSongListState extends State<_DesktopSongList> {
         final queue = queueSnapshot.data!;
 
         return StreamBuilder<MediaItem?>(
-          stream: widget.playerCubit.bloomeePlayer.mediaItem,
+          stream: widget.playerCubit.nasbeatPlayer.mediaItem,
           builder: (context, mediaSnapshot) {
             final currentId = mediaSnapshot.data?.id;
             if (currentId != null && currentId != _lastPlayingId) {
@@ -507,7 +507,7 @@ class _DesktopSongListState extends State<_DesktopSongList> {
               scrollController: _scrollController,
               physics: const BouncingScrollPhysics(),
               itemCount: uniqueQueue.length,
-              onReorder: widget.playerCubit.bloomeePlayer.moveQueueItem,
+              onReorder: widget.playerCubit.nasbeatPlayer.moveQueueItem,
               buildDefaultDragHandles: false,
               itemBuilder: (context, index) {
                 return _QueueItem(
@@ -527,7 +527,7 @@ class _DesktopSongListState extends State<_DesktopSongList> {
 }
 
 class _SongListSliver extends StatefulWidget {
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   final ScrollController scrollController;
   const _SongListSliver(
       {required this.playerCubit, required this.scrollController});
@@ -565,7 +565,7 @@ class _SongListSliverState extends State<_SongListSliver> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<MediaItem>>(
-      stream: widget.playerCubit.bloomeePlayer.queue,
+      stream: widget.playerCubit.nasbeatPlayer.queue,
       builder: (context, queueSnapshot) {
         if (!queueSnapshot.hasData) {
           return const SliverToBoxAdapter(child: SizedBox.shrink());
@@ -573,7 +573,7 @@ class _SongListSliverState extends State<_SongListSliver> {
         final queue = queueSnapshot.data!;
 
         return StreamBuilder<MediaItem?>(
-          stream: widget.playerCubit.bloomeePlayer.mediaItem,
+          stream: widget.playerCubit.nasbeatPlayer.mediaItem,
           builder: (context, mediaSnapshot) {
             final currentId = mediaSnapshot.data?.id;
             if (currentId != null && currentId != _lastPlayingId) {
@@ -590,7 +590,7 @@ class _SongListSliverState extends State<_SongListSliver> {
 
             return SliverReorderableList(
               itemCount: uniqueQueue.length,
-              onReorder: widget.playerCubit.bloomeePlayer.moveQueueItem,
+              onReorder: widget.playerCubit.nasbeatPlayer.moveQueueItem,
               itemBuilder: (context, index) {
                 return _QueueItem(
                   key: ValueKey('mobile_${uniqueQueue[index].id}'),
@@ -611,7 +611,7 @@ class _SongListSliverState extends State<_SongListSliver> {
 class _QueueItem extends StatelessWidget {
   final MediaItem mediaItem;
   final int index;
-  final BloomeePlayerCubit playerCubit;
+  final NasBeatPlayerCubit playerCubit;
   final bool isDesktop;
 
   const _QueueItem({
@@ -635,7 +635,7 @@ class _QueueItem extends StatelessWidget {
         color: Colors.red.withValues(alpha: 0.8),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      onDismissed: (_) => playerCubit.bloomeePlayer.removeQueueItemAt(index),
+      onDismissed: (_) => playerCubit.nasbeatPlayer.removeQueueItemAt(index),
       child: Material(
         color: Colors.transparent,
         child: Padding(
@@ -646,7 +646,7 @@ class _QueueItem extends StatelessWidget {
               Expanded(
                 child: SongCardWidget(
                   showOptions: false,
-                  onTap: () => playerCubit.bloomeePlayer.skipToQueueItem(index),
+                  onTap: () => playerCubit.nasbeatPlayer.skipToQueueItem(index),
                   song: songModel,
                   trailing: IconButton(
                     tooltip: 'More options',

@@ -58,7 +58,7 @@ class PluginBootstrapProgress {
 
 class PluginBootstrapService {
   static const String hostedRepositoriesUrl =
-      'https://nastech-ai.github.io/NasBeat/repositories.json';
+      'https://hemantkarya.github.io/NasBeat/repositories.json';
 
   static const int maxRetries = 3;
 

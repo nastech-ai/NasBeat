@@ -1,29 +1,29 @@
-import 'package:nasbeat/services/bloomee_player.dart';
+import 'package:nasbeat/services/nasbeat_player.dart';
 import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
-part 'bloomee_player_state.dart';
+part 'nasbeat_player_state.dart';
 
-class BloomeePlayerCubit extends Cubit<BloomeePlayerState> {
-  final BloomeeMusicPlayer bloomeePlayer;
+class NasBeatPlayerCubit extends Cubit<NasBeatPlayerState> {
+  final NasBeatMusicPlayer nasbeatPlayer;
   late ValueStream<ProgressBarStreams> progressStreams;
 
-  BloomeePlayerCubit(this.bloomeePlayer)
-      : super(BloomeePlayerState(isReady: true)) {
-    bloomeePlayer.syncPublicState();
+  NasBeatPlayerCubit(this.nasbeatPlayer)
+      : super(NasBeatPlayerState(isReady: true)) {
+    nasbeatPlayer.syncPublicState();
     _setupProgressStreams();
   }
 
   void switchShowLyrics({bool? value}) {
-    emit(BloomeePlayerState(
+    emit(NasBeatPlayerState(
         isReady: true, showLyrics: value ?? !state.showLyrics));
   }
 
   void _setupProgressStreams() {
     progressStreams = Rx.combineLatest4(
-      Rx.defer(() => bloomeePlayer.engine.positionStream, reusable: true),
-      Rx.defer(() => bloomeePlayer.engine.durationStream, reusable: true),
-      Rx.defer(() => bloomeePlayer.engine.bufferedStream, reusable: true),
-      Rx.defer(() => bloomeePlayer.engine.playingStream, reusable: true),
+      Rx.defer(() => nasbeatPlayer.engine.positionStream, reusable: true),
+      Rx.defer(() => nasbeatPlayer.engine.durationStream, reusable: true),
+      Rx.defer(() => nasbeatPlayer.engine.bufferedStream, reusable: true),
+      Rx.defer(() => nasbeatPlayer.engine.playingStream, reusable: true),
       (Duration position, Duration duration, Duration buffered, bool playing) =>
           ProgressBarStreams(
         position: position,

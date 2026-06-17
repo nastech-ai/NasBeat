@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:nasbeat/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/constants/route_paths.dart';
 import 'package:nasbeat/core/models/exported.dart';
 import 'package:nasbeat/core/models/media_playlist_model.dart';
@@ -229,7 +229,7 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
       return;
     }
 
-    context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+    context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
           Playlist(tracks: [track], title: widget.chartTitle),
           doPlay: true,
         );

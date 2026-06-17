@@ -44,7 +44,7 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
   static const _bgBase = Color(0xFF060608); // Ultra deep cinematic dark
   static const _surfaceCol = Color(0xFF14141A);
   static const _errorAccent = Color(0xFFFF4C4C);
-  static const _successAccent = Color(0xFFFF2A5F); // Bloomee Pink/Red
+  static const _successAccent = Color(0xFFFF2A5F); // NasBeat Pink/Red
 
   // ── State (Isolated for Zero Jank) ─────────────────────────────────────
   final ValueNotifier<_Phase> _phase = ValueNotifier(_Phase.running);
@@ -207,8 +207,8 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
       valueListenable: _phase,
       builder: (context, phase, _) {
         final title = switch (phase) {
-          _Phase.running => 'Upgrading Bloomee',
-          _Phase.success => 'Welcome to Bloomee 3.0',
+          _Phase.running => 'Upgrading NasBeat',
+          _Phase.success => 'Welcome to NasBeat 3.0',
           _Phase.failed => 'Migration Aborted',
         };
 
@@ -406,7 +406,7 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
           elevation: 0,
         ),
         child: Text(
-          isErr ? 'Retry Migration' : 'Enter Bloomee',
+          isErr ? 'Retry Migration' : 'Enter NasBeat',
           style: const TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.3),
         ),

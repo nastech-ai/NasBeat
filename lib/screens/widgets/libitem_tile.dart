@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/utils/load_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nasbeat/core/theme/app_theme.dart';
@@ -60,8 +60,8 @@ class LibItemCard extends StatelessWidget {
               type == LibItemTypes.userPlaylist
                   ? StreamBuilder<String>(
                       stream: context
-                          .watch<BloomeePlayerCubit>()
-                          .bloomeePlayer
+                          .watch<NasBeatPlayerCubit>()
+                          .nasbeatPlayer
                           .queueTitle,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data == title) {

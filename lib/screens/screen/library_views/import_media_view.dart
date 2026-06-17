@@ -76,9 +76,9 @@ class _ImportMediaFromPlatformsViewState
                   ),
                   const SizedBox(height: 8),
                   _ImportFromBtn(
-                    btnName: AppLocalizations.of(context)!.importBloomeeFiles,
+                    btnName: AppLocalizations.of(context)!.importNasBeatFiles,
                     btnIcon: MingCute.file_import_fill,
-                    onClickFunc: () => _importBloomeeFile(context),
+                    onClickFunc: () => _importNasBeatFile(context),
                   ),
                   const SizedBox(height: 10),
                   _ImportFromBtn(
@@ -129,9 +129,9 @@ class _ImportMediaFromPlatformsViewState
     );
   }
 
-  // ─── Import Bloomee JSON/BLM files ────────────────────────────────────────
+  // ─── Import NasBeat JSON/BLM files ────────────────────────────────────────
 
-  void _importBloomeeFile(BuildContext context) {
+  void _importNasBeatFile(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

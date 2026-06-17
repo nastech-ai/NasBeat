@@ -82,29 +82,117 @@ class _AppUISettingsState extends State<AppUISettings> {
       ),
       body: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (prev, curr) =>
-            prev.appTheme != curr.appTheme ||
             prev.autoSlideCharts != curr.autoSlideCharts ||
             prev.lFMPicks != curr.lFMPicks ||
-            prev.chartMap != curr.chartMap,
+            prev.chartMap != curr.chartMap ||
+            prev.appTheme != curr.appTheme,
         builder: (context, state) {
           return ListView(
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             children: [
-                            SettingSectionHeader(label: 'Theme'),
-              SettingCard(
-                children: [
-                  for (final theme in NasBeatTheme.values) ...[
-                    if (theme != NasBeatTheme.values.first) const SettingDivider(),
-                    _ThemeTile(
-                      theme: theme,
-                      isSelected: state.appTheme == theme.key,
-                      onTap: () => context.read<SettingsCubit>().setAppTheme(theme.key),
+              // ── Theme Picker ──────────────────────────────────────────────
+              const SettingSectionHeader(label: 'App Theme'),
+              const SizedBox(height: 12),
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.55,
+                children: NasBeatTheme.values.map((theme) {
+                  final selected = state.appTheme == theme.key;
+                  return GestureDetector(
+                    onTap: () => context
+                        .read<SettingsCubit>()
+                        .setAppTheme(theme.key),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      decoration: BoxDecoration(
+                        color: theme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: selected
+                              ? theme.accent
+                              : Colors.white.withValues(alpha: 0.08),
+                          width: selected ? 2.5 : 1,
+                        ),
+                        boxShadow: selected
+                            ? [
+                                BoxShadow(
+                                  color: theme.accent.withValues(alpha: 0.35),
+                                  blurRadius: 14,
+                                  spreadRadius: 1,
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: Stack(
+                        children: [
+                          // Color swatch strip at top
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(14)),
+                              child: Container(
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      theme.background,
+                                      theme.accent,
+                                      theme.accentSecondary,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Theme name
+                          Positioned(
+                            bottom: 10,
+                            left: 12,
+                            right: 28,
+                            child: Text(
+                              theme.displayName,
+                              style: TextStyle(
+                                color: theme.primaryText,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          // Selected checkmark
+                          if (selected)
+                            Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: theme.accent,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.check,
+                                    size: 13, color: Colors.white),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ],
-                ],
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 28),
+              // ── Home Screen ───────────────────────────────────────────────
               SettingSectionHeader(label: l10n.settingsHomeScreen),
               SettingCard(
                 children: [
@@ -193,75 +281,6 @@ class _AppUISettingsState extends State<AppUISettings> {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _ThemeTile extends StatelessWidget {
-  final NasBeatTheme theme;
-  final bool isSelected;
-  final VoidCallback onTap;
-  const _ThemeTile({required this.theme, required this.isSelected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = theme.accent;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: theme.background,
-                border: Border.all(
-                  color: isSelected ? accent : Colors.white.withValues(alpha: 0.08),
-                  width: isSelected ? 2.5 : 1,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: isSelected
-                  ? Icon(Icons.check_rounded, size: 18, color: accent)
-                  : null,
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    theme.displayName,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.92),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (theme.isAmoled)
-                    Text(
-                      'True black — best for OLED screens',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.45),
-                        fontSize: 11,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: accent,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

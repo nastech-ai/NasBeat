@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/models/exported.dart' hide MediaItem;
 import 'package:nasbeat/core/adapters/track_adapter.dart';
 import 'package:nasbeat/services/player/player_engine.dart';
@@ -34,9 +34,6 @@ class MiniPlayerState extends Equatable {
   /// Whether the engine is in an error state.
   final bool hasError;
 
-  /// True while the mini-player is hidden because the user scrolled down.
-  final bool scrollHidden;
-
   const MiniPlayerState({
     this.track,
     this.isPlaying = false,
@@ -44,11 +41,10 @@ class MiniPlayerState extends Equatable {
     this.isResolving = false,
     this.isCompleted = false,
     this.hasError = false,
-    this.scrollHidden = false,
   });
 
   /// Mini player is visible whenever there's a track to show.
-  bool get isVisible => track != null && track!.id != 'Null' && !scrollHidden;
+  bool get isVisible => track != null && track!.id != 'Null';
 
   const MiniPlayerState.hidden()
       : track = null,
@@ -56,8 +52,7 @@ class MiniPlayerState extends Equatable {
         isLoading = false,
         isResolving = false,
         isCompleted = false,
-        hasError = false,
-        scrollHidden = false;
+        hasError = false;
 
   MiniPlayerState copyWith({
     Track? track,
@@ -66,7 +61,6 @@ class MiniPlayerState extends Equatable {
     bool? isResolving,
     bool? isCompleted,
     bool? hasError,
-    bool? scrollHidden,
   }) {
     return MiniPlayerState(
       track: track ?? this.track,
@@ -75,13 +69,12 @@ class MiniPlayerState extends Equatable {
       isResolving: isResolving ?? this.isResolving,
       isCompleted: isCompleted ?? this.isCompleted,
       hasError: hasError ?? this.hasError,
-      scrollHidden: scrollHidden ?? this.scrollHidden,
     );
   }
 
   @override
   List<Object?> get props =>
-      [track, isPlaying, isLoading, isResolving, isCompleted, hasError, scrollHidden];
+      [track, isPlaying, isLoading, isResolving, isCompleted, hasError];
 }
 
 // ─── Cubit ───────────────────────────────────────────────────────────────────
@@ -97,10 +90,10 @@ class MiniPlayerState extends Equatable {
 /// - **Minimal state machine**: One [MiniPlayerState] with boolean flags
 ///   instead of a sealed class hierarchy with 5+ subtypes.
 class MiniPlayerCubit extends Cubit<MiniPlayerState> {
-  final BloomeePlayerCubit _playerCubit;
+  final NasBeatPlayerCubit _playerCubit;
   StreamSubscription? _sub;
 
-  MiniPlayerCubit({required BloomeePlayerCubit playerCubit})
+  MiniPlayerCubit({required NasBeatPlayerCubit playerCubit})
       : _playerCubit = playerCubit,
         super(const MiniPlayerState.hidden()) {
     _listen();
@@ -109,12 +102,12 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
   void _listen() {
     _sub = Rx.combineLatest4<MediaItem?, EngineState, bool, bool,
         (MediaItem?, EngineState, bool, bool)>(
-      _playerCubit.bloomeePlayer.mediaItem,
-      Rx.defer(() => _playerCubit.bloomeePlayer.engine.stateStream,
+      _playerCubit.nasbeatPlayer.mediaItem,
+      Rx.defer(() => _playerCubit.nasbeatPlayer.engine.stateStream,
           reusable: true),
-      Rx.defer(() => _playerCubit.bloomeePlayer.engine.playingStream,
+      Rx.defer(() => _playerCubit.nasbeatPlayer.engine.playingStream,
           reusable: true),
-      _playerCubit.bloomeePlayer.isResolving,
+      _playerCubit.nasbeatPlayer.isResolving,
       (media, engineState, playing, resolving) =>
           (media, engineState, playing, resolving),
     ).listen((record) {
@@ -137,16 +130,6 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
         hasError: engineState == EngineState.error,
       ));
     });
-  }
-
-  /// Called by scroll listeners when the user scrolls down through content.
-  void hideForScroll() {
-    if (!state.scrollHidden) emit(state.copyWith(scrollHidden: true));
-  }
-
-  /// Called by scroll listeners when the user scrolls back up.
-  void revealAfterScroll() {
-    if (state.scrollHidden) emit(state.copyWith(scrollHidden: false));
   }
 
   @override

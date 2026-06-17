@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/models/media_playlist_model.dart';
 import 'package:nasbeat/core/models/exported.dart';
 import 'package:nasbeat/screens/screen/library_views/cubit/current_playlist_cubit.dart';
@@ -100,7 +100,7 @@ class _PlaylistViewState extends State<PlaylistView> {
         await context.read<CurrentPlaylistCubit>().ensureAllTracksLoaded();
     if (!mounted || fullPlaylist.tracks.isEmpty) return;
 
-    context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+    context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
           Playlist(tracks: fullPlaylist.tracks, title: fullPlaylist.title),
           idx: index ?? 0,
           doPlay: true,
@@ -589,14 +589,14 @@ class _PlaylistViewState extends State<PlaylistView> {
           // Big Center Play Button
           StreamBuilder<String>(
               stream:
-                  context.watch<BloomeePlayerCubit>().bloomeePlayer.queueTitle,
+                  context.watch<NasBeatPlayerCubit>().nasbeatPlayer.queueTitle,
               builder: (context, snapshot) {
                 final isCurrent =
                     snapshot.hasData && snapshot.data == state.playlist.title;
                 return StreamBuilder<bool>(
                     stream: context
-                        .read<BloomeePlayerCubit>()
-                        .bloomeePlayer
+                        .read<NasBeatPlayerCubit>()
+                        .nasbeatPlayer
                         .engine
                         .playingStream,
                     builder: (context, playingSnapshot) {
@@ -620,13 +620,13 @@ class _PlaylistViewState extends State<PlaylistView> {
                               ? () {}
                               : () => isCurrent
                                   ? context
-                                      .read<BloomeePlayerCubit>()
-                                      .bloomeePlayer
+                                      .read<NasBeatPlayerCubit>()
+                                      .nasbeatPlayer
                                       .play()
                                   : _playFromPlaylist(context, state),
                           onPause: () => context
-                              .read<BloomeePlayerCubit>()
-                              .bloomeePlayer
+                              .read<NasBeatPlayerCubit>()
+                              .nasbeatPlayer
                               .pause(),
                         ),
                       );

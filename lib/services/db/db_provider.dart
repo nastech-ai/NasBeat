@@ -78,8 +78,8 @@ class DBProvider {
       if (!await dbFile.exists()) {
         await checkAndRestoreDB(dbFile.path, [
           p.join(appDocDir, 'dbv3.isar'),
-          p.join(appDocDir, 'bloomee_backup_dbv3.isar'),
-          p.join(appSuppDir, 'bloomee_backup_dbv3.isar'),
+          p.join(appDocDir, 'nasbeat_backup_dbv3.isar'),
+          p.join(appSuppDir, 'nasbeat_backup_dbv3.isar'),
         ]);
       }
 
@@ -167,7 +167,7 @@ class DBProvider {
   static Future<String> getDbBackupFilePath() async {
     String backupPath = (await getDownloadsDirectory())?.path ?? appDocDir;
     backupPath =
-        p.join(backupPath, 'bloomeeBackup', 'bloomee_backup_dbv3.json');
+        p.join(backupPath, 'nasbeatBackup', 'nasbeat_backup_dbv3.json');
     return backupPath;
   }
 
@@ -287,7 +287,7 @@ class DBProvider {
         '_meta': {
           'format': 'legacy-v2-full',
           'exportedAt': DateTime.now().toIso8601String(),
-          'generatedBy': 'Bloomee DBProvider',
+          'generatedBy': 'NasBeat DBProvider',
           'playlistsCount': playlistRows.length,
           'mediaItemsCount': mediaRows.length,
         },

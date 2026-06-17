@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:nasbeat/core/models/media_playlist_model.dart';
 import 'package:nasbeat/core/models/exported.dart';
@@ -118,8 +118,8 @@ class _OfflineScreenState extends State<OfflineScreen> {
 
                                 try {
                                   context
-                                      .read<BloomeePlayerCubit>()
-                                      .bloomeePlayer
+                                      .read<NasBeatPlayerCubit>()
+                                      .nasbeatPlayer
                                       .loadPlaylist(
                                         Playlist(
                                           tracks: state.downloaded,

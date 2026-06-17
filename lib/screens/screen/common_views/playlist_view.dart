@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/di/service_locator.dart';
 import 'package:nasbeat/core/events/global_event_bus.dart';
 import 'package:nasbeat/core/models/exported.dart';
@@ -282,8 +282,8 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                                 context, song,
                                 showDelete: false, showSinglePlay: true),
                             onTap: () => context
-                                .read<BloomeePlayerCubit>()
-                                .bloomeePlayer
+                                .read<NasBeatPlayerCubit>()
+                                .nasbeatPlayer
                                 .loadPlaylist(
                                   Playlist(
                                       tracks: tracks,
@@ -513,7 +513,7 @@ class _PlaylistHeaderContent extends StatelessWidget {
         _PremiumPlayButton(
           isEmpty: tracks.isEmpty,
           onTap: () =>
-              context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+              context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
                     Playlist(tracks: tracks, title: title),
                     doPlay: true,
                     idx: 0,

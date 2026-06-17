@@ -9,7 +9,7 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Bloomee에 오신 것을 환영합니다';
+  String get onboardingTitle => 'NasBeat에 오신 것을 환영합니다';
 
   @override
   String get onboardingSubtitle => '언어와 지역 설정을 시작합니다.';
@@ -968,7 +968,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      '백업 파일은 다음 위치에 저장됩니다:\n\n1. 다운로드 폴더\n2. Android/data/ls.bloomee.musicplayer/data\n\n해당 위치에서 파일을 확인하세요.';
+      '백업 파일은 다음 위치에 저장됩니다:\n\n1. 다운로드 폴더\n2. Android/data/ai.nastech.nasbeat/data\n\n해당 위치에서 파일을 확인하세요.';
 
   @override
   String get storageLocationOther => '백업은 다운로드 폴더에 저장됩니다.';
@@ -1077,7 +1077,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => '새로운 버전의 Bloomee🌸가 출시되었습니다!';
+  String get updateNewVersionAvailable => '새로운 버전의 NasBeat🎵가 출시되었습니다!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1382,7 +1382,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutCreativeHighlights => '업데이트 및 주요 소식';
 
   @override
-  String get aboutTipQuote => 'Bloomee가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다. 🌸';
+  String get aboutTipQuote => 'NasBeat가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다. 🌸';
 
   @override
   String get aboutTipButton => '후원하기';
@@ -1532,7 +1532,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '가져오기 플러그인이 없습니다. 외부 플레이리스트를 가져오려면 플러그인을 설치하세요.';
 
   @override
-  String get importBloomeeFiles => 'Bloomee 파일 가져오기';
+  String get importNasBeatFiles => 'NasBeat 파일 가져오기';
 
   @override
   String get importM3UFiles => 'M3U 플레이리스트 가져오기';
@@ -1551,7 +1551,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'Bloomee에서 생성한 파일만 정상적으로 가져올 수 있습니다. 계속하시겠습니까?';
+      'NasBeat에서 생성한 파일만 정상적으로 가져올 수 있습니다. 계속하시겠습니까?';
 
   @override
   String get importTitle => '가져오기';
@@ -1856,7 +1856,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return '새로운 버전의 Bloomee🌸가 출시되었습니다!\n\n버전: $ver+$build';
+    return '새로운 버전의 NasBeat🎵가 출시되었습니다!\n\n버전: $ver+$build';
   }
 
   @override
@@ -1875,7 +1875,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee 설정 중';
+  String get pluginBootstrapTitle => 'NasBeat 설정 중';
 
   @override
   String pluginBootstrapProgress(int percent) {

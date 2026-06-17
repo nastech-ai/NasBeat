@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:nasbeat/core/constants/setting_keys.dart';
-import 'package:nasbeat/services/bloomee_updater_tools.dart';
+import 'package:nasbeat/services/nasbeat_updater_tools.dart';
 import 'package:nasbeat/services/db/dao/settings_dao.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -31,28 +31,9 @@ class GlobalEventsCubit extends Cubit<GlobalEventsState> {
         emit(UpdateAvailable(
           newVersion: updates["newVer"],
           newBuild: updates["newBuild"],
-          downloadUrl: updates["download_url"] ?? "https://github.com/nastech-ai/NasBeat/releases/latest",
+          downloadUrl: "https://github.com/nastech-ai/NasBeat/releases",
         ));
       }
-    }
-  }
-
-  Future<void> downloadUpdate(String downloadUrl) async {
-    log('Starting update download: $downloadUrl', name: 'GlobalEventsCubit');
-    try {
-      final path = await downloadUpdateFile(
-        downloadUrl,
-        onProgress: (progress) => emit(
-          UpdateDownloadProgress(
-              progress: progress, downloadUrl: downloadUrl),
-        ),
-      );
-      emit(UpdateDownloadComplete(filePath: path));
-      log('Update downloaded to: $path', name: 'GlobalEventsCubit');
-    } catch (e, st) {
-      log('Update download failed: $e\n$st', name: 'GlobalEventsCubit');
-      emit(UpdateDownloadError(
-          message: e.toString(), downloadUrl: downloadUrl));
     }
   }
 

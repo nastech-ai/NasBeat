@@ -9,7 +9,7 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Bloomee में आपका स्वागत है';
+  String get onboardingTitle => 'NasBeat में आपका स्वागत है';
 
   @override
   String get onboardingSubtitle => 'आइए आपकी भाषा और क्षेत्र सेट करें।';
@@ -1017,7 +1017,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'गाना बजते समय उसके लिरिक्स अपने-आप डिवाइस में सेव कर लें।';
 
   @override
-  String get storageResetApp => 'Bloomee ऐप को रीसेट करें';
+  String get storageResetApp => 'NasBeat ऐप को रीसेट करें';
 
   @override
   String get storageResetAppSubtitle =>
@@ -1028,7 +1028,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      'क्या आप वाकई Bloomee को रीसेट करना चाहते हैं? इससे आपका सारा डेटा डिलीट हो जाएगा और इसे वापस नहीं पाया जा सकेगा।';
+      'क्या आप वाकई NasBeat को रीसेट करना चाहते हैं? इससे आपका सारा डेटा डिलीट हो जाएगा और इसे वापस नहीं पाया जा सकेगा।';
 
   @override
   String get storageResetButton => 'रीसेट करें';
@@ -1041,7 +1041,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'बैकअप यहाँ सेव किए जाते हैं:\n\n1. Downloads फ़ोल्डर\n2. Android/data/ls.bloomee.musicplayer/data\n\nदोनों में से किसी भी जगह से आप फ़ाइल कॉपी कर सकते हैं।';
+      'बैकअप यहाँ सेव किए जाते हैं:\n\n1. Downloads फ़ोल्डर\n2. Android/data/ai.nastech.nasbeat/data\n\nदोनों में से किसी भी जगह से आप फ़ाइल कॉपी कर सकते हैं।';
 
   @override
   String get storageLocationOther =>
@@ -1137,7 +1137,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get updateCheckSubtitle =>
-      'देखें कि Bloomee का कोई नया वर्शन मौजूद है या नहीं।';
+      'देखें कि NasBeat का कोई नया वर्शन मौजूद है या नहीं।';
 
   @override
   String get updateAutoNotify => 'ऑटो अपडेट सूचना';
@@ -1150,7 +1150,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get updateCheckTitle => 'अपडेट्स चेक करें';
 
   @override
-  String get updateUpToDate => 'Bloomee🌸 पूरी तरह से अपडेटेड है!';
+  String get updateUpToDate => 'NasBeat🎵 पूरी तरह से अपडेटेड है!';
 
   @override
   String get updateViewPreRelease => 'नया प्री-रिलीज़ वर्शन देखें';
@@ -1162,7 +1162,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'Bloomee🌸 का एक नया वर्शन उपलब्ध है!';
+      'NasBeat🎵 का एक नया वर्शन उपलब्ध है!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1478,13 +1478,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Bloomee पसंद आ रहा है? आपका छोटा-सा सहयोग इसे और बेहतर बनाने में मदद करेगा। 🌸';
+      'NasBeat पसंद आ रहा है? आपका छोटा-सा सहयोग इसे और बेहतर बनाने में मदद करेगा। 🌸';
 
   @override
   String get aboutTipButton => 'मैं सहायता करना चाहता/चाहती हूँ';
 
   @override
-  String get aboutTipDesc => 'Bloomee को और बेहतर बनाने में अपना योगदान दें।';
+  String get aboutTipDesc => 'NasBeat को और बेहतर बनाने में अपना योगदान दें।';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1545,13 +1545,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'इस सोर्स के लिए नया डेटा लाना उपलब्ध नहीं है';
 
   @override
-  String get songInfoSearchTitle => 'Bloomee में यह गाना खोजें';
+  String get songInfoSearchTitle => 'NasBeat में यह गाना खोजें';
 
   @override
-  String get songInfoSearchArtist => 'Bloomee में इस कलाकार को खोजें';
+  String get songInfoSearchArtist => 'NasBeat में इस कलाकार को खोजें';
 
   @override
-  String get songInfoSearchAlbum => 'Bloomee में इस एल्बम को खोजें';
+  String get songInfoSearchAlbum => 'NasBeat में इस एल्बम को खोजें';
 
   @override
   String get eqTitle => 'इक्वलाइज़र';
@@ -1632,7 +1632,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'कोई इम्पोर्टर प्लगइन मौजूद नहीं है।\nबाहरी जगहों से प्लेलिस्ट लाने के लिए पहले कोई इम्पोर्टर प्लगइन इंस्टॉल करें।';
 
   @override
-  String get importBloomeeFiles => 'Bloomee फ़ाइलें इम्पोर्ट करें';
+  String get importNasBeatFiles => 'NasBeat फ़ाइलें इम्पोर्ट करें';
 
   @override
   String get importM3UFiles => 'M3U प्लेलिस्ट इम्पोर्ट करें';
@@ -1652,7 +1652,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'आप केवल Bloomee द्वारा बनाई गई फ़ाइलें ही इम्पोर्ट कर सकते हैं।\nयदि आपकी फ़ाइल किसी और जगह की है, तो वह काम नहीं करेगी। क्या आप फिर भी आगे बढ़ना चाहते हैं?';
+      'आप केवल NasBeat द्वारा बनाई गई फ़ाइलें ही इम्पोर्ट कर सकते हैं।\nयदि आपकी फ़ाइल किसी और जगह की है, तो वह काम नहीं करेगी। क्या आप फिर भी आगे बढ़ना चाहते हैं?';
 
   @override
   String get importTitle => 'इम्पोर्ट करें';
@@ -1987,7 +1987,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Bloomee🌸 का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
+    return 'NasBeat🎵 का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
   }
 
   @override
@@ -2006,7 +2006,7 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee को तैयार किया जा रहा है';
+  String get pluginBootstrapTitle => 'NasBeat को तैयार किया जा रहा है';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2021,7 +2021,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Bloomee का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।';
+      'कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी NasBeat का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।';
 
   @override
   String get pluginBootstrapContinue => 'फिर भी आगे बढ़ें';

@@ -3,21 +3,21 @@
 import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class BloomeeSwitch extends StatefulWidget {
+class NasBeatSwitch extends StatefulWidget {
   final bool value;
   final VoidCallback onChanged;
 
-  const BloomeeSwitch({
+  const NasBeatSwitch({
     super.key,
     required this.value,
     required this.onChanged,
   });
 
   @override
-  State<BloomeeSwitch> createState() => _BloomeeSwitchState();
+  State<NasBeatSwitch> createState() => _NasBeatSwitchState();
 }
 
-class _BloomeeSwitchState extends State<BloomeeSwitch> {
+class _NasBeatSwitchState extends State<NasBeatSwitch> {
   late bool _localValue;
 
   @override
@@ -27,7 +27,7 @@ class _BloomeeSwitchState extends State<BloomeeSwitch> {
   }
 
   @override
-  void didUpdateWidget(covariant BloomeeSwitch oldWidget) {
+  void didUpdateWidget(covariant NasBeatSwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Sync with external state when the parent rebuilds with a new value.
     if (oldWidget.value != widget.value) {

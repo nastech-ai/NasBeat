@@ -1,11 +1,11 @@
 import 'dart:io' as io;
 import 'dart:async';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:nasbeat/screens/screen/home_views/timer_view.dart';
 import 'package:nasbeat/core/constants/sentinel_values.dart';
 import 'package:nasbeat/screens/widgets/snackbar.dart';
-import 'package:nasbeat/services/bloomee_player.dart';
+import 'package:nasbeat/services/nasbeat_player.dart';
 import 'package:nasbeat/services/db/dao/playlist_dao.dart';
 import 'package:nasbeat/services/db/dao/track_dao.dart';
 import 'package:nasbeat/services/db/db_provider.dart';
@@ -112,7 +112,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   bool _handleMediaKey(LogicalKeyboardKey key) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
 
     if (key == LogicalKeyboardKey.mediaPlayPause) {
       _togglePlayPause(player);
@@ -132,7 +132,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   bool _handleAltShortcut(LogicalKeyboardKey key) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
 
     if (key == LogicalKeyboardKey.arrowRight) {
       player.seekNSecForward(const Duration(seconds: 5));
@@ -146,7 +146,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   bool _handleSimpleShortcut(LogicalKeyboardKey key) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
 
     if (key == LogicalKeyboardKey.space) {
       _togglePlayPause(player);
@@ -221,7 +221,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
   }
 
   void _startVolumeAdjust(
-      LogicalKeyboardKey key, double delta, BloomeeMusicPlayer player) {
+      LogicalKeyboardKey key, double delta, NasBeatMusicPlayer player) {
     if (_volumeAdjustKey == key && _volumeAdjustTimer != null) return;
 
     _stopVolumeAdjustForKey(_volumeAdjustKey);
@@ -244,7 +244,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
     }
   }
 
-  void _togglePlayPause(BloomeeMusicPlayer player) {
+  void _togglePlayPause(NasBeatMusicPlayer player) {
     if (player.engine.playing) {
       player.engine.pause();
     } else {
@@ -252,7 +252,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
     }
   }
 
-  double _changeVolume(BloomeeMusicPlayer player, double delta) {
+  double _changeVolume(NasBeatMusicPlayer player, double delta) {
     final currentVolume = player.engine.volume;
     final newVolume = (currentVolume + delta).clamp(0.0, 1.0);
     player.engine.setVolume(newVolume);
@@ -261,7 +261,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
 
   double _lastVolumeBeforeMute = 1.0;
 
-  (bool, double) _toggleMute(BloomeeMusicPlayer player) {
+  (bool, double) _toggleMute(NasBeatMusicPlayer player) {
     final currentVolume = player.engine.volume;
     if (currentVolume > 0) {
       _lastVolumeBeforeMute = currentVolume;
@@ -273,7 +273,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
     }
   }
 
-  LoopMode _cycleLoopMode(BloomeeMusicPlayer player) {
+  LoopMode _cycleLoopMode(NasBeatMusicPlayer player) {
     final currentMode = player.loopMode.value;
     LoopMode nextMode;
     switch (currentMode) {
@@ -291,7 +291,7 @@ class _KeyboardShortcutsHandlerState extends State<KeyboardShortcutsHandler> {
     return nextMode;
   }
 
-  Future<void> _toggleLike(BloomeeMusicPlayer player) async {
+  Future<void> _toggleLike(NasBeatMusicPlayer player) async {
     final currentMedia = player.currentMedia;
     if (isTrackNull(currentMedia)) return;
 

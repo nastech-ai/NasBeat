@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/core/constants/cache_keys.dart';
-import 'package:Bloomee/repository/bloomee/settings_repository.dart';
-import 'package:Bloomee/services/player/stream_quality_selector.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/utils/country_info.dart';
+import 'package:nasbeat/core/constants/setting_keys.dart';
+import 'package:nasbeat/core/constants/cache_keys.dart';
+import 'package:nasbeat/repository/nasbeat/settings_repository.dart';
+import 'package:nasbeat/services/player/stream_quality_selector.dart';
+import 'package:nasbeat/services/db/db_provider.dart';
+import 'package:nasbeat/utils/country_info.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';

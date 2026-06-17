@@ -9,7 +9,7 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get onboardingTitle => '欢迎使用 Bloomee';
+  String get onboardingTitle => '欢迎使用 NasBeat';
 
   @override
   String get onboardingSubtitle => '让我们开始设置您的语言和地区。';
@@ -942,7 +942,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageAutoLyricsSubtitle => '播放歌曲时自动保存歌词。';
 
   @override
-  String get storageResetApp => '重置 Bloomee 应用';
+  String get storageResetApp => '重置 NasBeat 应用';
 
   @override
   String get storageResetAppSubtitle => '删除所有数据并将应用恢复到初始状态。';
@@ -951,7 +951,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageResetConfirmTitle => '确认重置';
 
   @override
-  String get storageResetConfirmMessage => '确定要重置 Bloomee 吗？这将删除您的所有数据且无法撤销。';
+  String get storageResetConfirmMessage => '确定要重置 NasBeat 吗？这将删除您的所有数据且无法撤销。';
 
   @override
   String get storageResetButton => '重置';
@@ -964,7 +964,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      '备份存储在：\n\n1. 下载目录\n2. Android/data/ls.bloomee.musicplayer/data\n\n请从任一位置复制文件。';
+      '备份存储在：\n\n1. 下载目录\n2. Android/data/ai.nastech.nasbeat/data\n\n请从任一位置复制文件。';
 
   @override
   String get storageLocationOther => '备份存储在“下载”目录中。请从那里复制文件。';
@@ -1048,7 +1048,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateCheckForUpdates => '检查更新';
 
   @override
-  String get updateCheckSubtitle => '查看是否有新版本的 Bloomee 可用。';
+  String get updateCheckSubtitle => '查看是否有新版本的 NasBeat 可用。';
 
   @override
   String get updateAutoNotify => '自动更新通知';
@@ -1060,7 +1060,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateCheckTitle => '检查更新';
 
   @override
-  String get updateUpToDate => 'Bloomee🌸 已经是最新版本！';
+  String get updateUpToDate => 'NasBeat🎵 已经是最新版本！';
 
   @override
   String get updateViewPreRelease => '查看最新预发布版';
@@ -1071,7 +1071,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => 'Bloomee🌸 新版本现已可用！';
+  String get updateNewVersionAvailable => 'NasBeat🎵 新版本现已可用！';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1376,13 +1376,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutCreativeHighlights => '更新与创作亮点';
 
   @override
-  String get aboutTipQuote => '喜欢 Bloomee 吗？小小的打赏能让它持续绽放。🌸';
+  String get aboutTipQuote => '喜欢 NasBeat 吗？小小的打赏能让它持续绽放。🌸';
 
   @override
   String get aboutTipButton => '我要赞赏';
 
   @override
-  String get aboutTipDesc => '我希望 Bloomee 越来越好。';
+  String get aboutTipDesc => '我希望 NasBeat 越来越好。';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1442,13 +1442,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get songInfoMetadataUnavailable => '此来源不支持刷新元数据';
 
   @override
-  String get songInfoSearchTitle => '在 Bloomee 中搜索此歌曲';
+  String get songInfoSearchTitle => '在 NasBeat 中搜索此歌曲';
 
   @override
-  String get songInfoSearchArtist => '在 Bloomee 中搜索此艺人';
+  String get songInfoSearchArtist => '在 NasBeat 中搜索此艺人';
 
   @override
-  String get songInfoSearchAlbum => '在 Bloomee 中搜索此专辑';
+  String get songInfoSearchAlbum => '在 NasBeat 中搜索此专辑';
 
   @override
   String get eqTitle => '均衡器';
@@ -1525,7 +1525,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importNoPluginsLoaded => '未加载内容导入插件。\n请安装导入插件以从外部服务导入歌单。';
 
   @override
-  String get importBloomeeFiles => '导入 Bloomee 文件';
+  String get importNasBeatFiles => '导入 NasBeat 文件';
 
   @override
   String get importM3UFiles => '导入 M3U 歌单';
@@ -1544,7 +1544,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      '您只能导入由 Bloomee 创建的文件。\n如果文件来自其他来源，将无法工作。是否仍要继续？';
+      '您只能导入由 NasBeat 创建的文件。\n如果文件来自其他来源，将无法工作。是否仍要继续？';
 
   @override
   String get importTitle => '导入';
@@ -1849,7 +1849,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Bloomee🌸 新版本现已可用！\n\n版本：$ver+$build';
+    return 'NasBeat🎵 新版本现已可用！\n\n版本：$ver+$build';
   }
 
   @override
@@ -1868,7 +1868,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => '正在设置 Bloomee';
+  String get pluginBootstrapTitle => '正在设置 NasBeat';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -1883,7 +1883,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      '部分插件无法安装。您仍可使用 Bloomee —— 插件将在下次启动时重试。';
+      '部分插件无法安装。您仍可使用 NasBeat —— 插件将在下次启动时重试。';
 
   @override
   String get pluginBootstrapContinue => '仍然继续';

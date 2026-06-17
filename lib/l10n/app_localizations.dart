@@ -111,7 +111,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Bloomee'**
+  /// **'Welcome to NasBeat'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingSubtitle.
@@ -1869,7 +1869,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageResetApp.
   ///
   /// In en, this message translates to:
-  /// **'Reset Bloomee App'**
+  /// **'Reset NasBeat App'**
   String get storageResetApp;
 
   /// No description provided for @storageResetAppSubtitle.
@@ -1887,7 +1887,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageResetConfirmMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to reset Bloomee? This will delete all your data and cannot be undone.'**
+  /// **'Are you sure you want to reset NasBeat? This will delete all your data and cannot be undone.'**
   String get storageResetConfirmMessage;
 
   /// No description provided for @storageResetButton.
@@ -1911,7 +1911,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageLocationAndroid.
   ///
   /// In en, this message translates to:
-  /// **'Backups are stored in:\n\n1. Downloads directory\n2. Android/data/ls.bloomee.musicplayer/data\n\nCopy the file from either location.'**
+  /// **'Backups are stored in:\n\n1. Downloads directory\n2. Android/data/ai.nastech.nasbeat/data\n\nCopy the file from either location.'**
   String get storageLocationAndroid;
 
   /// No description provided for @storageLocationOther.
@@ -2079,7 +2079,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateCheckSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'See if a newer version of Bloomee is available.'**
+  /// **'See if a newer version of NasBeat is available.'**
   String get updateCheckSubtitle;
 
   /// No description provided for @updateAutoNotify.
@@ -2103,7 +2103,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateUpToDate.
   ///
   /// In en, this message translates to:
-  /// **'Bloomee🌸 is up-to-date!!!'**
+  /// **'NasBeat is up-to-date!!!'**
   String get updateUpToDate;
 
   /// No description provided for @updateViewPreRelease.
@@ -2121,7 +2121,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateNewVersionAvailable.
   ///
   /// In en, this message translates to:
-  /// **'New Version of Bloomee🌸 is now available!!'**
+  /// **'New Version of NasBeat is now available!!'**
   String get updateNewVersionAvailable;
 
   /// No description provided for @updateVersion.
@@ -2679,7 +2679,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipQuote.
   ///
   /// In en, this message translates to:
-  /// **'Enjoying Bloomee? A small tip keeps it blooming. 🌸'**
+  /// **'Enjoying NasBeat? A small tip keeps it blooming. 🌸'**
   String get aboutTipQuote;
 
   /// No description provided for @aboutTipButton.
@@ -2691,7 +2691,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipDesc.
   ///
   /// In en, this message translates to:
-  /// **'I want Bloomee to keep improving.'**
+  /// **'I want NasBeat to keep improving.'**
   String get aboutTipDesc;
 
   /// No description provided for @aboutGitHub.
@@ -2811,19 +2811,19 @@ abstract class AppLocalizations {
   /// No description provided for @songInfoSearchTitle.
   ///
   /// In en, this message translates to:
-  /// **'Search for this song in Bloomee'**
+  /// **'Search for this song in NasBeat'**
   String get songInfoSearchTitle;
 
   /// No description provided for @songInfoSearchArtist.
   ///
   /// In en, this message translates to:
-  /// **'Search for this artist in Bloomee'**
+  /// **'Search for this artist in NasBeat'**
   String get songInfoSearchArtist;
 
   /// No description provided for @songInfoSearchAlbum.
   ///
   /// In en, this message translates to:
-  /// **'Search for this album in Bloomee'**
+  /// **'Search for this album in NasBeat'**
   String get songInfoSearchAlbum;
 
   /// No description provided for @eqTitle.
@@ -2970,11 +2970,11 @@ abstract class AppLocalizations {
   /// **'No content-importer plugins loaded.\nInstall an importer plugin to import playlists from external services.'**
   String get importNoPluginsLoaded;
 
-  /// No description provided for @importBloomeeFiles.
+  /// No description provided for @importNasBeatFiles.
   ///
   /// In en, this message translates to:
-  /// **'Import Bloomee Files'**
-  String get importBloomeeFiles;
+  /// **'Import NasBeat Files'**
+  String get importNasBeatFiles;
 
   /// No description provided for @importM3UFiles.
   ///
@@ -3009,7 +3009,7 @@ abstract class AppLocalizations {
   /// No description provided for @importNoteMessage.
   ///
   /// In en, this message translates to:
-  /// **'You can only import files created by Bloomee.\nIf your file is from another source, it will not work. Continue anyway?'**
+  /// **'You can only import files created by NasBeat.\nIf your file is from another source, it will not work. Continue anyway?'**
   String get importNoteMessage;
 
   /// No description provided for @importTitle.
@@ -3549,7 +3549,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'New Version of Bloomee🌸 is now available!\n\nVersion: {ver}+{build}'**
+  /// **'New Version of NasBeat is now available!\n\nVersion: {ver}+{build}'**
   String updateAvailableBody(String ver, String build);
 
   /// No description provided for @pluginSnackbarInstalled.
@@ -3573,7 +3573,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginBootstrapTitle.
   ///
   /// In en, this message translates to:
-  /// **'Setting up Bloomee'**
+  /// **'Setting up NasBeat'**
   String get pluginBootstrapTitle;
 
   /// No description provided for @pluginBootstrapProgress.
@@ -3597,7 +3597,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginBootstrapErrorBody.
   ///
   /// In en, this message translates to:
-  /// **'Some plugins could not be installed. You can still use Bloomee — plugins will be retried on next launch.'**
+  /// **'Some plugins could not be installed. You can still use NasBeat — plugins will be retried on next launch.'**
   String get pluginBootstrapErrorBody;
 
   /// No description provided for @pluginBootstrapContinue.

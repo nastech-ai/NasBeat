@@ -4,7 +4,7 @@ import 'package:nasbeat/blocs/global_events/global_events_cubit.dart';
 import 'package:nasbeat/core/events/global_event_bus.dart';
 import 'package:nasbeat/l10n/app_localizations.dart';
 import 'package:nasbeat/screens/screen/common_views/changelog_reader.dart';
-import 'package:nasbeat/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:nasbeat/screens/widgets/nasbeat_ui_kit/nasbeat_dialog.dart';
 import 'package:nasbeat/screens/widgets/snackbar.dart';
 import 'package:nasbeat/services/plugin/plugin_event_bus.dart';
 import 'package:nasbeat/src/rust/api/plugin/events.dart';
@@ -119,50 +119,15 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
             final s = state as UpdateAvailable;
             final l10n = AppLocalizations.of(dialogContext)!;
             log("Update Available: ${s.newVersion}+${s.newBuild}");
-            showBloomeeDialog(
+            showNasBeatDialog(
               context: dialogContext,
               title: l10n.dialogUpdateAvailable,
               subtitle: l10n.updateAvailableBody(s.newVersion, s.newBuild),
               icon: Icons.system_update_rounded,
               actions: [
-                BloomeeDialogAction.text(l10n.buttonLater),
-                // On mobile: download in-background. On desktop: open browser.
-                BloomeeDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
-                  if (s.downloadUrl.endsWith('.apk') ||
-                      s.downloadUrl.endsWith('.exe')) {
-                    context
-                        .read<GlobalEventsCubit>()
-                        .downloadUpdate(s.downloadUrl);
-                  } else {
-                    openURL(s.downloadUrl);
-                  }
-                }),
-              ],
-            );
-            break;
-          case UpdateDownloadProgress:
-            final dp = state as UpdateDownloadProgress;
-            final pct = (dp.progress * 100).toStringAsFixed(0);
-            SnackbarService.showMessage('Downloading update… $pct%');
-            break;
-          case UpdateDownloadComplete:
-            final dc = state as UpdateDownloadComplete;
-            log('Update ready at: ${dc.filePath}', name: 'GlobalEventListener');
-            SnackbarService.showMessage(
-                'Download complete! Install from: ${dc.filePath}');
-            break;
-          case UpdateDownloadError:
-            final de = state as UpdateDownloadError;
-            log('Download error: ${de.message}', name: 'GlobalEventListener');
-            showBloomeeDialog(
-              context: dialogContext,
-              title: 'Download Failed',
-              subtitle: 'Could not download the update.\n${de.message}',
-              icon: Icons.error_outline_rounded,
-              actions: [
-                BloomeeDialogAction.text('Cancel'),
-                BloomeeDialogAction.filled('Open in Browser', onPressed: () {
-                  openURL(de.downloadUrl);
+                NasBeatDialogAction.text(l10n.buttonLater),
+                NasBeatDialogAction.filled(l10n.dialogUpdateNow, onPressed: () {
+                  openURL(s.downloadUrl);
                 }),
               ],
             );
@@ -170,12 +135,12 @@ class _GlobalEventListenerState extends State<GlobalEventListener> {
           case AlertDialogState:
             final s = state as AlertDialogState;
             final l10n = AppLocalizations.of(dialogContext)!;
-            showBloomeeDialog(
+            showNasBeatDialog(
               context: dialogContext,
               title: s.title,
               subtitle: s.content,
               actions: [
-                BloomeeDialogAction.filled(l10n.buttonOk),
+                NasBeatDialogAction.filled(l10n.buttonOk),
               ],
             );
             break;

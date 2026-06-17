@@ -1,4 +1,4 @@
-import 'package:nasbeat/services/bloomee_updater_tools.dart';
+import 'package:nasbeat/services/nasbeat_updater_tools.dart';
 import 'package:flutter/material.dart';
 import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:nasbeat/utils/url_launcher.dart';
@@ -44,7 +44,7 @@ class CheckUpdateView extends StatelessWidget {
                       child: FilledButton(
                         onPressed: () {
                           launch_Url(Uri.parse(
-                              "https://github.com/nastech-ai/NasBeat/releases"));
+                              "https://github.com/HemantKArya/NasBeat/releases"));
                         },
                         child: SizedBox(
                           // width: 150,
@@ -114,8 +114,8 @@ class CheckUpdateView extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: FilledButton(
                         onPressed: () {
-                          launch_Url(Uri.parse(
-                              "https://github.com/nastech-ai/NasBeat/releases/latest"));
+                          launch_Url(
+                              Uri.parse("https://github.com/nastech-ai/NasBeat/"));
                         },
                         child: SizedBox(
                           width: 150,

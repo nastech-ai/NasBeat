@@ -6,7 +6,6 @@ import 'package:nasbeat/services/db/db_provider.dart';
 import 'package:nasbeat/services/db/dao/settings_dao.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 
 bool isUpdateAvailable(
     String currentVer, String currentBuild, String newVer, String newBuild,
@@ -56,14 +55,119 @@ bool isUpdateAvailable(
 
 Future<Map<String, dynamic>> sourceforgeUpdate(
     {Duration timeout = const Duration(seconds: 6)}) async {
-  // NasBeat uses GitHub Releases exclusively — SourceForge is not supported.
-  throw Exception('SourceForge not used by NasBeat');
+  String platform = Platform.operatingSystem;
+  if (platform != 'linux' && platform != 'android' && platform != 'win') {
+    // normalize unknowns to win for SourceForge naming
+    platform = 'win';
+  }
+  const url = 'https://sourceforge.net/projects/nasbeat/best_release.json';
+  final userAgent = {
+    'win':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+    'linux':
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3868.146 Safari/537.36 OPR/54.0.4087.46',
+    'android':
+        'Mozilla/5.0 (Linux; Android 13;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36',
+  };
+
+  // Use a single known-working header set (desktop UA + accept + referer).
+  final headers = {
+    'user-agent': userAgent['win']!,
+    'accept': 'application/json, text/javascript, */*; q=0.01',
+    'referer': 'https://sourceforge.net',
+  };
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  try {
+    final response =
+        await http.get(Uri.parse(url), headers: headers).timeout(timeout);
+    log("SourceForge response status code: ${response.statusCode}",
+        name: 'UpdaterTools');
+    if (response.statusCode == 403) {
+      try {
+        final snippet = response.body.length > 200
+            ? response.body.substring(0, 200)
+            : response.body;
+        log('SourceForge 403 response snippet: $snippet', name: 'UpdaterTools');
+      } catch (_) {}
+      throw Exception('SourceForge returned 403');
+    }
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // Prefer platform-specific release entry when available
+      String platformKey = 'windows';
+      if (Platform.isLinux) {
+        platformKey = 'linux';
+      } else if (Platform.isMacOS) {
+        platformKey = 'mac';
+      } else if (Platform.isAndroid) {
+        platformKey = 'android';
+      }
+
+      Map? entry = (data['platform_releases'] is Map)
+          ? (data['platform_releases'] as Map)[platformKey]
+          : null;
+      entry ??= data['release'];
+
+      // extract url/filename from the chosen entry first, fall back to release
+      final releaseUrl = (entry != null && entry['url'] != null)
+          ? entry['url'] as String
+          : (data['release']?['url'] ?? '');
+      String filename = (entry != null && entry['filename'] != null)
+          ? entry['filename'] as String
+          : (data['release']?['filename'] ?? '');
+
+      // decode percent-encoding and normalize
+      try {
+        filename = Uri.decodeFull(filename);
+      } catch (_) {}
+      String decodedUrl = releaseUrl;
+      try {
+        decodedUrl = Uri.decodeFull(releaseUrl);
+      } catch (_) {}
+
+      // try to find version/build in filename, then url
+      final versionRegex = RegExp(r'v(\d+(?:\.\d+)*)');
+      final buildRegex = RegExp(r'\+(\d+)');
+
+      Match? versionMatch = versionRegex.firstMatch(filename);
+      versionMatch ??= versionRegex.firstMatch(decodedUrl);
+      Match? buildMatch = buildRegex.firstMatch(filename);
+      buildMatch ??= buildRegex.firstMatch(decodedUrl);
+
+      final version = versionMatch?.group(1) ?? '';
+      final build = buildMatch?.group(1) ?? '';
+
+      return {
+        'source': 'sourceforge',
+        'newVer': version,
+        'newBuild': build,
+        'download_url': releaseUrl,
+        'currVer': packageInfo.version,
+        'currBuild': (int.tryParse(packageInfo.buildNumber) ?? 0) > 1000
+            ? ((int.tryParse(packageInfo.buildNumber) ?? 0) % 1000).toString()
+            : packageInfo.buildNumber,
+        'results': isUpdateAvailable(
+          packageInfo.version,
+          packageInfo.buildNumber,
+          version.isNotEmpty ? version : '0.0.0',
+          build.isNotEmpty ? build : '0',
+          checkBuild: platform == 'linux' ? false : true,
+        ),
+      };
+    } else {
+      throw Exception('SourceForge returned ${response.statusCode}');
+    }
+  } catch (e, st) {
+    log('SourceForge update check failed: $e\n$st', name: 'UpdaterTools');
+    rethrow;
+  }
 }
 
 Future<Map<String, dynamic>> githubUpdate(
     {Duration timeout = const Duration(seconds: 6)}) async {
   final url =
-      'https://api.github.com/repos/nastech-ai/NasBeat/releases/latest';
+      'https://api.github.com/repos/HemantKArya/NasBeat/releases/latest';
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   try {
     final response = await http.get(Uri.parse(url)).timeout(timeout);
@@ -115,22 +219,29 @@ Future<Map<String, dynamic>> getAppUpdates() async {
   try {
     updates = await githubUpdate();
   } catch (e) {
-    log('Update check failed: $e', name: 'UpdaterTools');
+    log('GitHub check failed, trying SourceForge: $e', name: 'UpdaterTools');
     try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      updates = {
-        'results': false,
-        'error': 'Failed to check for updates',
-        'currVer': packageInfo.version,
-        'currBuild': packageInfo.buildNumber,
-        'source': 'none',
-      };
-    } catch (e3) {
-      updates = {
-        'results': false,
-        'error': 'Failed to check for updates',
-        'source': 'none',
-      };
+      updates = await sourceforgeUpdate();
+    } catch (e2) {
+      log('SourceForge check failed: $e2', name: 'UpdaterTools');
+      // Final fallback: return structured failure map with current info
+      try {
+        final packageInfo = await PackageInfo.fromPlatform();
+        updates = {
+          'results': false,
+          'error': 'Failed to check remote releases',
+          'currVer': packageInfo.version,
+          'currBuild': packageInfo.buildNumber,
+          'source': 'none',
+        };
+      } catch (e3) {
+        updates = {
+          'results': false,
+          'error':
+              'Failed to check remote releases and failed to read local package info',
+          'source': 'none',
+        };
+      }
     }
   }
 
@@ -166,7 +277,7 @@ Future<Map<String, dynamic>> getAppUpdates() async {
 Future<String?> fetchChangelog(
     {Duration timeout = const Duration(seconds: 6)}) async {
   const changelogUrl =
-      'https://raw.githubusercontent.com/nastech-ai/NasBeat/main/CHANGELOG.md';
+      'https://hemantkarya.github.io/NasBeat/CHANGELOG.md';
   try {
     final response = await http.get(Uri.parse(changelogUrl)).timeout(timeout);
     if (response.statusCode == 200) {
@@ -203,38 +314,4 @@ String? extractUpUrl(Map<String, dynamic> data) {
     }
   }
   return null;
-}
-
-/// Downloads the update file at [url] to the device's temp directory.
-///
-/// Reports 0.0–1.0 progress via [onProgress] as bytes arrive.
-/// Returns the local file path when finished.
-Future<String> downloadUpdateFile(
-  String url, {
-  void Function(double progress)? onProgress,
-}) async {
-  final dir = await getTemporaryDirectory();
-  final ext = Platform.isAndroid
-      ? '.apk'
-      : Platform.isWindows
-          ? '.exe'
-          : '';
-  final file = File('${dir.path}/nasbeat_update$ext');
-
-  final client = http.Client();
-  try {
-    final request = http.Request('GET', Uri.parse(url));
-    final response = await client.send(request);
-    final total = response.contentLength ?? 0;
-    int received = 0;
-    final sink = file.openWrite();
-    await response.stream.map((chunk) {
-      received += chunk.length;
-      if (total > 0) onProgress?.call(received / total);
-      return chunk;
-    }).pipe(sink);
-    return file.path;
-  } finally {
-    client.close();
-  }
 }

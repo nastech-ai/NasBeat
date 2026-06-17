@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:nasbeat/blocs/explore/cubit/explore_cubits.dart';
 import 'package:nasbeat/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:nasbeat/blocs/lastdotfm/lastdotfm_cubit.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/blocs/notification/notification_cubit.dart';
 import 'package:nasbeat/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:nasbeat/core/di/service_locator.dart';
@@ -214,8 +214,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         song: e,
                                         onTap: () {
                                           context
-                                              .read<BloomeePlayerCubit>()
-                                              .bloomeePlayer
+                                              .read<NasBeatPlayerCubit>()
+                                              .nasbeatPlayer
                                               .loadPlaylist(
                                                 Playlist(
                                                   tracks: state.tracks,
@@ -259,8 +259,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           song: e,
                                           onTap: () {
                                             context
-                                                .read<BloomeePlayerCubit>()
-                                                .bloomeePlayer
+                                                .read<NasBeatPlayerCubit>()
+                                                .nasbeatPlayer
                                                 .loadPlaylist(
                                                   Playlist(
                                                     tracks: snapshot.data!,

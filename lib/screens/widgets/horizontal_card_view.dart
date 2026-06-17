@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/models/exported.dart';
 import 'package:nasbeat/core/models/media_playlist_model.dart';
 import 'package:nasbeat/core/events/global_event_bus.dart';
@@ -183,7 +183,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
         }
         if (tracks.isEmpty) return;
         final idx = tracks.indexWhere((t) => t.id == track.id);
-        context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+        context.read<NasBeatPlayerCubit>().nasbeatPlayer.loadPlaylist(
               Playlist(tracks: tracks, title: widget.section.title),
               idx: idx >= 0 ? idx : 0,
               doPlay: true,

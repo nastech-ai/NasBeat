@@ -11,7 +11,7 @@ import 'package:path/path.dart' as path;
 import 'package:nasbeat/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:nasbeat/core/models/exported.dart';
 import 'package:nasbeat/core/constants/setting_keys.dart';
-import 'package:nasbeat/repository/bloomee/download_repository.dart';
+import 'package:nasbeat/repository/nasbeat/download_repository.dart';
 import 'package:nasbeat/screens/widgets/snackbar.dart';
 import 'package:nasbeat/services/db/global_db.dart';
 import 'package:nasbeat/services/db/dao/settings_dao.dart';
@@ -183,7 +183,7 @@ class DownloaderCubit extends Cubit<DownloaderState> {
     await _downloadService.initialize(
       pluginManager: _pluginService.manager,
       stateDir: path.join(supportDirectory.path, 'download_manager'),
-      tempDir: path.join(tempDirectory.path, 'bloomee_downloads'),
+      tempDir: path.join(tempDirectory.path, 'nasbeat_downloads'),
     );
 
     _downloadSubscription ??= _downloadService.events.listen(

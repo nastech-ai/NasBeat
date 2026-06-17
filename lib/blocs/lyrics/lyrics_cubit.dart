@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/adapters/track_adapter.dart';
 import 'package:nasbeat/core/constants/setting_keys.dart';
 import 'package:nasbeat/core/models/exported.dart' hide Lyrics;
@@ -30,7 +30,7 @@ class LyricsCubit extends Cubit<LyricsState> {
   int _requestSerial = 0;
 
   LyricsCubit(
-    BloomeePlayerCubit playerCubit, {
+    NasBeatPlayerCubit playerCubit, {
     required LyricsDAO lyricsDao,
     required SettingsDAO settingsDao,
     required PluginService pluginService,
@@ -44,7 +44,7 @@ class LyricsCubit extends Cubit<LyricsState> {
         ),
         super(LyricsInitial()) {
     _mediaItemSubscription =
-        playerCubit.bloomeePlayer.mediaItem.stream.listen((item) {
+        playerCubit.nasbeatPlayer.mediaItem.stream.listen((item) {
       if (item != null) {
         getLyrics(mediaItemToTrack(item));
       }

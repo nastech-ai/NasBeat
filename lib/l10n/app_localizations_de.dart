@@ -9,7 +9,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Willkommen bei Bloomee';
+  String get onboardingTitle => 'Willkommen bei NasBeat';
 
   @override
   String get onboardingSubtitle => 'Richten wir deine Sprache und Region ein.';
@@ -335,7 +335,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle deine Sprache und dein Land.';
 
   @override
-  String get settingsAbout => 'Über Bloomee';
+  String get settingsAbout => 'Über NasBeat';
 
   @override
   String get settingsAboutSubtitle => 'Version, Entwickler und App-Info.';
@@ -1020,7 +1020,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Speichert Songtexte automatisch beim Abspielen eines Titels.';
 
   @override
-  String get storageResetApp => 'Bloomee App zurücksetzen';
+  String get storageResetApp => 'NasBeat App zurücksetzen';
 
   @override
   String get storageResetAppSubtitle =>
@@ -1031,7 +1031,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      'Bist du sicher, dass du Bloomee zurücksetzen möchtest? Dies löscht alle deine Daten unwiderruflich.';
+      'Bist du sicher, dass du NasBeat zurücksetzen möchtest? Dies löscht alle deine Daten unwiderruflich.';
 
   @override
   String get storageResetButton => 'Zurücksetzen';
@@ -1045,7 +1045,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'Sicherungen befinden sich in:\n\n1. Downloads-Verzeichnis\n2. Android/data/ls.bloomee.musicplayer/data\n\nKopiere die Datei von einem dieser Orte.';
+      'Sicherungen befinden sich in:\n\n1. Downloads-Verzeichnis\n2. Android/data/ai.nastech.nasbeat/data\n\nKopiere die Datei von einem dieser Orte.';
 
   @override
   String get storageLocationOther =>
@@ -1140,7 +1140,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get updateCheckSubtitle =>
-      'Prüfen, ob eine neuere Version von Bloomee verfügbar ist.';
+      'Prüfen, ob eine neuere Version von NasBeat verfügbar ist.';
 
   @override
   String get updateAutoNotify => 'Update-Benachrichtigung';
@@ -1153,7 +1153,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get updateCheckTitle => 'Update-Suche';
 
   @override
-  String get updateUpToDate => 'Bloomee🌸 ist auf dem neuesten Stand!!!';
+  String get updateUpToDate => 'NasBeat🎵 ist auf dem neuesten Stand!!!';
 
   @override
   String get updateViewPreRelease => 'Neueste Pre-Release ansehen';
@@ -1165,7 +1165,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'Neue Version von Bloomee🌸 verfügbar!';
+      'Neue Version von NasBeat🎵 verfügbar!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1481,13 +1481,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Gefällt dir Bloomee? Eine kleine Unterstützung lässt die App weiter blühen. 🌸';
+      'Gefällt dir NasBeat? Eine kleine Unterstützung lässt die App weiter blühen. 🌸';
 
   @override
   String get aboutTipButton => 'Ich möchte helfen';
 
   @override
-  String get aboutTipDesc => 'Ich möchte, dass Bloomee immer besser wird.';
+  String get aboutTipDesc => 'Ich möchte, dass NasBeat immer besser wird.';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1549,14 +1549,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Metadaten-Update für diese Quelle nicht verfügbar';
 
   @override
-  String get songInfoSearchTitle => 'In Bloomee nach diesem Song suchen';
+  String get songInfoSearchTitle => 'In NasBeat nach diesem Song suchen';
 
   @override
   String get songInfoSearchArtist =>
-      'In Bloomee nach diesem Interpreten suchen';
+      'In NasBeat nach diesem Interpreten suchen';
 
   @override
-  String get songInfoSearchAlbum => 'In Bloomee nach diesem Album suchen';
+  String get songInfoSearchAlbum => 'In NasBeat nach diesem Album suchen';
 
   @override
   String get eqTitle => 'Equalizer';
@@ -1638,7 +1638,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Importer-Plugins geladen.\nInstalliere ein Plugin, um Playlists externer Dienste zu importieren.';
 
   @override
-  String get importBloomeeFiles => 'Bloomee-Dateien importieren';
+  String get importNasBeatFiles => 'NasBeat-Dateien importieren';
 
   @override
   String get importM3UFiles => 'M3U-Playlist importieren';
@@ -1658,7 +1658,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'Du kannst nur Dateien importieren, die von Bloomee erstellt wurden. Andere Dateien funktionieren nicht. Trotzdem fortfahren?';
+      'Du kannst nur Dateien importieren, die von NasBeat erstellt wurden. Andere Dateien funktionieren nicht. Trotzdem fortfahren?';
 
   @override
   String get importTitle => 'Import';
@@ -1990,7 +1990,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Neue Version von Bloomee🌸 verfügbar!\n\nVersion: $ver+$build';
+    return 'Neue Version von NasBeat🎵 verfügbar!\n\nVersion: $ver+$build';
   }
 
   @override
@@ -2009,7 +2009,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee wird eingerichtet';
+  String get pluginBootstrapTitle => 'NasBeat wird eingerichtet';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2024,7 +2024,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'Einige Plugins konnten nicht installiert werden. Du kannst Bloomee dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.';
+      'Einige Plugins konnten nicht installiert werden. Du kannst NasBeat dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.';
 
   @override
   String get pluginBootstrapContinue => 'Trotzdem fortfahren';

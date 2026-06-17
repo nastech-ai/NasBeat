@@ -9,7 +9,7 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Bloomeeへようこそ';
+  String get onboardingTitle => 'NasBeatへようこそ';
 
   @override
   String get onboardingSubtitle => '言語と地域の設定を行いましょう。';
@@ -967,7 +967,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'バックアップは以下に保存されます:\n\n1. ダウンロードフォルダー\n2. Android/data/ls.bloomee.musicplayer/data\n\nここからファイルをコピーしてください。';
+      'バックアップは以下に保存されます:\n\n1. ダウンロードフォルダー\n2. Android/data/ai.nastech.nasbeat/data\n\nここからファイルをコピーしてください。';
 
   @override
   String get storageLocationOther => 'バックアップはダウンロードフォルダーに保存されます。';
@@ -1052,7 +1052,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateCheckForUpdates => 'アップデートを確認';
 
   @override
-  String get updateCheckSubtitle => 'Bloomee の新しいバージョンがあるか確認します。';
+  String get updateCheckSubtitle => 'NasBeat の新しいバージョンがあるか確認します。';
 
   @override
   String get updateAutoNotify => 'アップデートの自動通知';
@@ -1064,7 +1064,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateCheckTitle => '更新の確認';
 
   @override
-  String get updateUpToDate => 'Bloomee🌸 は最新の状態です！';
+  String get updateUpToDate => 'NasBeat🎵 は最新の状態です！';
 
   @override
   String get updateViewPreRelease => '最新のプレリリースを表示';
@@ -1075,7 +1075,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get updateNewVersionAvailable => 'Bloomee🌸 の新しいバージョンが利用可能です！';
+  String get updateNewVersionAvailable => 'NasBeat🎵 の新しいバージョンが利用可能です！';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1380,7 +1380,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutCreativeHighlights => 'アップデートとクリエイティブな活動';
 
   @override
-  String get aboutTipQuote => 'Bloomee を気に入っていただけましたか？応援が活動の励みになります。 🌸';
+  String get aboutTipQuote => 'NasBeat を気に入っていただけましたか？応援が活動の励みになります。 🌸';
 
   @override
   String get aboutTipButton => '応援する';
@@ -1446,13 +1446,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get songInfoMetadataUnavailable => 'このソースは情報の更新に対応していません';
 
   @override
-  String get songInfoSearchTitle => 'Bloomee でこの曲を検索';
+  String get songInfoSearchTitle => 'NasBeat でこの曲を検索';
 
   @override
-  String get songInfoSearchArtist => 'Bloomee でこのアーティストを検索';
+  String get songInfoSearchArtist => 'NasBeat でこのアーティストを検索';
 
   @override
-  String get songInfoSearchAlbum => 'Bloomee でこのアルバムを検索';
+  String get songInfoSearchAlbum => 'NasBeat でこのアルバムを検索';
 
   @override
   String get eqTitle => 'イコライザー';
@@ -1530,7 +1530,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'インポータープラグインがありません。外部サービスから取り込むにはインストールしてください。';
 
   @override
-  String get importBloomeeFiles => 'Bloomee ファイルをインポート';
+  String get importNasBeatFiles => 'NasBeat ファイルをインポート';
 
   @override
   String get importM3UFiles => 'M3U プレイリストをインポート';
@@ -1548,7 +1548,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importNoteTitle => '注記';
 
   @override
-  String get importNoteMessage => 'Bloomee で作成されたファイルのみが対象です。続行しますか？';
+  String get importNoteMessage => 'NasBeat で作成されたファイルのみが対象です。続行しますか？';
 
   @override
   String get importTitle => 'インポート';
@@ -1854,7 +1854,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Bloomee🌸 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
+    return 'NasBeat🎵 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
   }
 
   @override
@@ -1873,7 +1873,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee をセットアップ中';
+  String get pluginBootstrapTitle => 'NasBeat をセットアップ中';
 
   @override
   String pluginBootstrapProgress(int percent) {

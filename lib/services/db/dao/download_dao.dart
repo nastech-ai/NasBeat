@@ -270,7 +270,7 @@ class DownloadDAO {
 
   Future<String> _runtimeArtworkCacheDir() async {
     final tempDir = await getTemporaryDirectory();
-    return p.join(tempDir.path, 'bloomee_runtime_embedded_art');
+    return p.join(tempDir.path, 'nasbeat_runtime_embedded_art');
   }
 
   Future<Track> _resolveEmbeddedArtworkAtRuntime(

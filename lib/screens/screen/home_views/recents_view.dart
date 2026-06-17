@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:nasbeat/blocs/history/cubit/history_cubit.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/models/media_playlist_model.dart';
 import 'package:nasbeat/screens/screen/home_views/setting_views/storage_setting.dart';
 import 'package:nasbeat/screens/widgets/more_bottom_sheet.dart';
@@ -61,8 +61,8 @@ class HistoryView extends StatelessWidget {
                         song: state.tracks[index],
                         onTap: () {
                           context
-                              .read<BloomeePlayerCubit>()
-                              .bloomeePlayer
+                              .read<NasBeatPlayerCubit>()
+                              .nasbeatPlayer
                               .loadPlaylist(
                                   Playlist(
                                       tracks: state.tracks, title: 'History'),

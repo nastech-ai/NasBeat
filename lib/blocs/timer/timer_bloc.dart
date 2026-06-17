@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/utils/ticker.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -12,10 +12,10 @@ part 'timer_state.dart';
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   final Ticker _ticker;
   static const int _duration = 0;
-  final BloomeePlayerCubit bloomeePlayer;
+  final NasBeatPlayerCubit nasbeatPlayer;
   StreamSubscription<int>? _tickerSubscription;
 
-  TimerBloc({required Ticker ticker, required this.bloomeePlayer})
+  TimerBloc({required Ticker ticker, required this.nasbeatPlayer})
       : _ticker = ticker,
         super(const TimerInitial(_duration)) {
     on<TimerStarted>(_onTimerStarted);
@@ -68,7 +68,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     } else {
       emit(const TimerRunComplete());
       try {
-        bloomeePlayer.bloomeePlayer.pause();
+        nasbeatPlayer.nasbeatPlayer.pause();
       } catch (e) {
         log(e.toString(), name: "TimerBloc");
       }

@@ -1,37 +1,37 @@
 import 'dart:async';
 
-import 'package:Bloomee/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:Bloomee/blocs/library/cubit/library_items_cubit.dart';
-import 'package:Bloomee/blocs/player_overlay/player_overlay_cubit.dart';
-import 'package:Bloomee/core/adapters/track_adapter.dart';
-import 'package:Bloomee/screens/screen/home_views/timer_view.dart';
-import 'package:Bloomee/screens/screen/home_views/setting_views/player_setting.dart';
-import 'package:Bloomee/screens/widgets/gradient_progress_bar.dart';
-import 'package:Bloomee/screens/widgets/more_bottom_sheet.dart';
-import 'package:Bloomee/screens/widgets/up_next_panel.dart';
-import 'package:Bloomee/screens/widgets/volume_slider.dart';
-import 'package:Bloomee/screens/widgets/media_metadata_links.dart';
-import 'package:Bloomee/screens/screen/player_views/segments_sheet.dart';
-import 'package:Bloomee/services/bloomee_player.dart';
+import 'package:nasbeat/blocs/downloader/cubit/downloader_cubit.dart';
+import 'package:nasbeat/blocs/library/cubit/library_items_cubit.dart';
+import 'package:nasbeat/blocs/player_overlay/player_overlay_cubit.dart';
+import 'package:nasbeat/core/adapters/track_adapter.dart';
+import 'package:nasbeat/screens/screen/home_views/timer_view.dart';
+import 'package:nasbeat/screens/screen/home_views/setting_views/player_setting.dart';
+import 'package:nasbeat/screens/widgets/gradient_progress_bar.dart';
+import 'package:nasbeat/screens/widgets/more_bottom_sheet.dart';
+import 'package:nasbeat/screens/widgets/up_next_panel.dart';
+import 'package:nasbeat/screens/widgets/volume_slider.dart';
+import 'package:nasbeat/screens/widgets/media_metadata_links.dart';
+import 'package:nasbeat/screens/screen/player_views/segments_sheet.dart';
+import 'package:nasbeat/services/nasbeat_player.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:nasbeat/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:Bloomee/services/player/player_engine.dart';
-import 'package:Bloomee/screens/widgets/like_widget.dart';
-import 'package:Bloomee/screens/widgets/play_pause_widget.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/utils/load_image.dart';
-import 'package:Bloomee/utils/pallete_generator.dart';
+import 'package:nasbeat/services/player/player_engine.dart';
+import 'package:nasbeat/screens/widgets/like_widget.dart';
+import 'package:nasbeat/screens/widgets/play_pause_widget.dart';
+import 'package:nasbeat/screens/widgets/snackbar.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/utils/load_image.dart';
+import 'package:nasbeat/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../blocs/media_player/bloomee_player_cubit.dart';
+import '../../blocs/media_player/nasbeat_player_cubit.dart';
 import '../../blocs/mini_player/mini_player_cubit.dart';
 import 'player_views/fullscreen_lyrics_view.dart';
-import 'package:Bloomee/blocs/lyrics/lyrics_cubit.dart';
-import 'package:Bloomee/blocs/lyrics/lyrics_state.dart';
+import 'package:nasbeat/blocs/lyrics/lyrics_cubit.dart';
+import 'package:nasbeat/blocs/lyrics/lyrics_state.dart';
 
 class AudioPlayerView extends StatefulWidget {
   const AudioPlayerView({super.key});
@@ -91,8 +91,8 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
-    final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
+    final nasbeatPlayerCubit = context.read<NasBeatPlayerCubit>();
+    final musicPlayer = nasbeatPlayerCubit.nasbeatPlayer;
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
 
     return Scaffold(
@@ -225,7 +225,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
 }
 
 class _PlayerUI extends StatelessWidget {
-  final BloomeeMusicPlayer musicPlayer;
+  final NasBeatMusicPlayer musicPlayer;
   final TabController tabController;
 
   const _PlayerUI({
@@ -281,14 +281,14 @@ class CoverImageVolSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
+    final nasbeatPlayerCubit = context.read<NasBeatPlayerCubit>();
 
     return VolumeDragController(
       child: StreamBuilder<MediaItem?>(
-        stream: bloomeePlayerCubit.bloomeePlayer.mediaItem,
+        stream: nasbeatPlayerCubit.nasbeatPlayer.mediaItem,
         builder: (context, snapshot) {
           final currentTrack =
-              bloomeePlayerCubit.bloomeePlayer.currentTrackInfo;
+              nasbeatPlayerCubit.nasbeatPlayer.currentTrackInfo;
           final highResUrl =
               currentTrack.thumbnail.urlHigh ?? currentTrack.thumbnail.url;
           final lowResUrl =
@@ -316,7 +316,7 @@ class CoverImageVolSlider extends StatelessWidget {
 }
 
 class PlayerCtrlWidgets extends StatelessWidget {
-  final BloomeeMusicPlayer musicPlayer;
+  final NasBeatMusicPlayer musicPlayer;
   const PlayerCtrlWidgets({super.key, required this.musicPlayer});
 
   @override
@@ -342,7 +342,7 @@ class _SongInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     return Row(
       children: [
         Expanded(
@@ -407,7 +407,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       if (mi?.id != _lastTrackId) {
         _lastTrackId = mi?.id;
@@ -473,7 +473,7 @@ class _LikeButtonState extends State<_LikeButton> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       if (mi?.id != _lastTrackId) {
         _lastTrackId = mi?.id;
@@ -506,7 +506,7 @@ class _LikeButtonState extends State<_LikeButton> {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     final l10n = AppLocalizations.of(context)!;
 
     return StreamBuilder<bool>(
@@ -545,7 +545,7 @@ class _PlayerProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playerCubit = context.read<BloomeePlayerCubit>();
+    final playerCubit = context.read<NasBeatPlayerCubit>();
     return RepaintBoundary(
       child: StreamBuilder<ProgressBarStreams>(
         stream: playerCubit.progressStreams,
@@ -555,7 +555,7 @@ class _PlayerProgressBar extends StatelessWidget {
             progress: data?.position ?? Duration.zero,
             total: data?.duration ?? Duration.zero,
             buffered: data?.buffered ?? Duration.zero,
-            onSeek: playerCubit.bloomeePlayer.seek,
+            onSeek: playerCubit.nasbeatPlayer.seek,
             isPlaying: data?.isPlaying ?? false,
             activeAccentColor: Default_Theme.accentColor1,
             inactiveAccentColor: Default_Theme.accentColor2,
@@ -581,7 +581,7 @@ class _PlayerProgressBar extends StatelessWidget {
 }
 
 class _PlayerControlsRow extends StatelessWidget {
-  final BloomeeMusicPlayer musicPlayer;
+  final NasBeatMusicPlayer musicPlayer;
   const _PlayerControlsRow({required this.musicPlayer});
 
   Widget _buildControlColumn({required Widget top, required Widget bottom}) {
@@ -660,7 +660,7 @@ class _LoopControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<LoopMode>(
-      stream: context.read<BloomeePlayerCubit>().bloomeePlayer.loopMode,
+      stream: context.read<NasBeatPlayerCubit>().nasbeatPlayer.loopMode,
       builder: (context, snapshot) {
         final loopMode = snapshot.data ?? LoopMode.off;
         final l10n = AppLocalizations.of(context)!;
@@ -682,7 +682,7 @@ class _LoopControl extends StatelessWidget {
             size: 24,
           ),
           onSelected: (value) {
-            final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+            final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
             if (value == 0) player.setLoopMode(LoopMode.off);
             if (value == 1) player.setLoopMode(LoopMode.one);
             if (value == 2) player.setLoopMode(LoopMode.all);
@@ -698,7 +698,7 @@ class _ShuffleControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     return StreamBuilder<bool>(
       stream: player.shuffleMode,
       builder: (context, snapshot) {
@@ -723,7 +723,7 @@ class _ExternalLinkControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     return IconButton(
       icon: const Icon(MingCute.external_link_line,
           color: Default_Theme.primaryColor1, size: 24),
@@ -745,7 +745,7 @@ class _PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final musicPlayer = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final musicPlayer = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
       builder: (context, state) {
         Widget child;
@@ -823,7 +823,7 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       final artUri = mi?.artUri?.toString();
       if (artUri != _lastArtUri) {

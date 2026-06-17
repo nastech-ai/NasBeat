@@ -159,7 +159,7 @@ class _SettingToggleTileState extends State<SettingToggleTile> {
             ),
           ),
           const SizedBox(width: 12),
-          BloomeeSwitch(
+          NasBeatSwitch(
             value: _currentValue,
             onChanged: () {
               final newValue = !_currentValue;

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:nasbeat/blocs/lyrics/lyrics_cubit.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/blocs/mini_player/mini_player_cubit.dart';
 import 'package:nasbeat/screens/screen/player_views/lyrics_search.dart';
 import 'package:nasbeat/screens/widgets/media_metadata_links.dart';
@@ -26,8 +28,11 @@ class FullscreenLyricsView extends StatefulWidget {
   State<FullscreenLyricsView> createState() => _FullscreenLyricsViewState();
 }
 
-class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
+class _FullscreenLyricsViewState extends State<FullscreenLyricsView>
+    with SingleTickerProviderStateMixin {
   bool _showControls = true;
+
+  late final AnimationController _waveController;
   Timer? _hideControlsTimer;
   final UpNextPanelController _upNextPanelController = UpNextPanelController();
 
@@ -45,10 +50,15 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     _startHideControlsTimer();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-    final playerCubit = context.read<BloomeePlayerCubit>();
-    _currentTrackId = playerCubit.bloomeePlayer.currentTrackInfo.id;
+    final playerCubit = context.read<NasBeatPlayerCubit>();
+    _currentTrackId = playerCubit.nasbeatPlayer.currentTrackInfo.id;
 
     _loadPersistedOffset();
+
+    _waveController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
   }
 
   void _loadPersistedOffset() {
@@ -69,13 +79,14 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     _holdTimer?.cancel();
     _hideControlsTimer?.cancel();
     _positionNotifier.dispose();
+    _waveController.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
   void _startHideControlsTimer() {
     _hideControlsTimer?.cancel();
-    _hideControlsTimer = Timer(const Duration(seconds: 6), () {
+    _hideControlsTimer = Timer(const Duration(seconds: 4), () {
       if (mounted && _showControls && !_isSyncMode) {
         setState(() => _showControls = false);
       }
@@ -105,7 +116,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
 
   void _stopOffsetChange() => _holdTimer?.cancel();
 
-  void _openSettingsMenu(LyricsState state, BloomeePlayerCubit playerCubit) {
+  void _openSettingsMenu(LyricsState state, NasBeatPlayerCubit playerCubit) {
     _hideControlsTimer?.cancel();
     showModalBottomSheet(
       context: context,
@@ -127,7 +138,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
+    final nasbeatPlayerCubit = context.read<NasBeatPlayerCubit>();
     final isDesktop = MediaQuery.of(context).size.width > 600;
 
     return Scaffold(
@@ -138,8 +149,31 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
         behavior: HitTestBehavior.translucent,
         child: Stack(
           children: [
-            _buildBackground(bloomeePlayerCubit),
-            Container(color: Colors.black.withValues(alpha: 0.4)),
+            _buildBackground(nasbeatPlayerCubit),
+            BlocSelector<SettingsCubit, SettingsState, bool>(
+              selector: (s) => NasBeatTheme.fromKey(s.appTheme).isAmoled,
+              builder: (context, isAmoled) => Container(
+                color: isAmoled
+                    ? Colors.black.withValues(alpha: 0.92)
+                    : Colors.black.withValues(alpha: 0.4),
+              ),
+            ),
+            BlocSelector<SettingsCubit, SettingsState, NasBeatTheme>(
+              selector: (s) => NasBeatTheme.fromKey(s.appTheme),
+              builder: (context, theme) {
+                if (!theme.isAmoled) return const SizedBox.shrink();
+                return AnimatedBuilder(
+                  animation: _waveController,
+                  builder: (context, _) => CustomPaint(
+                    painter: _WavingLightPainter(
+                      phase: _waveController.value * 2 * math.pi,
+                      accentColor: theme.accent,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                );
+              },
+            ),
             Positioned.fill(
               child: BlocBuilder<LyricsCubit, LyricsState>(
                 builder: (context, state) {
@@ -209,7 +243,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
               right: 0,
               child: GestureDetector(
                 onTap: () {},
-                child: _buildTopBar(bloomeePlayerCubit, isDesktop),
+                child: _buildTopBar(nasbeatPlayerCubit, isDesktop),
               ),
             ),
             AnimatedPositioned(
@@ -220,7 +254,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
               right: 0,
               child: GestureDetector(
                 onTap: () {},
-                child: _buildBottomControls(bloomeePlayerCubit, isDesktop),
+                child: _buildBottomControls(nasbeatPlayerCubit, isDesktop),
               ),
             ),
             AnimatedPositioned(
@@ -250,11 +284,11 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     );
   }
 
-  Widget _buildBackground(BloomeePlayerCubit bloomeePlayerCubit) {
+  Widget _buildBackground(NasBeatPlayerCubit nasbeatPlayerCubit) {
     return StreamBuilder<MediaItem?>(
-      stream: bloomeePlayerCubit.bloomeePlayer.mediaItem,
+      stream: nasbeatPlayerCubit.nasbeatPlayer.mediaItem,
       builder: (context, snapshot) {
-        final currentTrack = bloomeePlayerCubit.bloomeePlayer.currentTrackInfo;
+        final currentTrack = nasbeatPlayerCubit.nasbeatPlayer.currentTrackInfo;
         final artworkUrl =
             currentTrack.thumbnail.urlLow ?? currentTrack.thumbnail.url;
 
@@ -297,7 +331,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     );
   }
 
-  Widget _buildTopBar(BloomeePlayerCubit bloomeePlayerCubit, bool isDesktop) {
+  Widget _buildTopBar(NasBeatPlayerCubit nasbeatPlayerCubit, bool isDesktop) {
     return Container(
       padding: EdgeInsets.fromLTRB(
           16, MediaQuery.of(context).padding.top + 16, 16, 40),
@@ -322,10 +356,10 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
               const SizedBox(width: 16),
               Expanded(
                 child: StreamBuilder<MediaItem?>(
-                  stream: bloomeePlayerCubit.bloomeePlayer.mediaItem,
+                  stream: nasbeatPlayerCubit.nasbeatPlayer.mediaItem,
                   builder: (context, snapshot) {
                     final currentTrack =
-                        bloomeePlayerCubit.bloomeePlayer.currentTrackInfo;
+                        nasbeatPlayerCubit.nasbeatPlayer.currentTrackInfo;
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -363,7 +397,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 builder: (context, state) {
                   return IconButton(
                     onPressed: () =>
-                        _openSettingsMenu(state, bloomeePlayerCubit),
+                        _openSettingsMenu(state, nasbeatPlayerCubit),
                     icon: const Icon(MingCute.more_2_fill,
                         color: Colors.white, size: 28),
                   );
@@ -483,9 +517,9 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
   }
 
   Widget _buildBottomControls(
-      BloomeePlayerCubit bloomeePlayerCubit, bool isDesktop) {
+      NasBeatPlayerCubit nasbeatPlayerCubit, bool isDesktop) {
     final l10n = AppLocalizations.of(context)!;
-    final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
+    final musicPlayer = nasbeatPlayerCubit.nasbeatPlayer;
     final paddingBottom = MediaQuery.of(context).padding.bottom;
 
     return Container(
@@ -649,7 +683,7 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
   }
 
   void _forceSyncRecalculation() {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer.engine;
+    final player = context.read<NasBeatPlayerCubit>().nasbeatPlayer.engine;
     final adjustedPosition = player.position + widget.lyricOffset;
     widget.positionNotifier.value = adjustedPosition;
 
@@ -661,8 +695,8 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
   }
 
   void _setupPositionListener() {
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
-    final posStream = bloomeePlayerCubit.bloomeePlayer.engine.positionStream;
+    final nasbeatPlayerCubit = context.read<NasBeatPlayerCubit>();
+    final posStream = nasbeatPlayerCubit.nasbeatPlayer.engine.positionStream;
 
     _positionSubscription = posStream.listen((rawPosition) {
       if (!mounted) return;
@@ -721,7 +755,7 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
     widget.onInteraction?.call();
     _userScrolling = true;
     _userScrollTimer?.cancel();
-    _userScrollTimer = Timer(const Duration(seconds: 6), () {
+    _userScrollTimer = Timer(const Duration(seconds: 4), () {
       _userScrolling = false;
       _scrollToCurrentLyric();
     });
@@ -773,8 +807,8 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
               onTap: () {
                 widget.onInteraction?.call();
                 context
-                    .read<BloomeePlayerCubit>()
-                    .bloomeePlayer
+                    .read<NasBeatPlayerCubit>()
+                    .nasbeatPlayer
                     .seek(lyric.start - widget.lyricOffset);
               },
               child: _KaraokeLyricLine(
@@ -820,11 +854,43 @@ class _KaraokeLyricLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = TextStyle(
-        fontSize: isDesktop ? 32 : 28,
-        fontFamily: 'NotoSans',
-        fontWeight: FontWeight.w800,
-        height: 1.4);
+    final double fontSize = isDesktop ? 32 : 28;
+    const String fontFamily = 'NotoSans';
+    const FontWeight fontWeight = FontWeight.w800;
+
+    if (!isActive) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: isPast ? 0.25 : 0.4,
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontFamily: fontFamily,
+                  fontWeight: fontWeight,
+                  color: Colors.white,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Active line — word-by-word highlight with glow on current word
+    final words = text.trim().split(RegExp(r'\s+'));
+    if (words.isEmpty) return const SizedBox.shrink();
+
+    final totalMs =
+        (endTime.inMilliseconds - startTime.inMilliseconds).toDouble();
+    final msPerWord = totalMs > 0 ? totalMs / words.length : 1.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -832,54 +898,130 @@ class _KaraokeLyricLine extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: isActive ? 1.0 : (isPast ? 0.25 : 0.4),
-              child: isActive
-                  ? ValueListenableBuilder<Duration>(
-                      valueListenable: positionNotifier,
-                      builder: (context, currentPosition, child) {
-                        final elapsed = currentPosition.inMilliseconds -
-                            startTime.inMilliseconds;
-                        final total =
-                            endTime.inMilliseconds - startTime.inMilliseconds;
-                        final double progress =
-                            total > 0 ? (elapsed / total).clamp(0.0, 1.0) : 1.0;
+            child: ValueListenableBuilder<Duration>(
+              valueListenable: positionNotifier,
+              builder: (context, pos, _) {
+                final elapsedMs =
+                    (pos.inMilliseconds - startTime.inMilliseconds).toDouble();
 
-                        // FIX M-08: Direct ShaderMask with current progress.
-                        // No TweenAnimationBuilder needed — positionNotifier
-                        // already provides smooth sub-second updates.
-                        return ShaderMask(
-                          shaderCallback: (Rect bounds) {
-                            return LinearGradient(
-                              colors: [
-                                Colors.white,
-                                Colors.white.withValues(alpha: 0.35)
-                              ],
-                              stops: [
-                                progress,
-                                (progress + 0.05).clamp(0.0, 1.0)
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ).createShader(bounds);
-                          },
-                          blendMode: BlendMode.srcIn,
-                          child: child!,
-                        );
-                      },
-                      child: Text(text,
-                          textAlign: TextAlign.center, style: textStyle),
-                    )
-                  : Text(text,
-                      textAlign: TextAlign.center,
-                      style: textStyle.copyWith(color: Colors.white)),
+                return RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: List.generate(words.length, (i) {
+                      final wordStartMs = i * msPerWord;
+                      final wordEndMs = (i + 1) * msPerWord;
+                      final bool isCurrent =
+                          elapsedMs >= wordStartMs && elapsedMs < wordEndMs;
+                      final bool isDone = elapsedMs >= wordEndMs;
+
+                      Color color;
+                      List<Shadow>? shadows;
+
+                      if (isDone) {
+                        color = Colors.white;
+                        shadows = null;
+                      } else if (isCurrent) {
+                        final double wp =
+                            ((elapsedMs - wordStartMs) / msPerWord)
+                                .clamp(0.0, 1.0);
+                        color = Color.lerp(
+                              Colors.white.withValues(alpha: 0.35),
+                              Colors.white,
+                              wp,
+                            ) ??
+                            Colors.white;
+                        shadows = [
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.55 * wp),
+                            blurRadius: 16,
+                          ),
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.25 * wp),
+                            blurRadius: 32,
+                          ),
+                        ];
+                      } else {
+                        color = Colors.white.withValues(alpha: 0.35);
+                        shadows = null;
+                      }
+
+                      return TextSpan(
+                        text: i < words.length - 1
+                            ? '${words[i]} '
+                            : words[i],
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          fontFamily: fontFamily,
+                          fontWeight: fontWeight,
+                          color: color,
+                          height: 1.4,
+                          shadows: shadows,
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              },
             ),
           ),
         ),
       ),
     );
   }
+}
+
+class _WavingLightPainter extends CustomPainter {
+  final double phase;
+  final Color accentColor;
+
+  const _WavingLightPainter({required this.phase, required this.accentColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Soft radial glow from center
+    final glowPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          accentColor.withValues(alpha: 0.06),
+          Colors.transparent,
+        ],
+      ).createShader(Rect.fromCircle(
+        center: Offset(size.width / 2, size.height * 0.45),
+        radius: size.width * 0.65,
+      ));
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, size.height), glowPaint);
+
+    // 5 sine waves across the screen
+    for (int i = 0; i < 5; i++) {
+      final double opacity = (0.13 - i * 0.02).clamp(0.02, 0.13);
+      final wavePaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5
+        ..color = accentColor.withValues(alpha: opacity);
+
+      final double wavePhase = phase + i * (math.pi * 0.5);
+      final double amplitude = size.height * (0.045 + i * 0.015);
+      final double yBase = size.height * (0.42 + i * 0.04);
+
+      final path = Path();
+      bool first = true;
+      for (double x = 0; x <= size.width; x += 3) {
+        final double y =
+            yBase + amplitude * math.sin(2.8 * math.pi * x / size.width + wavePhase);
+        if (first) {
+          path.moveTo(x, y);
+          first = false;
+        } else {
+          path.lineTo(x, y);
+        }
+      }
+      canvas.drawPath(path, wavePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_WavingLightPainter old) => old.phase != phase;
 }
 
 class _LyricsSettingsBottomSheet extends StatelessWidget {

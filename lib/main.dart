@@ -1,70 +1,70 @@
 import 'dart:async';
 import 'dart:io' as io;
-import 'package:Bloomee/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:Bloomee/blocs/global_events/global_events_cubit.dart';
-import 'package:Bloomee/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
-import 'package:Bloomee/blocs/lastdotfm/lastdotfm_cubit.dart';
-import 'package:Bloomee/blocs/local_music/cubit/local_music_cubit.dart';
-import 'package:Bloomee/blocs/lyrics/lyrics_cubit.dart';
-import 'package:Bloomee/blocs/mini_player/mini_player_cubit.dart';
-import 'package:Bloomee/blocs/notification/notification_cubit.dart';
-import 'package:Bloomee/blocs/history/cubit/history_cubit.dart';
-import 'package:Bloomee/blocs/explore/cubit/recently_cubit.dart';
-import 'package:Bloomee/blocs/player_overlay/player_overlay_cubit.dart';
-import 'package:Bloomee/blocs/search_suggestions/search_suggestion_bloc.dart';
-import 'package:Bloomee/blocs/settings_cubit/cubit/settings_cubit.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_bloc.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_event.dart';
-import 'package:Bloomee/repository/bloomee/download_repository.dart';
-import 'package:Bloomee/repository/bloomee/settings_repository.dart';
-import 'package:Bloomee/services/db/dao/cache_dao.dart';
-import 'package:Bloomee/services/db/dao/download_dao.dart';
-import 'package:Bloomee/services/db/dao/history_dao.dart';
-import 'package:Bloomee/services/db/dao/lyrics_dao.dart';
-import 'package:Bloomee/services/db/dao/notification_dao.dart';
-import 'package:Bloomee/services/db/dao/library_dao.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/search_history_dao.dart';
-import 'package:Bloomee/core/di/service_locator.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/blocs/timer/timer_bloc.dart';
-import 'package:Bloomee/screens/widgets/global_event_listener.dart';
-import 'package:Bloomee/screens/widgets/shortcut_indicator_overlay.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/services/bootstrap.dart';
-import 'package:Bloomee/services/audio_service_initializer.dart';
-import 'package:Bloomee/services/keyboard_shortcuts_service.dart';
-import 'package:Bloomee/services/shortcut_indicator_service.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/services/import_export_service.dart';
-import 'package:Bloomee/utils/ticker.dart';
-import 'package:Bloomee/utils/url_checker.dart';
+import 'package:nasbeat/blocs/downloader/cubit/downloader_cubit.dart';
+import 'package:nasbeat/blocs/global_events/global_events_cubit.dart';
+import 'package:nasbeat/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
+import 'package:nasbeat/blocs/lastdotfm/lastdotfm_cubit.dart';
+import 'package:nasbeat/blocs/local_music/cubit/local_music_cubit.dart';
+import 'package:nasbeat/blocs/lyrics/lyrics_cubit.dart';
+import 'package:nasbeat/blocs/mini_player/mini_player_cubit.dart';
+import 'package:nasbeat/blocs/notification/notification_cubit.dart';
+import 'package:nasbeat/blocs/history/cubit/history_cubit.dart';
+import 'package:nasbeat/blocs/explore/cubit/recently_cubit.dart';
+import 'package:nasbeat/blocs/player_overlay/player_overlay_cubit.dart';
+import 'package:nasbeat/blocs/search_suggestions/search_suggestion_bloc.dart';
+import 'package:nasbeat/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_bloc.dart';
+import 'package:nasbeat/plugins/blocs/plugin/plugin_event.dart';
+import 'package:nasbeat/repository/nasbeat/download_repository.dart';
+import 'package:nasbeat/repository/nasbeat/settings_repository.dart';
+import 'package:nasbeat/services/db/dao/cache_dao.dart';
+import 'package:nasbeat/services/db/dao/download_dao.dart';
+import 'package:nasbeat/services/db/dao/history_dao.dart';
+import 'package:nasbeat/services/db/dao/lyrics_dao.dart';
+import 'package:nasbeat/services/db/dao/notification_dao.dart';
+import 'package:nasbeat/services/db/dao/library_dao.dart';
+import 'package:nasbeat/services/db/dao/playlist_dao.dart';
+import 'package:nasbeat/services/db/dao/search_history_dao.dart';
+import 'package:nasbeat/core/di/service_locator.dart';
+import 'package:nasbeat/services/db/dao/track_dao.dart';
+import 'package:nasbeat/services/db/dao/settings_dao.dart';
+import 'package:nasbeat/services/db/db_provider.dart';
+import 'package:nasbeat/blocs/timer/timer_bloc.dart';
+import 'package:nasbeat/screens/widgets/global_event_listener.dart';
+import 'package:nasbeat/screens/widgets/shortcut_indicator_overlay.dart';
+import 'package:nasbeat/screens/widgets/snackbar.dart';
+import 'package:nasbeat/services/bootstrap.dart';
+import 'package:nasbeat/services/audio_service_initializer.dart';
+import 'package:nasbeat/services/keyboard_shortcuts_service.dart';
+import 'package:nasbeat/services/shortcut_indicator_service.dart';
+import 'package:nasbeat/core/theme/app_theme.dart';
+import 'package:nasbeat/services/import_export_service.dart';
+import 'package:nasbeat/utils/ticker.dart';
+import 'package:nasbeat/utils/url_checker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
-import 'package:Bloomee/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
-import 'package:Bloomee/blocs/library/cubit/library_items_cubit.dart';
-import 'package:Bloomee/plugins/blocs/import/content_import_cubit.dart';
-import 'package:Bloomee/routes/app_router.dart';
-import 'package:Bloomee/screens/screen/library_views/cubit/current_playlist_cubit.dart';
+import 'package:nasbeat/l10n/app_localizations.dart';
+import 'package:nasbeat/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
+import 'package:nasbeat/blocs/library/cubit/library_items_cubit.dart';
+import 'package:nasbeat/plugins/blocs/import/content_import_cubit.dart';
+import 'package:nasbeat/routes/app_router.dart';
+import 'package:nasbeat/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:share_handler/share_handler.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'blocs/media_player/bloomee_player_cubit.dart';
+import 'blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
-import 'package:Bloomee/services/discord_service.dart';
-import 'package:Bloomee/services/db/legacy/legacy_migration_service.dart'
+import 'package:nasbeat/services/discord_service.dart';
+import 'package:nasbeat/services/db/legacy/legacy_migration_service.dart'
     as legacy_migration;
-import 'package:Bloomee/screens/widgets/legacy_migration_overlay.dart';
-import 'package:Bloomee/screens/widgets/onboarding_overlay.dart';
-import 'package:Bloomee/screens/widgets/plugin_bootstrap_overlay.dart';
-import 'package:Bloomee/services/onboarding_service.dart';
-import 'package:Bloomee/services/plugin_bootstrap_service.dart';
-import 'package:Bloomee/plugins/services/plugin_repository_service.dart';
-import 'package:Bloomee/services/shared_url_resolver_service.dart';
+import 'package:nasbeat/screens/widgets/legacy_migration_overlay.dart';
+import 'package:nasbeat/screens/widgets/onboarding_overlay.dart';
+import 'package:nasbeat/screens/widgets/plugin_bootstrap_overlay.dart';
+import 'package:nasbeat/services/onboarding_service.dart';
+import 'package:nasbeat/services/plugin_bootstrap_service.dart';
+import 'package:nasbeat/plugins/services/plugin_repository_service.dart';
+import 'package:nasbeat/services/shared_url_resolver_service.dart';
 
 void processIncomingIntent(SharedMedia sharedMedia) {
   if (sharedMedia.content != null && isUrl(sharedMedia.content!)) {
@@ -113,7 +113,7 @@ Future<void> _handleYoutubeVideoIntent(String url) async {
 
   final track = result.track;
   if (result.status == SharedUrlResolveStatus.success && track != null) {
-    final player = await PlayerInitializer().getBloomeeMusicPlayer();
+    final player = await PlayerInitializer().getNasBeatMusicPlayer();
     await player.updateQueueTracks([track], doPlay: true);
     SnackbarService.showMessage('Playing: ${track.title}');
     return;
@@ -142,11 +142,11 @@ Future<void> setHighRefreshRate() async {
   }
 }
 
-late BloomeePlayerCubit bloomeePlayerCubit;
+late NasBeatPlayerCubit nasbeatPlayerCubit;
 Future<void> setupPlayerCubit() async {
   await setupAudioSession();
-  final player = await PlayerInitializer().getBloomeeMusicPlayer();
-  bloomeePlayerCubit = BloomeePlayerCubit(player);
+  final player = await PlayerInitializer().getNasBeatMusicPlayer();
+  nasbeatPlayerCubit = NasBeatPlayerCubit(player);
 }
 
 Future<void> main() async {
@@ -213,7 +213,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> _ensurePlayerHealthyOnResume() async {
     try {
-      final player = await PlayerInitializer().getBloomeeMusicPlayer();
+      final player = await PlayerInitializer().getNasBeatMusicPlayer();
       if (!player.isPlayerHealthy) {
         await player.revive();
       }
@@ -274,7 +274,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _intentSub?.cancel();
-    bloomeePlayerCubit.close();
+    nasbeatPlayerCubit.close();
     if (io.Platform.isWindows || io.Platform.isLinux || io.Platform.isMacOS) {
       DiscordService.clearPresence();
     }
@@ -345,12 +345,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           lazy: false,
         ),
         BlocProvider(
-          create: (context) => bloomeePlayerCubit,
+          create: (context) => nasbeatPlayerCubit,
           lazy: false,
         ),
         BlocProvider(
             create: (context) =>
-                MiniPlayerCubit(playerCubit: bloomeePlayerCubit),
+                MiniPlayerCubit(playerCubit: nasbeatPlayerCubit),
             lazy: true),
         BlocProvider(
           create: (context) => SettingsCubit(
@@ -366,7 +366,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
             create: (context) => TimerBloc(
-                ticker: const Ticker(), bloomeePlayer: bloomeePlayerCubit)),
+                ticker: const Ticker(), nasbeatPlayer: nasbeatPlayerCubit)),
         BlocProvider(
           create: (context) => ConnectivityCubit(),
           lazy: false,
@@ -406,7 +406,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => LyricsCubit(
-            bloomeePlayerCubit,
+            nasbeatPlayerCubit,
             lyricsDao: LyricsDAO(DBProvider.db),
             settingsDao: SettingsDAO(DBProvider.db),
             pluginService: ServiceLocator.pluginService,
@@ -414,7 +414,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => LastdotfmCubit(
-            playerCubit: bloomeePlayerCubit,
+            playerCubit: nasbeatPlayerCubit,
             cacheDao: CacheDAO(DBProvider.db),
             settingsDao: SettingsDAO(DBProvider.db),
             pluginService: ServiceLocator.pluginService,
@@ -452,9 +452,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           lazy: true,
         ),
       ],
-      child: BlocBuilder<BloomeePlayerCubit, BloomeePlayerState>(
+      child: BlocBuilder<NasBeatPlayerCubit, NasBeatPlayerState>(
         builder: (context, state) {
-          if (state is BloomeePlayerInitial) {
+          if (state is NasBeatPlayerInitial) {
             return const Center(
               child: SizedBox(
                 width: 50,

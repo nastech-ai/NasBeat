@@ -9,7 +9,7 @@ import 'package:nasbeat/l10n/app_localizations.dart';
 import 'package:nasbeat/screens/screen/common_views/song_info_screen.dart';
 import 'package:nasbeat/screens/widgets/snackbar.dart';
 import 'package:nasbeat/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/core/models/exported.dart' hide MediaItem;
 import 'package:nasbeat/core/theme/app_theme.dart';
 import 'package:nasbeat/screens/widgets/media_metadata_links.dart';
@@ -53,10 +53,10 @@ class SongCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playerCubit = context.read<BloomeePlayerCubit>();
+    final playerCubit = context.read<NasBeatPlayerCubit>();
 
     return StreamBuilder<MediaItem?>(
-      stream: playerCubit.bloomeePlayer.mediaItem,
+      stream: playerCubit.nasbeatPlayer.mediaItem,
       builder: (context, snapshot) {
         final isPlaying = snapshot.data?.id == song.id;
         final l10n = AppLocalizations.of(context)!;
@@ -234,7 +234,7 @@ class SongCardWidget extends StatelessWidget {
                             iconColor: Colors.redAccent.withValues(alpha: 0.9),
                             onTap: () {
                               try {
-                                if (playerCubit.bloomeePlayer.currentMedia.id !=
+                                if (playerCubit.nasbeatPlayer.currentMedia.id !=
                                     song.id) {
                                   context
                                       .read<DownloaderCubit>()

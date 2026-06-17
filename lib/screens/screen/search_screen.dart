@@ -7,7 +7,7 @@ import 'package:icons_plus/icons_plus.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:nasbeat/blocs/settings_cubit/cubit/settings_cubit.dart';
-import 'package:nasbeat/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:nasbeat/blocs/media_player/nasbeat_player_cubit.dart';
 import 'package:nasbeat/blocs/search_suggestions/search_suggestion_bloc.dart';
 import 'package:nasbeat/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:nasbeat/core/di/service_locator.dart';
@@ -1299,8 +1299,8 @@ class _SliverSearchResults extends StatelessWidget {
                     child: SongCardWidget(
                       song: track,
                       onTap: () => context
-                          .read<BloomeePlayerCubit>()
-                          .bloomeePlayer
+                          .read<NasBeatPlayerCubit>()
+                          .nasbeatPlayer
                           .updateQueueTracks([track], doPlay: true),
                       onOptionsTap: () => showMoreBottomSheet(context, track,
                           showSinglePlay: true),

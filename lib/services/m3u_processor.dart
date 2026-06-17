@@ -18,7 +18,7 @@ String convertJsonToM3U(Map<String, dynamic> jsonData) {
     if (meta == null) {
       throw const FormatException("Missing '_meta' section in JSON.");
     }
-    final generatedBy = meta['generated_by']?.toString() ?? "Bloomee";
+    final generatedBy = meta['generated_by']?.toString() ?? "NasBeat";
     final version = meta['version']?.toString() ?? "Unknown";
     final exportedAt = meta['exportedAt']?.toString() ?? "Unknown";
     final note = meta['note']?.toString() ?? "";
@@ -41,7 +41,7 @@ String convertJsonToM3U(Map<String, dynamic> jsonData) {
     buffer.writeln("#PLAYLIST: $playlistName");
     buffer.writeln();
 
-    // Custom Bloomee metadata (ignored by standard M3U players).
+    // Custom NasBeat metadata (ignored by standard M3U players).
     buffer.writeln("#BLOOMEE-GENERATED_BY: $generatedBy");
     buffer.writeln("#BLOOMEE-VERSION: $version");
     buffer.writeln("#BLOOMEE-EXPORTEDAT: $exportedAt");
