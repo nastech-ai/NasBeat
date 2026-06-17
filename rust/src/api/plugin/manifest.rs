@@ -192,8 +192,12 @@ impl Manifest {
     /// Validate manifest structure
     #[flutter_rust_bridge::frb(ignore)]
     fn validate(&self) -> PluginResult<()> {
-        // Removed strict manifest_version check here to allow parsing legacy/future manifests.
-        // It should be validated at install time instead.
+        if self.manifest_version != 1 {
+            return Err(PluginError::ManifestParseError(format!(
+                "Unsupported manifest_version: {}. Only version 1 is supported.",
+                self.manifest_version
+            )));
+        }
 
         // Validate required string fields are not empty
         let required_strings = vec![
