@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 #![allow(non_snake_case)]
 #![allow(clippy::clone_on_copy)]
 #![allow(clippy::collapsible_if)]
