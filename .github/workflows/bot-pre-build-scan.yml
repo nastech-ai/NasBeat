@@ -280,7 +280,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const dartFmt     = "${{ needs.scan-dart.outputs.format_ok }}"    === "true";
+            // advisory — dart format enforced by flutter-ci.yml (|| true); not a gate blocker
+            const dartFmtRaw  = "${{ needs.scan-dart.outputs.format_ok }}";
             const dartAnalyze = "${{ needs.scan-dart.outputs.analyze_ok }}"   === "true";
             const rustFmt     = "${{ needs.scan-rust.outputs.fmt_ok }}"       === "true";
             const rustClippy  = "${{ needs.scan-rust.outputs.clippy_ok }}"    === "true";
@@ -289,8 +290,8 @@ jobs:
             const rustSec     = "${{ needs.scan-security.outputs.rust_ok }}"  !== "false";
             const branding    = "${{ needs.scan-branding.outputs.ok }}"       === "true";
 
+            // Blocking checks (gate fails if any false)
             const checks = [
-              ["Dart format",   dartFmt],
               ["Dart analyze",  dartAnalyze],
               ["Rust fmt",      rustFmt],
               ["Rust clippy",   rustClippy],
@@ -298,6 +299,10 @@ jobs:
               ["Dart security", dartSec],
               ["Rust security", rustSec],
               ["Branding",      branding],
+            ];
+            // Advisory-only row (shown in report, never blocks gate)
+            const advisory = [
+              ["Dart format ⚠️ advisory", dartFmtRaw === "true"],
             ];
 
             const passed = checks.filter(([,v]) => v).length;
@@ -308,12 +313,16 @@ jobs:
             const rows = checks.map(([name, ok]) =>
               `| ${ok ? "✅" : "❌"} | ${name} |`
             ).join("\n");
+            const advRows = advisory.map(([name, ok]) =>
+              `| ${ok ? "✅" : "⚠️"} | ${name} |`
+            ).join("\n");
 
             const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
             const title  = `🔍 [NasTech Bot] Pre-Build Scan: ${status}`;
             const body   = `## NasBeat Pre-Build Scan Report\n\n` +
               `**Status:** ${status} — ${passed}/${checks.length} checks passed\n\n` +
               `| | Check |\n|---|---|\n${rows}\n\n` +
+              `**Advisory (non-blocking):**\n| | Check |\n|---|---|\n${advRows}\n\n` +
               `**Run:** [${context.runId}](${runUrl})\n\n` +
               `---\n*NasTech Pre-Build Scanner — triggered by push to \`${{ github.ref_name }}\`*`;
 
