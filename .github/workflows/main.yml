@@ -150,7 +150,7 @@ jobs:
             exit 1
           fi
           echo "$_KS" | base64 -d > android/nasbeat.jks
-          echo "✅ Keystore ready"
+          echo "✅ Keystore decoded ($(wc -c < android/nasbeat.jks) bytes)"
 
       - name: Write key.properties
         if: steps.keystore.outcome == 'success'
@@ -159,12 +159,19 @@ jobs:
           _SP: ${{ secrets.STORE_PASSWORD }}
           _KA: ${{ secrets.KEY_ALIAS }}
         run: |
-          cat > android/key.properties << EOF
-          keyPassword=$_KP
-          storePassword=$_SP
-          keyAlias=$_KA
-          storeType=PKCS12
-          EOF
+          # Auto-detect keystore format from magic bytes:
+          # JKS  → starts with FEEDFEED
+          # PKCS12 → starts with 3082 / 3083 / 3084 (DER sequence)
+          MAGIC=$(xxd -p -l 4 android/nasbeat.jks 2>/dev/null || echo "00000000")
+          if [[ "$MAGIC" == "feedfeed" ]]; then
+            STORE_TYPE="JKS"
+          else
+            STORE_TYPE="PKCS12"
+          fi
+          echo "ℹ️  Detected keystore format: $STORE_TYPE (magic=$MAGIC)"
+          printf 'keyPassword=%s\nstorePassword=%s\nkeyAlias=%s\nstoreType=%s\n' \
+            "$_KP" "$_SP" "$_KA" "$STORE_TYPE" > android/key.properties
+          echo "✅ key.properties written"
 
       - name: Build Android APKs (split-per-abi)
         run: flutter build apk --release --split-per-abi --build-number ${{ github.run_number }}
