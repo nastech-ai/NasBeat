@@ -185,14 +185,24 @@ jobs:
           FINDINGS=""
 
           # Stale upstream branding in UI/l10n
+          # NOTE: lib/src/rust/ contains flutter_rust_bridge FFI generated code
+          # whose symbol names (frbgen_Bloomee_rust_*) MUST match the compiled
+          # Rust library — those files are intentionally excluded from this scan.
           for term in "BloomeeTunes" "iamhemantindia" "HemantKArya" \
-                      "hemantkarya.github.io" "ls\.bloomee\.musicplayer" \
-                      "com\.flutter_rust_bridge\.rust_lib_Bloomee" \
-                      "rust_lib_Bloomee"; do
+                      "hemantkarya.github.io" "ls\.bloomee\.musicplayer"; do
             HITS=$(grep -rn "$term" lib/ android/ ios/ linux/ windows/ macos/ rust_builder/ 2>/dev/null | \
-                   grep -v "Binary\|\.git" || true)
+                   grep -v "Binary\|\.git\|lib/src/rust" || true)
             if [ -n "$HITS" ]; then
               FINDINGS="${FINDINGS}\n**\`$term\`**\n\`\`\`\n${HITS}\n\`\`\`\n"
+            fi
+          done
+
+          # rust_lib_Bloomee — only flag if it appears OUTSIDE the FFI generated layer
+          for term in "com\.flutter_rust_bridge\.rust_lib_Bloomee" "rust_lib_Bloomee"; do
+            HITS=$(grep -rn "$term" lib/ android/ ios/ linux/ windows/ macos/ rust_builder/ 2>/dev/null | \
+                   grep -v "Binary\|\.git\|lib/src/rust" || true)
+            if [ -n "$HITS" ]; then
+              FINDINGS="${FINDINGS}\n**\`$term\`** (outside FFI layer)\n\`\`\`\n${HITS}\n\`\`\`\n"
             fi
           done
 

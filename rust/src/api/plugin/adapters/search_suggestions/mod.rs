@@ -1,11 +1,9 @@
 pub mod bindgen;
 
-use crate::api::plugin::commands::{SearchSuggestionCommand, PluginResponse};
+use crate::api::plugin::commands::{PluginResponse, SearchSuggestionCommand};
 use crate::api::plugin::errors::{PluginError, PluginResult};
 use crate::api::plugin::loader::get_instance_with_host;
-use crate::api::plugin::models::{
-    EntitySuggestion, EntityType, Suggestion, SuggestionArtwork,
-};
+use crate::api::plugin::models::{EntitySuggestion, EntityType, Suggestion, SuggestionArtwork};
 use crate::api::plugin::traits::Plugin;
 use crate::api::plugin::types::{PluginAdapter, PluginType};
 use crate::api::plugin::wasm_runtime::{HostPluginStore, SharedWasmEngine};
@@ -144,8 +142,7 @@ impl SearchSuggestionPluginAdapter {
         wasm_path: String,
         engine: SharedWasmEngine,
     ) -> PluginResult<Self> {
-        let mut store =
-            HostPluginStore::new(&engine, SearchSuggestionHostImpl::new(name.clone()));
+        let mut store = HostPluginStore::new(&engine, SearchSuggestionHostImpl::new(name.clone()));
 
         let instance = get_instance_with_host(&mut store, engine, &wasm_path, |linker, store| {
             bindgen::imports::register_utils_host::<SearchSuggestionHostImpl, _>(linker, store)

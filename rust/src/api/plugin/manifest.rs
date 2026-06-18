@@ -91,8 +91,7 @@ where
             let as_u64 = number
                 .as_u64()
                 .ok_or_else(|| de::Error::custom("manifest_version must be a positive integer"))?;
-            u32::try_from(as_u64)
-                .map_err(|_| de::Error::custom("manifest_version is too large"))
+            u32::try_from(as_u64).map_err(|_| de::Error::custom("manifest_version is too large"))
         }
         serde_json::Value::String(text) => {
             let trimmed = text.trim();
@@ -192,12 +191,8 @@ impl Manifest {
     /// Validate manifest structure
     #[flutter_rust_bridge::frb(ignore)]
     fn validate(&self) -> PluginResult<()> {
-        if self.manifest_version != 1 {
-            return Err(PluginError::ManifestParseError(format!(
-                "Unsupported manifest_version: {}. Only version 1 is supported.",
-                self.manifest_version
-            )));
-        }
+        // Removed strict manifest_version check here to allow parsing legacy/future manifests.
+        // It should be validated at install time instead.
 
         // Validate required string fields are not empty
         let required_strings = vec![

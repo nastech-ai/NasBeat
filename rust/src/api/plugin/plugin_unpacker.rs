@@ -25,11 +25,7 @@ pub async fn unpack_and_read_manifest(
         .context("System clock before UNIX_EPOCH")?
         .as_nanos();
 
-    let temp_plugin_dir = format!(
-        "{}/plugin_temp_{}",
-        temp_dir,
-        now_nanos
-    );
+    let temp_plugin_dir = format!("{}/plugin_temp_{}", temp_dir, now_nanos);
 
     unpack_plugin(archive_path, &temp_plugin_dir, Some("bex")).await?;
 
@@ -142,7 +138,11 @@ pub async fn install_packed_plugin(
                 error: Some(format!(
                     "country restriction: requires {}, got '{}'",
                     manifest.country_allowlist.join(","),
-                    if normalized.is_empty() { "<unset>" } else { &normalized }
+                    if normalized.is_empty() {
+                        "<unset>"
+                    } else {
+                        &normalized
+                    }
                 )),
             });
         }

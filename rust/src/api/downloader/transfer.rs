@@ -125,16 +125,27 @@ pub fn download_task_blocking(
         .unwrap_or(status.as_u16() == 206);
 
     // If we sent a Range header but got 200 back, start from the beginning.
-    let resume_from = if existing_size > 0 && status.as_u16() != 206 { 0 } else { existing_size };
+    let resume_from = if existing_size > 0 && status.as_u16() != 206 {
+        0
+    } else {
+        existing_size
+    };
 
     let total_bytes = extract_total_bytes(response.headers(), resume_from);
 
     // Open or create the .part file.
     let append = resume_from > 0 && status.as_u16() == 206;
     let file = if append {
-        OpenOptions::new().create(true).append(true).open(&temp_path)
+        OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&temp_path)
     } else {
-        OpenOptions::new().create(true).truncate(true).write(true).open(&temp_path)
+        OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open(&temp_path)
     }
     .map_err(|e| format!("Failed to open part file: {e}"))?;
     let mut output = BufWriter::with_capacity(FILE_WRITE_BUFFER_SIZE, file);
@@ -186,11 +197,15 @@ pub fn download_task_blocking(
             return Ok(TransferOutcome::Paused);
         }
 
-        let n = response.read(&mut buf).map_err(|e| format!("Read error: {e}"))?;
+        let n = response
+            .read(&mut buf)
+            .map_err(|e| format!("Read error: {e}"))?;
         if n == 0 {
             break;
         }
-        output.write_all(&buf[..n]).map_err(|e| format!("Write error: {e}"))?;
+        output
+            .write_all(&buf[..n])
+            .map_err(|e| format!("Write error: {e}"))?;
         downloaded += n as u64;
 
         if last_emit.elapsed() >= PROGRESS_EMIT_INTERVAL {
@@ -293,7 +308,12 @@ pub fn write_audio_metadata(
 
     tag.set_title(track.title.clone());
 
-    let artist = track.artists.iter().map(|a| a.name.clone()).collect::<Vec<_>>().join(", ");
+    let artist = track
+        .artists
+        .iter()
+        .map(|a| a.name.clone())
+        .collect::<Vec<_>>()
+        .join(", ");
     if !artist.is_empty() {
         tag.set_artist(artist);
     }
@@ -308,7 +328,11 @@ pub fn write_audio_metadata(
     if let Some(lyrics) = &track.lyrics {
         if let Some(plain) = lyrics.plain.as_ref().filter(|text| !text.trim().is_empty()) {
             tag.insert_text(ItemKey::Lyrics, plain.clone());
-        } else if let Some(synced) = lyrics.synced.as_ref().filter(|text| !text.trim().is_empty()) {
+        } else if let Some(synced) = lyrics
+            .synced
+            .as_ref()
+            .filter(|text| !text.trim().is_empty())
+        {
             tag.insert_text(ItemKey::Lyrics, synced.clone());
         }
         if let Some(copyright) = lyrics
@@ -347,7 +371,9 @@ fn finalize_output_path(
     let detected_extension = detect_audio_extension(temp_path).ok();
 
     let (track, download_dir, current_target_path) = {
-        let guard = task.lock().map_err(|_| "Task mutex poisoned while finalizing path".to_string())?;
+        let guard = task
+            .lock()
+            .map_err(|_| "Task mutex poisoned while finalizing path".to_string())?;
         (
             guard.persisted.track.clone(),
             guard.persisted.download_dir.clone(),

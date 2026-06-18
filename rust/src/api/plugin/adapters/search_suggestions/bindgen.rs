@@ -5,8 +5,7 @@
 
 use anyhow::*;
 use waclay::*;
-use wasm_runtime_layer::{backend};
-
+use wasm_runtime_layer::backend;
 
 // ========== Type Definitions ==========
 
@@ -23,15 +22,13 @@ pub enum HttpMethod {
 
 impl ComponentType for HttpMethod {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "get",
-            "post",
-            "put",
-            "delete",
-            "head",
-            "patch",
-            "options",
-        ]).unwrap())
+        ValueType::Enum(
+            EnumType::new(
+                None,
+                ["get", "post", "put", "delete", "head", "patch", "options"],
+            )
+            .unwrap(),
+        )
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -53,15 +50,11 @@ impl ComponentType for HttpMethod {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "get",
-            "post",
-            "put",
-            "delete",
-            "head",
-            "patch",
-            "options",
-        ]).unwrap();
+        let enum_type = EnumType::new(
+            None,
+            ["get", "post", "put", "delete", "head", "patch", "options"],
+        )
+        .unwrap();
 
         let discriminant = match self {
             HttpMethod::Get => 0,
@@ -79,9 +72,6 @@ impl ComponentType for HttpMethod {
 
 impl UnaryComponentType for HttpMethod {}
 
-
-
-
 #[derive(Debug, Clone)]
 pub struct HttpResponse {
     pub status: u16,
@@ -96,10 +86,17 @@ impl ComponentType for HttpResponse {
                 None,
                 [
                     ("status", ValueType::U16),
-                    ("headers", ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))),
+                    (
+                        "headers",
+                        ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(
+                            None,
+                            [ValueType::String, ValueType::String],
+                        )))),
+                    ),
                     ("body", ValueType::List(ListType::new(ValueType::U8))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -115,7 +112,11 @@ impl ComponentType for HttpResponse {
                 .field("body")
                 .ok_or_else(|| anyhow!("Missing 'body' field"))?;
 
-            let status = if let Value::U16(x) = status { x } else { bail!("Expected u16") };
+            let status = if let Value::U16(x) = status {
+                x
+            } else {
+                bail!("Expected u16")
+            };
             let headers = Vec::<(String, String)>::from_value(&headers)?;
             let body = Vec::<u8>::from_value(&body)?;
 
@@ -135,10 +136,17 @@ impl ComponentType for HttpResponse {
                 None,
                 [
                     ("status", ValueType::U16),
-                    ("headers", ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))),
+                    (
+                        "headers",
+                        ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(
+                            None,
+                            [ValueType::String, ValueType::String],
+                        )))),
+                    ),
                     ("body", ValueType::List(ListType::new(ValueType::U8))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("status", Value::U16(self.status)),
                 ("headers", self.headers.into_value()?),
@@ -150,9 +158,6 @@ impl ComponentType for HttpResponse {
 }
 
 impl UnaryComponentType for HttpResponse {}
-
-
-
 
 #[derive(Debug, Clone)]
 pub struct RequestOptions {
@@ -169,11 +174,28 @@ impl ComponentType for RequestOptions {
                 None,
                 [
                     ("method", HttpMethod::ty()),
-                    ("headers", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))))),
-                    ("body", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::U8))))),
-                    ("timeout-seconds", ValueType::Option(OptionType::new(ValueType::U32))),
+                    (
+                        "headers",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::Tuple(TupleType::new(
+                                None,
+                                [ValueType::String, ValueType::String],
+                            )),
+                        )))),
+                    ),
+                    (
+                        "body",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::U8,
+                        )))),
+                    ),
+                    (
+                        "timeout-seconds",
+                        ValueType::Option(OptionType::new(ValueType::U32)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -193,8 +215,8 @@ impl ComponentType for RequestOptions {
                 .ok_or_else(|| anyhow!("Missing 'timeout-seconds' field"))?;
 
             let method = HttpMethod::from_value(&method)?;
-            let headers = Option::<Vec::<(String, String)>>::from_value(&headers)?;
-            let body = Option::<Vec::<u8>>::from_value(&body)?;
+            let headers = Option::<Vec<(String, String)>>::from_value(&headers)?;
+            let body = Option::<Vec<u8>>::from_value(&body)?;
             let timeout_seconds = Option::<u32>::from_value(&timeout_seconds)?;
 
             Ok(RequestOptions {
@@ -214,11 +236,28 @@ impl ComponentType for RequestOptions {
                 None,
                 [
                     ("method", HttpMethod::ty()),
-                    ("headers", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))))),
-                    ("body", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::U8))))),
-                    ("timeout-seconds", ValueType::Option(OptionType::new(ValueType::U32))),
+                    (
+                        "headers",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::Tuple(TupleType::new(
+                                None,
+                                [ValueType::String, ValueType::String],
+                            )),
+                        )))),
+                    ),
+                    (
+                        "body",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::U8,
+                        )))),
+                    ),
+                    (
+                        "timeout-seconds",
+                        ValueType::Option(OptionType::new(ValueType::U32)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("method", self.method.into_value()?),
                 ("headers", self.headers.into_value()?),
@@ -232,8 +271,6 @@ impl ComponentType for RequestOptions {
 
 impl UnaryComponentType for RequestOptions {}
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EntityType {
     Track,
@@ -246,14 +283,13 @@ pub enum EntityType {
 
 impl ComponentType for EntityType {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "track",
-            "album",
-            "artist",
-            "playlist",
-            "genre",
-            "unknown",
-        ]).unwrap())
+        ValueType::Enum(
+            EnumType::new(
+                None,
+                ["track", "album", "artist", "playlist", "genre", "unknown"],
+            )
+            .unwrap(),
+        )
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -274,14 +310,11 @@ impl ComponentType for EntityType {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "track",
-            "album",
-            "artist",
-            "playlist",
-            "genre",
-            "unknown",
-        ]).unwrap();
+        let enum_type = EnumType::new(
+            None,
+            ["track", "album", "artist", "playlist", "genre", "unknown"],
+        )
+        .unwrap();
 
         let discriminant = match self {
             EntityType::Track => 0,
@@ -311,9 +344,13 @@ impl ComponentType for Artwork {
                 None,
                 [
                     ("url", ValueType::String),
-                    ("url-low", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "url-low",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -326,13 +363,14 @@ impl ComponentType for Artwork {
                 .field("url-low")
                 .ok_or_else(|| anyhow!("Missing 'url-low' field"))?;
 
-            let url = if let Value::String(s) = url { s.to_string() } else { bail!("Expected string") };
+            let url = if let Value::String(s) = url {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let url_low = Option::<String>::from_value(&url_low)?;
 
-            Ok(Artwork {
-                url,
-                url_low,
-            })
+            Ok(Artwork { url, url_low })
         } else {
             bail!("Expected Record value")
         }
@@ -344,9 +382,13 @@ impl ComponentType for Artwork {
                 None,
                 [
                     ("url", ValueType::String),
-                    ("url-low", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "url-low",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("url", Value::String(self.url.into())),
                 ("url-low", self.url_low.into_value()?),
@@ -357,7 +399,6 @@ impl ComponentType for Artwork {
 }
 
 impl UnaryComponentType for Artwork {}
-
 
 #[derive(Debug, Clone)]
 pub struct EntitySuggestion {
@@ -376,11 +417,18 @@ impl ComponentType for EntitySuggestion {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("kind", EntityType::ty()),
-                    ("thumbnail", ValueType::Option(OptionType::new(Artwork::ty()))),
+                    (
+                        "thumbnail",
+                        ValueType::Option(OptionType::new(Artwork::ty())),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -402,8 +450,16 @@ impl ComponentType for EntitySuggestion {
                 .field("thumbnail")
                 .ok_or_else(|| anyhow!("Missing 'thumbnail' field"))?;
 
-            let id = if let Value::String(s) = id { s.to_string() } else { bail!("Expected string") };
-            let title = if let Value::String(s) = title { s.to_string() } else { bail!("Expected string") };
+            let id = if let Value::String(s) = id {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let title = if let Value::String(s) = title {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let subtitle = Option::<String>::from_value(&subtitle)?;
             let kind = EntityType::from_value(&kind)?;
             let thumbnail = Option::<Artwork>::from_value(&thumbnail)?;
@@ -427,11 +483,18 @@ impl ComponentType for EntitySuggestion {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("kind", EntityType::ty()),
-                    ("thumbnail", ValueType::Option(OptionType::new(Artwork::ty()))),
+                    (
+                        "thumbnail",
+                        ValueType::Option(OptionType::new(Artwork::ty())),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("id", Value::String(self.id.into())),
                 ("title", Value::String(self.title.into())),
@@ -461,7 +524,8 @@ impl ComponentType for Suggestion {
                     VariantCase::new("query", Some(ValueType::String)),
                     VariantCase::new("entity", Some(EntitySuggestion::ty())),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -476,7 +540,11 @@ impl ComponentType for Suggestion {
             match case_name {
                 "query" => {
                     if let Some(payload_value) = payload {
-                        let converted = if let Value::String(s) = payload_value { s.to_string() } else { bail!("Expected string") };
+                        let converted = if let Value::String(s) = payload_value {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         Ok(Suggestion::Query(converted))
                     } else {
                         bail!("Expected payload for query case")
@@ -504,7 +572,8 @@ impl ComponentType for Suggestion {
                 VariantCase::new("query", Some(ValueType::String)),
                 VariantCase::new("entity", Some(EntitySuggestion::ty())),
             ],
-        ).unwrap();
+        )
+        .unwrap();
 
         let (discriminant, payload) = match self {
             Suggestion::Query(val) => (0, Some(Value::String(val.into()))),
@@ -517,9 +586,6 @@ impl ComponentType for Suggestion {
 }
 
 impl UnaryComponentType for Suggestion {}
-
-
-
 
 #[derive(Debug, Clone)]
 pub struct SuggestionOptions {
@@ -536,9 +602,15 @@ impl ComponentType for SuggestionOptions {
                 [
                     ("limit", ValueType::Option(OptionType::new(ValueType::U8))),
                     ("include-entities", ValueType::Bool),
-                    ("allowed-types", ValueType::Option(OptionType::new(ValueType::List(ListType::new(EntityType::ty()))))),
+                    (
+                        "allowed-types",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            EntityType::ty(),
+                        )))),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -555,8 +627,12 @@ impl ComponentType for SuggestionOptions {
                 .ok_or_else(|| anyhow!("Missing 'allowed-types' field"))?;
 
             let limit = Option::<u8>::from_value(&limit)?;
-            let include_entities = if let Value::Bool(x) = include_entities { x } else { bail!("Expected bool") };
-            let allowed_types = Option::<Vec::<EntityType>>::from_value(&allowed_types)?;
+            let include_entities = if let Value::Bool(x) = include_entities {
+                x
+            } else {
+                bail!("Expected bool")
+            };
+            let allowed_types = Option::<Vec<EntityType>>::from_value(&allowed_types)?;
 
             Ok(SuggestionOptions {
                 limit,
@@ -575,9 +651,15 @@ impl ComponentType for SuggestionOptions {
                 [
                     ("limit", ValueType::Option(OptionType::new(ValueType::U8))),
                     ("include-entities", ValueType::Bool),
-                    ("allowed-types", ValueType::Option(OptionType::new(ValueType::List(ListType::new(EntityType::ty()))))),
+                    (
+                        "allowed-types",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            EntityType::ty(),
+                        )))),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("limit", self.limit.into_value()?),
                 ("include-entities", Value::Bool(self.include_entities)),
@@ -590,15 +672,15 @@ impl ComponentType for SuggestionOptions {
 
 impl UnaryComponentType for SuggestionOptions {}
 
-
-
-
-
 // ========== Host Imports ==========
 
 /// Host trait for interface: component:search-suggestion-provider/utils
 pub trait UtilsHost {
-    fn http_request(&mut self, url: String, options: RequestOptions) -> Result<HttpResponse, String>;
+    fn http_request(
+        &mut self,
+        url: String,
+        options: RequestOptions,
+    ) -> Result<HttpResponse, String>;
     fn random_number(&mut self) -> u64;
     fn current_unix_timestamp(&mut self) -> u64;
     fn storage_set(&mut self, key: String, value: String) -> bool;
@@ -615,7 +697,11 @@ pub mod imports {
         store: &mut Store<T, E>,
     ) -> Result<()> {
         let host_interface = linker
-            .define_instance("component:search-suggestion-provider/utils".try_into().unwrap())
+            .define_instance(
+                "component:search-suggestion-provider/utils"
+                    .try_into()
+                    .unwrap(),
+            )
             .context("Failed to define host interface")?;
 
         host_interface
@@ -624,11 +710,18 @@ pub mod imports {
                 Func::new(
                     &mut *store,
                     FuncType::new(
-                        [ValueType::String, RequestOptions::ty(), ],
-                        [ValueType::Result(ResultType::new(Some(HttpResponse::ty()), Some(ValueType::String)))],
+                        [ValueType::String, RequestOptions::ty()],
+                        [ValueType::Result(ResultType::new(
+                            Some(HttpResponse::ty()),
+                            Some(ValueType::String),
+                        ))],
                     ),
                     |mut ctx, params, results| {
-                        let url = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
+                        let url = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let options = RequestOptions::from_value(&params[1])?;
                         let result = ctx.data_mut().http_request(url, options);
                         results[0] = result.into_value()?;
@@ -643,10 +736,7 @@ pub mod imports {
                 "random-number",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [],
-                        [ValueType::U64],
-                    ),
+                    FuncType::new([], [ValueType::U64]),
                     |mut ctx, params, results| {
                         let result = ctx.data_mut().random_number();
                         results[0] = Value::U64(result);
@@ -661,10 +751,7 @@ pub mod imports {
                 "current-unix-timestamp",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [],
-                        [ValueType::U64],
-                    ),
+                    FuncType::new([], [ValueType::U64]),
                     |mut ctx, params, results| {
                         let result = ctx.data_mut().current_unix_timestamp();
                         results[0] = Value::U64(result);
@@ -679,13 +766,18 @@ pub mod imports {
                 "storage-set",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [ValueType::String, ValueType::String, ],
-                        [ValueType::Bool],
-                    ),
+                    FuncType::new([ValueType::String, ValueType::String], [ValueType::Bool]),
                     |mut ctx, params, results| {
-                        let key = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
-                        let value = if let Value::String(s) = &params[1] { s.to_string() } else { bail!("Expected string") };
+                        let key = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
+                        let value = if let Value::String(s) = &params[1] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let result = ctx.data_mut().storage_set(key, value);
                         results[0] = Value::Bool(result);
                         Ok(())
@@ -700,11 +792,15 @@ pub mod imports {
                 Func::new(
                     &mut *store,
                     FuncType::new(
-                        [ValueType::String, ],
+                        [ValueType::String],
                         [ValueType::Option(OptionType::new(ValueType::String))],
                     ),
                     |mut ctx, params, results| {
-                        let key = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
+                        let key = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let result = ctx.data_mut().storage_get(key);
                         results[0] = result.into_value()?;
                         Ok(())
@@ -718,12 +814,13 @@ pub mod imports {
                 "storage-delete",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [ValueType::String, ],
-                        [ValueType::Bool],
-                    ),
+                    FuncType::new([ValueType::String], [ValueType::Bool]),
                     |mut ctx, params, results| {
-                        let key = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
+                        let key = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let result = ctx.data_mut().storage_delete(key);
                         results[0] = Value::Bool(result);
                         Ok(())
@@ -737,12 +834,13 @@ pub mod imports {
                 "log",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [ValueType::String, ],
-                        [],
-                    ),
+                    FuncType::new([ValueType::String], []),
                     |mut ctx, params, _results| {
-                        let message = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
+                        let message = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         ctx.data_mut().log(message);
                         Ok(())
                     },
@@ -752,7 +850,6 @@ pub mod imports {
 
         Ok(())
     }
-
 }
 
 // ========== Guest Exports ==========
@@ -761,7 +858,6 @@ pub mod exports_types {
     use super::*;
 
     pub const INTERFACE_NAME: &str = "component:search-suggestion-provider/types";
-
 }
 
 pub mod exports_suggestion_api {
@@ -800,6 +896,4 @@ pub mod exports_suggestion_api {
             .ok_or_else(|| anyhow!("Function 'get-default-suggestions' not found"))?
             .typed::<SuggestionOptions, Result<Vec<Suggestion>, String>>()
     }
-
 }
-

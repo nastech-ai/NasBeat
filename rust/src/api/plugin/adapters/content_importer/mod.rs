@@ -134,8 +134,7 @@ impl ContentImporterPluginAdapter {
         wasm_path: String,
         engine: SharedWasmEngine,
     ) -> PluginResult<Self> {
-        let mut store =
-            HostPluginStore::new(&engine, ContentImporterHostImpl::new(name.clone()));
+        let mut store = HostPluginStore::new(&engine, ContentImporterHostImpl::new(name.clone()));
 
         let instance = get_instance_with_host(&mut store, engine, &wasm_path, |linker, store| {
             bindgen::imports::register_utils_host::<ContentImporterHostImpl, _>(linker, store)
@@ -194,14 +193,13 @@ impl Plugin for ContentImporterPluginAdapter {
                         .call(&mut state.store, url)
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
                         .map_err(|e| PluginError::WasmExecutionError(e))?;
-                    Ok(PluginResponse::CollectionInfo(to_import_collection_summary(
-                        result,
-                    )))
+                    Ok(PluginResponse::CollectionInfo(
+                        to_import_collection_summary(result),
+                    ))
                 }
                 ContentImporterCommand::GetTracks { url } => {
-                    let func =
-                        exports_importer::get_get_tracks(&state.instance, &mut state.store)
-                            .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?;
+                    let func = exports_importer::get_get_tracks(&state.instance, &mut state.store)
+                        .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?;
                     let result = func
                         .call(&mut state.store, url)
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
@@ -244,9 +242,7 @@ impl PluginAdapter for ContentImporterPluginAdapter {
 
 // ── Converters ───────────────────────────────────────────────────────────────
 
-fn to_import_collection_summary(
-    s: bindgen::CollectionSummary,
-) -> ImportCollectionSummary {
+fn to_import_collection_summary(s: bindgen::CollectionSummary) -> ImportCollectionSummary {
     ImportCollectionSummary {
         title: s.title,
         kind: match s.kind {

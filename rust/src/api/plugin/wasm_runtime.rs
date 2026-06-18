@@ -89,7 +89,7 @@ pub fn get_global_engine() -> &'static SharedWasmEngine {
 // ============================================================================
 
 /// Get information about the currently configured WASM runtime backend
-/// 
+///
 /// Returns information about Wasmi (interpreter) by default.
 /// To switch to Wasmtime (JIT), change the pub use statement at the top of this file.
 pub fn runtime_info() -> RuntimeInfo {
@@ -98,9 +98,14 @@ pub fn runtime_info() -> RuntimeInfo {
         name: "Wasmi",
         version: "1.0.0",
         description: "Lightweight WebAssembly interpreter",
-        features: &["Interpreter-based", "Low memory footprint", "Fast startup", "Portable"],
+        features: &[
+            "Interpreter-based",
+            "Low memory footprint",
+            "Fast startup",
+            "Portable",
+        ],
     }
-    
+
     // Alternative: Wasmtime JIT backend (uncomment if using wasmtime_runtime_layer)
     // RuntimeInfo {
     //     name: "Wasmtime",

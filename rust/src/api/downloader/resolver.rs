@@ -2,13 +2,13 @@
 /// the plugin manager, caching the result, and refreshing only when the cached
 /// URL has expired.
 use std::path::Path;
-use std::sync::{Arc, Mutex};
 use std::sync::atomic::Ordering;
+use std::sync::{Arc, Mutex};
 
 use crate::api::downloader::types::ManagedTask;
 use crate::api::downloader::utils::{
-    current_unix_epoch_secs, guess_extension_from_url, normalize_quality, split_media_id,
-    build_download_file_name,
+    build_download_file_name, current_unix_epoch_secs, guess_extension_from_url, normalize_quality,
+    split_media_id,
 };
 use crate::api::plugin::commands::{ContentResolverCommand, PluginRequest, PluginResponse};
 use crate::api::plugin::models::{Quality, StreamSource};
@@ -38,13 +38,31 @@ pub fn is_stream_usable(stream: &StreamSource) -> bool {
 /// Falls back to progressively wider selections before giving up.
 pub fn select_best_stream(streams: &[StreamSource], preference: &str) -> Option<StreamSource> {
     let priority: &[Quality] = match normalize_quality(preference) {
-        "Low" => &[Quality::Low, Quality::Medium, Quality::High, Quality::Lossless],
-        "High" => &[Quality::Lossless, Quality::High, Quality::Medium, Quality::Low],
-        _ => &[Quality::Medium, Quality::High, Quality::Low, Quality::Lossless],
+        "Low" => &[
+            Quality::Low,
+            Quality::Medium,
+            Quality::High,
+            Quality::Lossless,
+        ],
+        "High" => &[
+            Quality::Lossless,
+            Quality::High,
+            Quality::Medium,
+            Quality::Low,
+        ],
+        _ => &[
+            Quality::Medium,
+            Quality::High,
+            Quality::Low,
+            Quality::Lossless,
+        ],
     };
 
     for &quality in priority {
-        if let Some(s) = streams.iter().find(|s| s.quality == quality && is_stream_usable(s)) {
+        if let Some(s) = streams
+            .iter()
+            .find(|s| s.quality == quality && is_stream_usable(s))
+        {
             return Some(s.clone());
         }
     }
@@ -79,7 +97,10 @@ pub async fn resolve_stream(
     // 2. Need a fresh stream – read the fields we need under a short lock.
     let (track, preference) = {
         let guard = task.lock().map_err(|_| "Task mutex poisoned".to_string())?;
-        (guard.persisted.track.clone(), guard.persisted.preferred_quality.clone())
+        (
+            guard.persisted.track.clone(),
+            guard.persisted.preferred_quality.clone(),
+        )
     };
 
     // 3. Fetch from plugin manager (this is async and may take time).
@@ -87,9 +108,7 @@ pub async fn resolve_stream(
         let response = plugin_manager
             .handle_plugin_request(
                 &plugin_id,
-                PluginRequest::ContentResolver(ContentResolverCommand::GetStreams {
-                    id: local_id,
-                }),
+                PluginRequest::ContentResolver(ContentResolverCommand::GetStreams { id: local_id }),
             )
             .await
             .map_err(|e| e.to_string())?;
@@ -133,10 +152,7 @@ pub async fn resolve_stream(
         guard.persisted.selected_stream = Some(stream.clone());
 
         if guard.persisted.file_name.is_empty() || guard.persisted.target_path.is_empty() {
-            let ext = guess_extension_from_url(
-                Some(&stream.format),
-                &stream.url,
-            );
+            let ext = guess_extension_from_url(Some(&stream.format), &stream.url);
             let file_name = build_download_file_name(&guard.persisted.track, &ext);
             let target_path = Path::new(&guard.persisted.download_dir)
                 .join(&file_name)
@@ -149,4 +165,3 @@ pub async fn resolve_stream(
 
     Ok(stream)
 }
-

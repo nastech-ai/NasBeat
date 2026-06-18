@@ -1,11 +1,11 @@
-use crate::api::plugin::events::PluginManagerEvent;
-use crate::api::plugin::errors::PluginError;
-use crate::api::plugin::plugin::PluginManager;
-use crate::api::plugin::plugin_info::PluginInfo;
-use crate::api::plugin::types::{PluginInstallResult, PluginType};
 use crate::api::downloader::{
     DownloadManager, DownloadManagerEvent, DownloadTaskSnapshot, EnqueueDownloadRequest,
 };
+use crate::api::plugin::errors::PluginError;
+use crate::api::plugin::events::PluginManagerEvent;
+use crate::api::plugin::plugin::PluginManager;
+use crate::api::plugin::plugin_info::PluginInfo;
+use crate::api::plugin::types::{PluginInstallResult, PluginType};
 use crate::frb_generated::StreamSink;
 use flutter_rust_bridge::frb;
 
@@ -98,10 +98,7 @@ pub async fn cancel_download_task(
 }
 
 #[frb]
-pub async fn acknowledge_download_persisted(
-    manager: &DownloadManager,
-    task_id: String,
-) -> bool {
+pub async fn acknowledge_download_persisted(manager: &DownloadManager, task_id: String) -> bool {
     manager.acknowledge_persisted(task_id).await
 }
 

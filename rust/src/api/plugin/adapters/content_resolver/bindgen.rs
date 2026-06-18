@@ -5,8 +5,7 @@
 
 use anyhow::*;
 use waclay::*;
-use wasm_runtime_layer::{backend};
-
+use wasm_runtime_layer::backend;
 
 // ========== Type Definitions ==========
 
@@ -23,15 +22,13 @@ pub enum HttpMethod {
 
 impl ComponentType for HttpMethod {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "get",
-            "post",
-            "put",
-            "delete",
-            "head",
-            "patch",
-            "options",
-        ]).unwrap())
+        ValueType::Enum(
+            EnumType::new(
+                None,
+                ["get", "post", "put", "delete", "head", "patch", "options"],
+            )
+            .unwrap(),
+        )
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -53,15 +50,11 @@ impl ComponentType for HttpMethod {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "get",
-            "post",
-            "put",
-            "delete",
-            "head",
-            "patch",
-            "options",
-        ]).unwrap();
+        let enum_type = EnumType::new(
+            None,
+            ["get", "post", "put", "delete", "head", "patch", "options"],
+        )
+        .unwrap();
 
         let discriminant = match self {
             HttpMethod::Get => 0,
@@ -79,9 +72,6 @@ impl ComponentType for HttpMethod {
 
 impl UnaryComponentType for HttpMethod {}
 
-
-
-
 #[derive(Debug, Clone)]
 pub struct HttpResponse {
     pub status: u16,
@@ -96,10 +86,17 @@ impl ComponentType for HttpResponse {
                 None,
                 [
                     ("status", ValueType::U16),
-                    ("headers", ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))),
+                    (
+                        "headers",
+                        ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(
+                            None,
+                            [ValueType::String, ValueType::String],
+                        )))),
+                    ),
                     ("body", ValueType::List(ListType::new(ValueType::U8))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -115,7 +112,11 @@ impl ComponentType for HttpResponse {
                 .field("body")
                 .ok_or_else(|| anyhow!("Missing 'body' field"))?;
 
-            let status = if let Value::U16(x) = status { x } else { bail!("Expected u16") };
+            let status = if let Value::U16(x) = status {
+                x
+            } else {
+                bail!("Expected u16")
+            };
             let headers = Vec::<(String, String)>::from_value(&headers)?;
             let body = Vec::<u8>::from_value(&body)?;
 
@@ -135,10 +136,17 @@ impl ComponentType for HttpResponse {
                 None,
                 [
                     ("status", ValueType::U16),
-                    ("headers", ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))),
+                    (
+                        "headers",
+                        ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(
+                            None,
+                            [ValueType::String, ValueType::String],
+                        )))),
+                    ),
                     ("body", ValueType::List(ListType::new(ValueType::U8))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("status", Value::U16(self.status)),
                 ("headers", self.headers.into_value()?),
@@ -150,9 +158,6 @@ impl ComponentType for HttpResponse {
 }
 
 impl UnaryComponentType for HttpResponse {}
-
-
-
 
 #[derive(Debug, Clone)]
 pub struct RequestOptions {
@@ -169,11 +174,28 @@ impl ComponentType for RequestOptions {
                 None,
                 [
                     ("method", HttpMethod::ty()),
-                    ("headers", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))))),
-                    ("body", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::U8))))),
-                    ("timeout-seconds", ValueType::Option(OptionType::new(ValueType::U32))),
+                    (
+                        "headers",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::Tuple(TupleType::new(
+                                None,
+                                [ValueType::String, ValueType::String],
+                            )),
+                        )))),
+                    ),
+                    (
+                        "body",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::U8,
+                        )))),
+                    ),
+                    (
+                        "timeout-seconds",
+                        ValueType::Option(OptionType::new(ValueType::U32)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -193,8 +215,8 @@ impl ComponentType for RequestOptions {
                 .ok_or_else(|| anyhow!("Missing 'timeout-seconds' field"))?;
 
             let method = HttpMethod::from_value(&method)?;
-            let headers = Option::<Vec::<(String, String)>>::from_value(&headers)?;
-            let body = Option::<Vec::<u8>>::from_value(&body)?;
+            let headers = Option::<Vec<(String, String)>>::from_value(&headers)?;
+            let body = Option::<Vec<u8>>::from_value(&body)?;
             let timeout_seconds = Option::<u32>::from_value(&timeout_seconds)?;
 
             Ok(RequestOptions {
@@ -214,11 +236,28 @@ impl ComponentType for RequestOptions {
                 None,
                 [
                     ("method", HttpMethod::ty()),
-                    ("headers", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))))),
-                    ("body", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::U8))))),
-                    ("timeout-seconds", ValueType::Option(OptionType::new(ValueType::U32))),
+                    (
+                        "headers",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::Tuple(TupleType::new(
+                                None,
+                                [ValueType::String, ValueType::String],
+                            )),
+                        )))),
+                    ),
+                    (
+                        "body",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::U8,
+                        )))),
+                    ),
+                    (
+                        "timeout-seconds",
+                        ValueType::Option(OptionType::new(ValueType::U32)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("method", self.method.into_value()?),
                 ("headers", self.headers.into_value()?),
@@ -232,8 +271,6 @@ impl ComponentType for RequestOptions {
 
 impl UnaryComponentType for RequestOptions {}
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageLayout {
     Square,
@@ -245,13 +282,13 @@ pub enum ImageLayout {
 
 impl ComponentType for ImageLayout {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "square",
-            "portrait",
-            "landscape",
-            "banner",
-            "circular",
-        ]).unwrap())
+        ValueType::Enum(
+            EnumType::new(
+                None,
+                ["square", "portrait", "landscape", "banner", "circular"],
+            )
+            .unwrap(),
+        )
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -271,13 +308,11 @@ impl ComponentType for ImageLayout {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "square",
-            "portrait",
-            "landscape",
-            "banner",
-            "circular",
-        ]).unwrap();
+        let enum_type = EnumType::new(
+            None,
+            ["square", "portrait", "landscape", "banner", "circular"],
+        )
+        .unwrap();
 
         let discriminant = match self {
             ImageLayout::Square => 0,
@@ -308,11 +343,18 @@ impl ComponentType for Artwork {
                 None,
                 [
                     ("url", ValueType::String),
-                    ("url-low", ValueType::Option(OptionType::new(ValueType::String))),
-                    ("url-high", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "url-low",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
+                    (
+                        "url-high",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("layout", ImageLayout::ty()),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -331,7 +373,11 @@ impl ComponentType for Artwork {
                 .field("layout")
                 .ok_or_else(|| anyhow!("Missing 'layout' field"))?;
 
-            let url = if let Value::String(s) = url { s.to_string() } else { bail!("Expected string") };
+            let url = if let Value::String(s) = url {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let url_low = Option::<String>::from_value(&url_low)?;
             let url_high = Option::<String>::from_value(&url_high)?;
             let layout = ImageLayout::from_value(&layout)?;
@@ -353,11 +399,18 @@ impl ComponentType for Artwork {
                 None,
                 [
                     ("url", ValueType::String),
-                    ("url-low", ValueType::Option(OptionType::new(ValueType::String))),
-                    ("url-high", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "url-low",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
+                    (
+                        "url-high",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("layout", ImageLayout::ty()),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("url", Value::String(self.url.into())),
                 ("url-low", self.url_low.into_value()?),
@@ -370,7 +423,6 @@ impl ComponentType for Artwork {
 }
 
 impl UnaryComponentType for Artwork {}
-
 
 #[derive(Debug, Clone)]
 pub struct ArtistSummary {
@@ -389,11 +441,18 @@ impl ComponentType for ArtistSummary {
                 [
                     ("id", ValueType::String),
                     ("name", ValueType::String),
-                    ("thumbnail", ValueType::Option(OptionType::new(Artwork::ty()))),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "thumbnail",
+                        ValueType::Option(OptionType::new(Artwork::ty())),
+                    ),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -415,8 +474,16 @@ impl ComponentType for ArtistSummary {
                 .field("url")
                 .ok_or_else(|| anyhow!("Missing 'url' field"))?;
 
-            let id = if let Value::String(s) = id { s.to_string() } else { bail!("Expected string") };
-            let name = if let Value::String(s) = name { s.to_string() } else { bail!("Expected string") };
+            let id = if let Value::String(s) = id {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let name = if let Value::String(s) = name {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let thumbnail = Option::<Artwork>::from_value(&thumbnail)?;
             let subtitle = Option::<String>::from_value(&subtitle)?;
             let url = Option::<String>::from_value(&url)?;
@@ -440,11 +507,18 @@ impl ComponentType for ArtistSummary {
                 [
                     ("id", ValueType::String),
                     ("name", ValueType::String),
-                    ("thumbnail", ValueType::Option(OptionType::new(Artwork::ty()))),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "thumbnail",
+                        ValueType::Option(OptionType::new(Artwork::ty())),
+                    ),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("id", Value::String(self.id.into())),
                 ("name", Value::String(self.name.into())),
@@ -458,7 +532,6 @@ impl ComponentType for ArtistSummary {
 }
 
 impl UnaryComponentType for ArtistSummary {}
-
 
 #[derive(Debug, Clone)]
 pub struct AlbumSummary {
@@ -479,13 +552,23 @@ impl ComponentType for AlbumSummary {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("artists", ValueType::List(ListType::new(ArtistSummary::ty()))),
-                    ("thumbnail", ValueType::Option(OptionType::new(Artwork::ty()))),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "artists",
+                        ValueType::List(ListType::new(ArtistSummary::ty())),
+                    ),
+                    (
+                        "thumbnail",
+                        ValueType::Option(OptionType::new(Artwork::ty())),
+                    ),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("year", ValueType::Option(OptionType::new(ValueType::U32))),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -513,8 +596,16 @@ impl ComponentType for AlbumSummary {
                 .field("url")
                 .ok_or_else(|| anyhow!("Missing 'url' field"))?;
 
-            let id = if let Value::String(s) = id { s.to_string() } else { bail!("Expected string") };
-            let title = if let Value::String(s) = title { s.to_string() } else { bail!("Expected string") };
+            let id = if let Value::String(s) = id {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let title = if let Value::String(s) = title {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let artists = Vec::<ArtistSummary>::from_value(&artists)?;
             let thumbnail = Option::<Artwork>::from_value(&thumbnail)?;
             let subtitle = Option::<String>::from_value(&subtitle)?;
@@ -542,13 +633,23 @@ impl ComponentType for AlbumSummary {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("artists", ValueType::List(ListType::new(ArtistSummary::ty()))),
-                    ("thumbnail", ValueType::Option(OptionType::new(Artwork::ty()))),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "artists",
+                        ValueType::List(ListType::new(ArtistSummary::ty())),
+                    ),
+                    (
+                        "thumbnail",
+                        ValueType::Option(OptionType::new(Artwork::ty())),
+                    ),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("year", ValueType::Option(OptionType::new(ValueType::U32))),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("id", Value::String(self.id.into())),
                 ("title", Value::String(self.title.into())),
@@ -578,11 +679,21 @@ impl ComponentType for Lyrics {
             RecordType::new(
                 None,
                 [
-                    ("plain", ValueType::Option(OptionType::new(ValueType::String))),
-                    ("synced", ValueType::Option(OptionType::new(ValueType::String))),
-                    ("copyright", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "plain",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
+                    (
+                        "synced",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
+                    (
+                        "copyright",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -617,11 +728,21 @@ impl ComponentType for Lyrics {
             RecordType::new(
                 None,
                 [
-                    ("plain", ValueType::Option(OptionType::new(ValueType::String))),
-                    ("synced", ValueType::Option(OptionType::new(ValueType::String))),
-                    ("copyright", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "plain",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
+                    (
+                        "synced",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
+                    (
+                        "copyright",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("plain", self.plain.into_value()?),
                 ("synced", self.synced.into_value()?),
@@ -633,9 +754,6 @@ impl ComponentType for Lyrics {
 }
 
 impl UnaryComponentType for Lyrics {}
-
-
-
 
 #[derive(Debug, Clone)]
 pub struct Track {
@@ -658,15 +776,25 @@ impl ComponentType for Track {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("artists", ValueType::List(ListType::new(ArtistSummary::ty()))),
-                    ("album", ValueType::Option(OptionType::new(AlbumSummary::ty()))),
-                    ("duration-ms", ValueType::Option(OptionType::new(ValueType::U64))),
+                    (
+                        "artists",
+                        ValueType::List(ListType::new(ArtistSummary::ty())),
+                    ),
+                    (
+                        "album",
+                        ValueType::Option(OptionType::new(AlbumSummary::ty())),
+                    ),
+                    (
+                        "duration-ms",
+                        ValueType::Option(OptionType::new(ValueType::U64)),
+                    ),
                     ("thumbnail", Artwork::ty()),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                     ("is-explicit", ValueType::Bool),
                     ("lyrics", ValueType::Option(OptionType::new(Lyrics::ty()))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -700,14 +828,26 @@ impl ComponentType for Track {
                 .field("lyrics")
                 .ok_or_else(|| anyhow!("Missing 'lyrics' field"))?;
 
-            let id = if let Value::String(s) = id { s.to_string() } else { bail!("Expected string") };
-            let title = if let Value::String(s) = title { s.to_string() } else { bail!("Expected string") };
+            let id = if let Value::String(s) = id {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let title = if let Value::String(s) = title {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let artists = Vec::<ArtistSummary>::from_value(&artists)?;
             let album = Option::<AlbumSummary>::from_value(&album)?;
             let duration_ms = Option::<u64>::from_value(&duration_ms)?;
             let thumbnail = Artwork::from_value(&thumbnail)?;
             let url = Option::<String>::from_value(&url)?;
-            let is_explicit = if let Value::Bool(x) = is_explicit { x } else { bail!("Expected bool") };
+            let is_explicit = if let Value::Bool(x) = is_explicit {
+                x
+            } else {
+                bail!("Expected bool")
+            };
             let lyrics = Option::<Lyrics>::from_value(&lyrics)?;
 
             Ok(Track {
@@ -733,15 +873,25 @@ impl ComponentType for Track {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("artists", ValueType::List(ListType::new(ArtistSummary::ty()))),
-                    ("album", ValueType::Option(OptionType::new(AlbumSummary::ty()))),
-                    ("duration-ms", ValueType::Option(OptionType::new(ValueType::U64))),
+                    (
+                        "artists",
+                        ValueType::List(ListType::new(ArtistSummary::ty())),
+                    ),
+                    (
+                        "album",
+                        ValueType::Option(OptionType::new(AlbumSummary::ty())),
+                    ),
+                    (
+                        "duration-ms",
+                        ValueType::Option(OptionType::new(ValueType::U64)),
+                    ),
                     ("thumbnail", Artwork::ty()),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                     ("is-explicit", ValueType::Bool),
                     ("lyrics", ValueType::Option(OptionType::new(Lyrics::ty()))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("id", Value::String(self.id.into())),
                 ("title", Value::String(self.title.into())),
@@ -777,11 +927,15 @@ impl ComponentType for PlaylistSummary {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("owner", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "owner",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("thumbnail", Artwork::ty()),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -803,8 +957,16 @@ impl ComponentType for PlaylistSummary {
                 .field("url")
                 .ok_or_else(|| anyhow!("Missing 'url' field"))?;
 
-            let id = if let Value::String(s) = id { s.to_string() } else { bail!("Expected string") };
-            let title = if let Value::String(s) = title { s.to_string() } else { bail!("Expected string") };
+            let id = if let Value::String(s) = id {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let title = if let Value::String(s) = title {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let owner = Option::<String>::from_value(&owner)?;
             let thumbnail = Artwork::from_value(&thumbnail)?;
             let url = Option::<String>::from_value(&url)?;
@@ -828,11 +990,15 @@ impl ComponentType for PlaylistSummary {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("owner", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "owner",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("thumbnail", Artwork::ty()),
                     ("url", ValueType::Option(OptionType::new(ValueType::String))),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("id", Value::String(self.id.into())),
                 ("title", Value::String(self.title.into())),
@@ -866,7 +1032,8 @@ impl ComponentType for MediaItem {
                     VariantCase::new("artist", Some(ArtistSummary::ty())),
                     VariantCase::new("playlist", Some(PlaylistSummary::ty())),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -927,7 +1094,8 @@ impl ComponentType for MediaItem {
                 VariantCase::new("artist", Some(ArtistSummary::ty())),
                 VariantCase::new("playlist", Some(PlaylistSummary::ty())),
             ],
-        ).unwrap();
+        )
+        .unwrap();
 
         let (discriminant, payload) = match self {
             MediaItem::Track(val) => (0, Some(val.into_value()?)),
@@ -943,7 +1111,6 @@ impl ComponentType for MediaItem {
 
 impl UnaryComponentType for MediaItem {}
 
-
 #[derive(Debug, Clone)]
 pub struct PagedTracks {
     pub items: Vec<Track>,
@@ -957,9 +1124,13 @@ impl ComponentType for PagedTracks {
                 None,
                 [
                     ("items", ValueType::List(ListType::new(Track::ty()))),
-                    ("next-page-token", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "next-page-token",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -990,9 +1161,13 @@ impl ComponentType for PagedTracks {
                 None,
                 [
                     ("items", ValueType::List(ListType::new(Track::ty()))),
-                    ("next-page-token", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "next-page-token",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("items", self.items.into_value()?),
                 ("next-page-token", self.next_page_token.into_value()?),
@@ -1003,7 +1178,6 @@ impl ComponentType for PagedTracks {
 }
 
 impl UnaryComponentType for PagedTracks {}
-
 
 #[derive(Debug, Clone)]
 pub struct PagedAlbums {
@@ -1018,9 +1192,13 @@ impl ComponentType for PagedAlbums {
                 None,
                 [
                     ("items", ValueType::List(ListType::new(AlbumSummary::ty()))),
-                    ("next-page-token", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "next-page-token",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1051,9 +1229,13 @@ impl ComponentType for PagedAlbums {
                 None,
                 [
                     ("items", ValueType::List(ListType::new(AlbumSummary::ty()))),
-                    ("next-page-token", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "next-page-token",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("items", self.items.into_value()?),
                 ("next-page-token", self.next_page_token.into_value()?),
@@ -1064,7 +1246,6 @@ impl ComponentType for PagedAlbums {
 }
 
 impl UnaryComponentType for PagedAlbums {}
-
 
 #[derive(Debug, Clone)]
 pub struct PagedMediaItems {
@@ -1079,9 +1260,13 @@ impl ComponentType for PagedMediaItems {
                 None,
                 [
                     ("items", ValueType::List(ListType::new(MediaItem::ty()))),
-                    ("next-page-token", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "next-page-token",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1112,9 +1297,13 @@ impl ComponentType for PagedMediaItems {
                 None,
                 [
                     ("items", ValueType::List(ListType::new(MediaItem::ty()))),
-                    ("next-page-token", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "next-page-token",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("items", self.items.into_value()?),
                 ("next-page-token", self.next_page_token.into_value()?),
@@ -1125,15 +1314,6 @@ impl ComponentType for PagedMediaItems {
 }
 
 impl UnaryComponentType for PagedMediaItems {}
-
-
-
-
-
-
-
-
-
 
 #[derive(Debug, Clone)]
 pub struct AlbumDetails {
@@ -1150,9 +1330,13 @@ impl ComponentType for AlbumDetails {
                 [
                     ("summary", AlbumSummary::ty()),
                     ("tracks", PagedTracks::ty()),
-                    ("description", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "description",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1189,9 +1373,13 @@ impl ComponentType for AlbumDetails {
                 [
                     ("summary", AlbumSummary::ty()),
                     ("tracks", PagedTracks::ty()),
-                    ("description", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "description",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("summary", self.summary.into_value()?),
                 ("tracks", self.tracks.into_value()?),
@@ -1203,8 +1391,6 @@ impl ComponentType for AlbumDetails {
 }
 
 impl UnaryComponentType for AlbumDetails {}
-
-
 
 #[derive(Debug, Clone)]
 pub struct ArtistDetails {
@@ -1224,10 +1410,17 @@ impl ComponentType for ArtistDetails {
                     ("summary", ArtistSummary::ty()),
                     ("top-tracks", ValueType::List(ListType::new(Track::ty()))),
                     ("albums", PagedAlbums::ty()),
-                    ("related-artists", ValueType::List(ListType::new(ArtistSummary::ty()))),
-                    ("description", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "related-artists",
+                        ValueType::List(ListType::new(ArtistSummary::ty())),
+                    ),
+                    (
+                        "description",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1275,10 +1468,17 @@ impl ComponentType for ArtistDetails {
                     ("summary", ArtistSummary::ty()),
                     ("top-tracks", ValueType::List(ListType::new(Track::ty()))),
                     ("albums", PagedAlbums::ty()),
-                    ("related-artists", ValueType::List(ListType::new(ArtistSummary::ty()))),
-                    ("description", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "related-artists",
+                        ValueType::List(ListType::new(ArtistSummary::ty())),
+                    ),
+                    (
+                        "description",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("summary", self.summary.into_value()?),
                 ("top-tracks", self.top_tracks.into_value()?),
@@ -1308,9 +1508,13 @@ impl ComponentType for PlaylistDetails {
                 [
                     ("summary", PlaylistSummary::ty()),
                     ("tracks", PagedTracks::ty()),
-                    ("description", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "description",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1347,9 +1551,13 @@ impl ComponentType for PlaylistDetails {
                 [
                     ("summary", PlaylistSummary::ty()),
                     ("tracks", PagedTracks::ty()),
-                    ("description", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "description",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("summary", self.summary.into_value()?),
                 ("tracks", self.tracks.into_value()?),
@@ -1372,12 +1580,7 @@ pub enum Quality {
 
 impl ComponentType for Quality {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "low",
-            "medium",
-            "high",
-            "lossless",
-        ]).unwrap())
+        ValueType::Enum(EnumType::new(None, ["low", "medium", "high", "lossless"]).unwrap())
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -1396,12 +1599,7 @@ impl ComponentType for Quality {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "low",
-            "medium",
-            "high",
-            "lossless",
-        ]).unwrap();
+        let enum_type = EnumType::new(None, ["low", "medium", "high", "lossless"]).unwrap();
 
         let discriminant = match self {
             Quality::Low => 0,
@@ -1434,10 +1632,22 @@ impl ComponentType for StreamSource {
                     ("url", ValueType::String),
                     ("quality", Quality::ty()),
                     ("format", ValueType::String),
-                    ("headers", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))))),
-                    ("expires-at", ValueType::Option(OptionType::new(ValueType::U64))),
+                    (
+                        "headers",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::Tuple(TupleType::new(
+                                None,
+                                [ValueType::String, ValueType::String],
+                            )),
+                        )))),
+                    ),
+                    (
+                        "expires-at",
+                        ValueType::Option(OptionType::new(ValueType::U64)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1459,10 +1669,18 @@ impl ComponentType for StreamSource {
                 .field("expires-at")
                 .ok_or_else(|| anyhow!("Missing 'expires-at' field"))?;
 
-            let url = if let Value::String(s) = url { s.to_string() } else { bail!("Expected string") };
+            let url = if let Value::String(s) = url {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let quality = Quality::from_value(&quality)?;
-            let format = if let Value::String(s) = format { s.to_string() } else { bail!("Expected string") };
-            let headers = Option::<Vec::<(String, String)>>::from_value(&headers)?;
+            let format = if let Value::String(s) = format {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let headers = Option::<Vec<(String, String)>>::from_value(&headers)?;
             let expires_at = Option::<u64>::from_value(&expires_at)?;
 
             Ok(StreamSource {
@@ -1485,10 +1703,22 @@ impl ComponentType for StreamSource {
                     ("url", ValueType::String),
                     ("quality", Quality::ty()),
                     ("format", ValueType::String),
-                    ("headers", ValueType::Option(OptionType::new(ValueType::List(ListType::new(ValueType::Tuple(TupleType::new(None, [ValueType::String, ValueType::String]))))))),
-                    ("expires-at", ValueType::Option(OptionType::new(ValueType::U64))),
+                    (
+                        "headers",
+                        ValueType::Option(OptionType::new(ValueType::List(ListType::new(
+                            ValueType::Tuple(TupleType::new(
+                                None,
+                                [ValueType::String, ValueType::String],
+                            )),
+                        )))),
+                    ),
+                    (
+                        "expires-at",
+                        ValueType::Option(OptionType::new(ValueType::U64)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("url", Value::String(self.url.into())),
                 ("quality", self.quality.into_value()?),
@@ -1514,13 +1744,9 @@ pub enum SearchFilter {
 
 impl ComponentType for SearchFilter {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "all",
-            "track",
-            "album",
-            "artist",
-            "playlist",
-        ]).unwrap())
+        ValueType::Enum(
+            EnumType::new(None, ["all", "track", "album", "artist", "playlist"]).unwrap(),
+        )
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -1540,13 +1766,8 @@ impl ComponentType for SearchFilter {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "all",
-            "track",
-            "album",
-            "artist",
-            "playlist",
-        ]).unwrap();
+        let enum_type =
+            EnumType::new(None, ["all", "track", "album", "artist", "playlist"]).unwrap();
 
         let discriminant = match self {
             SearchFilter::All => 0,
@@ -1562,16 +1783,6 @@ impl ComponentType for SearchFilter {
 
 impl UnaryComponentType for SearchFilter {}
 
-
-
-
-
-
-
-
-
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SectionType {
     Carousel,
@@ -1581,11 +1792,7 @@ pub enum SectionType {
 
 impl ComponentType for SectionType {
     fn ty() -> ValueType {
-        ValueType::Enum(EnumType::new(None, [
-            "carousel",
-            "grid",
-            "vlist",
-        ]).unwrap())
+        ValueType::Enum(EnumType::new(None, ["carousel", "grid", "vlist"]).unwrap())
     }
 
     fn from_value(value: &Value) -> Result<Self> {
@@ -1603,11 +1810,7 @@ impl ComponentType for SectionType {
     }
 
     fn into_value(self) -> Result<Value> {
-        let enum_type = EnumType::new(None, [
-            "carousel",
-            "grid",
-            "vlist",
-        ]).unwrap();
+        let enum_type = EnumType::new(None, ["carousel", "grid", "vlist"]).unwrap();
 
         let discriminant = match self {
             SectionType::Carousel => 0,
@@ -1620,7 +1823,6 @@ impl ComponentType for SectionType {
 }
 
 impl UnaryComponentType for SectionType {}
-
 
 #[derive(Debug, Clone)]
 pub struct Section {
@@ -1640,12 +1842,19 @@ impl ComponentType for Section {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("card-type", SectionType::ty()),
                     ("items", ValueType::List(ListType::new(MediaItem::ty()))),
-                    ("more-link", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "more-link",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
         )
     }
 
@@ -1670,8 +1879,16 @@ impl ComponentType for Section {
                 .field("more-link")
                 .ok_or_else(|| anyhow!("Missing 'more-link' field"))?;
 
-            let id = if let Value::String(s) = id { s.to_string() } else { bail!("Expected string") };
-            let title = if let Value::String(s) = title { s.to_string() } else { bail!("Expected string") };
+            let id = if let Value::String(s) = id {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
+            let title = if let Value::String(s) = title {
+                s.to_string()
+            } else {
+                bail!("Expected string")
+            };
             let subtitle = Option::<String>::from_value(&subtitle)?;
             let card_type = SectionType::from_value(&card_type)?;
             let items = Vec::<MediaItem>::from_value(&items)?;
@@ -1697,12 +1914,19 @@ impl ComponentType for Section {
                 [
                     ("id", ValueType::String),
                     ("title", ValueType::String),
-                    ("subtitle", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "subtitle",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                     ("card-type", SectionType::ty()),
                     ("items", ValueType::List(ListType::new(MediaItem::ty()))),
-                    ("more-link", ValueType::Option(OptionType::new(ValueType::String))),
+                    (
+                        "more-link",
+                        ValueType::Option(OptionType::new(ValueType::String)),
+                    ),
                 ],
-            ).unwrap(),
+            )
+            .unwrap(),
             [
                 ("id", Value::String(self.id.into())),
                 ("title", Value::String(self.title.into())),
@@ -1718,14 +1942,15 @@ impl ComponentType for Section {
 
 impl UnaryComponentType for Section {}
 
-
-
-
 // ========== Host Imports ==========
 
 /// Host trait for interface: component:content-resolver/utils
 pub trait UtilsHost {
-    fn http_request(&mut self, url: String, options: RequestOptions) -> Result<HttpResponse, String>;
+    fn http_request(
+        &mut self,
+        url: String,
+        options: RequestOptions,
+    ) -> Result<HttpResponse, String>;
     fn random_number(&mut self) -> u64;
     fn current_unix_timestamp(&mut self) -> u64;
     fn storage_set(&mut self, key: String, value: String) -> bool;
@@ -1749,11 +1974,18 @@ pub mod imports {
                 Func::new(
                     &mut *store,
                     FuncType::new(
-                        [ValueType::String, RequestOptions::ty(), ],
-                        [ValueType::Result(ResultType::new(Some(HttpResponse::ty()), Some(ValueType::String)))],
+                        [ValueType::String, RequestOptions::ty()],
+                        [ValueType::Result(ResultType::new(
+                            Some(HttpResponse::ty()),
+                            Some(ValueType::String),
+                        ))],
                     ),
                     |mut ctx, params, results| {
-                        let url = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
+                        let url = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let options = RequestOptions::from_value(&params[1])?;
                         let result = ctx.data_mut().http_request(url, options);
                         results[0] = result.into_value()?;
@@ -1768,10 +2000,7 @@ pub mod imports {
                 "random-number",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [],
-                        [ValueType::U64],
-                    ),
+                    FuncType::new([], [ValueType::U64]),
                     |mut ctx, params, results| {
                         let result = ctx.data_mut().random_number();
                         results[0] = Value::U64(result);
@@ -1786,10 +2015,7 @@ pub mod imports {
                 "current-unix-timestamp",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [],
-                        [ValueType::U64],
-                    ),
+                    FuncType::new([], [ValueType::U64]),
                     |mut ctx, params, results| {
                         let result = ctx.data_mut().current_unix_timestamp();
                         results[0] = Value::U64(result);
@@ -1804,13 +2030,18 @@ pub mod imports {
                 "storage-set",
                 Func::new(
                     &mut *store,
-                    FuncType::new(
-                        [ValueType::String, ValueType::String, ],
-                        [ValueType::Bool],
-                    ),
+                    FuncType::new([ValueType::String, ValueType::String], [ValueType::Bool]),
                     |mut ctx, params, results| {
-                        let key = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
-                        let value = if let Value::String(s) = &params[1] { s.to_string() } else { bail!("Expected string") };
+                        let key = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
+                        let value = if let Value::String(s) = &params[1] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let result = ctx.data_mut().storage_set(key, value);
                         results[0] = Value::Bool(result);
                         Ok(())
@@ -1825,11 +2056,15 @@ pub mod imports {
                 Func::new(
                     &mut *store,
                     FuncType::new(
-                        [ValueType::String, ],
+                        [ValueType::String],
                         [ValueType::Option(OptionType::new(ValueType::String))],
                     ),
                     |mut ctx, params, results| {
-                        let key = if let Value::String(s) = &params[0] { s.to_string() } else { bail!("Expected string") };
+                        let key = if let Value::String(s) = &params[0] {
+                            s.to_string()
+                        } else {
+                            bail!("Expected string")
+                        };
                         let result = ctx.data_mut().storage_get(key);
                         results[0] = result.into_value()?;
                         Ok(())
@@ -1840,7 +2075,6 @@ pub mod imports {
 
         Ok(())
     }
-
 }
 
 // ========== Guest Exports ==========
@@ -1849,7 +2083,6 @@ pub mod exports_types {
     use super::*;
 
     pub const INTERFACE_NAME: &str = "component:content-resolver/types";
-
 }
 
 pub mod exports_data_source {
@@ -1989,7 +2222,8 @@ pub mod exports_data_source {
     pub fn get_search<T, E: backend::WasmEngine>(
         instance: &Instance,
         _store: &mut Store<T, E>,
-    ) -> Result<TypedFunc<(String, SearchFilter, Option<String>), Result<PagedMediaItems, String>>> {
+    ) -> Result<TypedFunc<(String, SearchFilter, Option<String>), Result<PagedMediaItems, String>>>
+    {
         let interface = instance
             .exports()
             .instance(&INTERFACE_NAME.try_into().unwrap())
@@ -2016,7 +2250,6 @@ pub mod exports_data_source {
             .ok_or_else(|| anyhow!("Function 'get-radio-tracks' not found"))?
             .typed::<(String, Option<String>), Result<PagedTracks, String>>()
     }
-
 }
 
 pub mod exports_discovery {
@@ -2055,6 +2288,4 @@ pub mod exports_discovery {
             .ok_or_else(|| anyhow!("Function 'load-more' not found"))?
             .typed::<(String, String), Result<Vec<MediaItem>, String>>()
     }
-
 }
-

@@ -1,8 +1,6 @@
 pub mod bindgen;
 
-use crate::api::plugin::commands::{
-    ContentResolverCommand, ContentSearchFilter, PluginResponse,
-};
+use crate::api::plugin::commands::{ContentResolverCommand, ContentSearchFilter, PluginResponse};
 use crate::api::plugin::errors::{PluginError, PluginResult};
 use crate::api::plugin::loader::get_instance_with_host;
 use crate::api::plugin::models::{
@@ -226,9 +224,7 @@ impl Plugin for ContentResolverPluginAdapter {
                         .call(&mut state.store, id)
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
                         .map_err(|e| PluginError::WasmExecutionError(e))?;
-                    Ok(PluginResponse::AlbumDetails(to_audio_album_details(
-                        result,
-                    )))
+                    Ok(PluginResponse::AlbumDetails(to_audio_album_details(result)))
                 }
                 ContentResolverCommand::GetArtistDetails { id } => {
                     let func = exports_data_source::get_get_artist_details(
@@ -254,9 +250,9 @@ impl Plugin for ContentResolverPluginAdapter {
                         .call(&mut state.store, id)
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
                         .map_err(|e| PluginError::WasmExecutionError(e))?;
-                    Ok(PluginResponse::PlaylistDetails(
-                        to_audio_playlist_details(result),
-                    ))
+                    Ok(PluginResponse::PlaylistDetails(to_audio_playlist_details(
+                        result,
+                    )))
                 }
                 ContentResolverCommand::GetStreams { id } => {
                     let func =
@@ -282,9 +278,7 @@ impl Plugin for ContentResolverPluginAdapter {
                         .call(&mut state.store, (query, filter_enum, page_token))
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
                         .map_err(|e| PluginError::WasmExecutionError(e))?;
-                    Ok(PluginResponse::Search(to_paged_audio_media_items(
-                        result,
-                    )))
+                    Ok(PluginResponse::Search(to_paged_audio_media_items(result)))
                 }
                 ContentResolverCommand::MoreAlbumTracks { id, page_token } => {
                     let func = exports_data_source::get_more_album_tracks(
@@ -563,7 +557,11 @@ fn stamp_id(plugin_id: &str, id: &str) -> String {
 
 fn stamp_track(pid: &str, mut t: Track) -> Track {
     t.id = stamp_id(pid, &t.id);
-    t.artists = t.artists.into_iter().map(|a| stamp_artist(pid, a)).collect();
+    t.artists = t
+        .artists
+        .into_iter()
+        .map(|a| stamp_artist(pid, a))
+        .collect();
     t.album = t.album.map(|a| stamp_album(pid, a));
     t
 }
@@ -575,7 +573,11 @@ fn stamp_artist(pid: &str, mut a: ArtistSummary) -> ArtistSummary {
 
 fn stamp_album(pid: &str, mut a: AlbumSummary) -> AlbumSummary {
     a.id = stamp_id(pid, &a.id);
-    a.artists = a.artists.into_iter().map(|ar| stamp_artist(pid, ar)).collect();
+    a.artists = a
+        .artists
+        .into_iter()
+        .map(|ar| stamp_artist(pid, ar))
+        .collect();
     a
 }
 
@@ -594,7 +596,11 @@ fn stamp_media_item(pid: &str, item: MediaItem) -> MediaItem {
 }
 
 fn stamp_section(pid: &str, mut s: Section) -> Section {
-    s.items = s.items.into_iter().map(|i| stamp_media_item(pid, i)).collect();
+    s.items = s
+        .items
+        .into_iter()
+        .map(|i| stamp_media_item(pid, i))
+        .collect();
     s
 }
 
@@ -609,7 +615,11 @@ fn stamp_chart_item(pid: &str, mut c: ChartItem) -> ChartItem {
 }
 
 fn stamp_paged_media_items(pid: &str, mut p: PagedMediaItems) -> PagedMediaItems {
-    p.items = p.items.into_iter().map(|i| stamp_media_item(pid, i)).collect();
+    p.items = p
+        .items
+        .into_iter()
+        .map(|i| stamp_media_item(pid, i))
+        .collect();
     p
 }
 
@@ -634,9 +644,17 @@ fn stamp_response(plugin_id: &str, response: PluginResponse) -> PluginResponse {
         }),
         PluginResponse::ArtistDetails(d) => PluginResponse::ArtistDetails(ArtistDetails {
             summary: stamp_artist(plugin_id, d.summary),
-            top_tracks: d.top_tracks.into_iter().map(|t| stamp_track(plugin_id, t)).collect(),
+            top_tracks: d
+                .top_tracks
+                .into_iter()
+                .map(|t| stamp_track(plugin_id, t))
+                .collect(),
             albums: stamp_paged_albums(plugin_id, d.albums),
-            related_artists: d.related_artists.into_iter().map(|a| stamp_artist(plugin_id, a)).collect(),
+            related_artists: d
+                .related_artists
+                .into_iter()
+                .map(|a| stamp_artist(plugin_id, a))
+                .collect(),
             description: d.description,
         }),
         PluginResponse::PlaylistDetails(d) => PluginResponse::PlaylistDetails(PlaylistDetails {
@@ -646,19 +664,35 @@ fn stamp_response(plugin_id: &str, response: PluginResponse) -> PluginResponse {
         }),
         // Streams carry playback URLs, not routable entity IDs — pass through.
         PluginResponse::Streams(streams) => PluginResponse::Streams(streams),
-        PluginResponse::MoreTracks(p) => PluginResponse::MoreTracks(stamp_paged_tracks(plugin_id, p)),
-        PluginResponse::MoreAlbums(p) => PluginResponse::MoreAlbums(stamp_paged_albums(plugin_id, p)),
+        PluginResponse::MoreTracks(p) => {
+            PluginResponse::MoreTracks(stamp_paged_tracks(plugin_id, p))
+        }
+        PluginResponse::MoreAlbums(p) => {
+            PluginResponse::MoreAlbums(stamp_paged_albums(plugin_id, p))
+        }
         PluginResponse::HomeSections(sections) => PluginResponse::HomeSections(
-            sections.into_iter().map(|s| stamp_section(plugin_id, s)).collect(),
+            sections
+                .into_iter()
+                .map(|s| stamp_section(plugin_id, s))
+                .collect(),
         ),
         PluginResponse::LoadMoreItems(items) => PluginResponse::LoadMoreItems(
-            items.into_iter().map(|i| stamp_media_item(plugin_id, i)).collect(),
+            items
+                .into_iter()
+                .map(|i| stamp_media_item(plugin_id, i))
+                .collect(),
         ),
         PluginResponse::Charts(charts) => PluginResponse::Charts(
-            charts.into_iter().map(|c| stamp_chart_summary(plugin_id, c)).collect(),
+            charts
+                .into_iter()
+                .map(|c| stamp_chart_summary(plugin_id, c))
+                .collect(),
         ),
         PluginResponse::ChartDetails(items) => PluginResponse::ChartDetails(
-            items.into_iter().map(|c| stamp_chart_item(plugin_id, c)).collect(),
+            items
+                .into_iter()
+                .map(|c| stamp_chart_item(plugin_id, c))
+                .collect(),
         ),
         PluginResponse::Segments(s) => PluginResponse::Segments(s),
         PluginResponse::LyricsResult(r) => PluginResponse::LyricsResult(r),

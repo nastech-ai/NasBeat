@@ -190,14 +190,13 @@ impl Plugin for LyricsProviderPluginAdapter {
                         .call(&mut state.store, bg_meta)
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
                         .map_err(|e| PluginError::WasmExecutionError(e))?;
-                    Ok(PluginResponse::LyricsResult(
-                        result.map(|(l, m)| (to_plugin_lyrics(l), to_lyrics_metadata(m))),
-                    ))
+                    Ok(PluginResponse::LyricsResult(result.map(|(l, m)| {
+                        (to_plugin_lyrics(l), to_lyrics_metadata(m))
+                    })))
                 }
                 LyricsProviderCommand::Search { query } => {
-                    let func =
-                        exports_lyrics_api::get_search(&state.instance, &mut state.store)
-                            .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?;
+                    let func = exports_lyrics_api::get_search(&state.instance, &mut state.store)
+                        .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?;
                     let result = func
                         .call(&mut state.store, query)
                         .map_err(|e| PluginError::WasmExecutionError(e.to_string()))?
@@ -266,7 +265,9 @@ fn to_plugin_lyrics(l: bindgen::Lyrics) -> PluginLyrics {
     PluginLyrics {
         plain: l.plain,
         lrc: l.lrc,
-        lines: l.lines.map(|lines| lines.into_iter().map(to_lyrics_line).collect()),
+        lines: l
+            .lines
+            .map(|lines| lines.into_iter().map(to_lyrics_line).collect()),
         is_instrumental: l.is_instrumental,
         sync_type: to_lyrics_sync_type(l.sync_type),
     }
@@ -277,7 +278,9 @@ fn to_lyrics_line(l: bindgen::LyricsLine) -> LyricsLine {
         start_ms: l.start_ms,
         duration_ms: l.duration_ms,
         content: l.content,
-        tokens: l.tokens.map(|t| t.into_iter().map(to_lyrics_token).collect()),
+        tokens: l
+            .tokens
+            .map(|t| t.into_iter().map(to_lyrics_token).collect()),
     }
 }
 

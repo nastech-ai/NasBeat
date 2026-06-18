@@ -31,7 +31,11 @@ pub fn current_unix_epoch_millis() -> u128 {
 pub fn generate_task_id() -> String {
     let mut rng = rand::thread_rng();
     use rand::Rng;
-    format!("dl-{}-{:08x}", current_unix_epoch_millis(), rng.gen::<u32>())
+    format!(
+        "dl-{}-{:08x}",
+        current_unix_epoch_millis(),
+        rng.gen::<u32>()
+    )
 }
 
 // ── File name helpers ─────────────────────────────────────────────────────────
@@ -62,7 +66,12 @@ pub fn build_download_file_name(track: &Track, extension: &str) -> String {
     let artist_text = if track.artists.is_empty() {
         "Unknown Artist".to_string()
     } else {
-        track.artists.iter().map(|a| a.name.clone()).collect::<Vec<_>>().join(", ")
+        track
+            .artists
+            .iter()
+            .map(|a| a.name.clone())
+            .collect::<Vec<_>>()
+            .join(", ")
     };
     let safe_artist = sanitize_file_component(&artist_text, 50);
 
@@ -70,7 +79,10 @@ pub fn build_download_file_name(track: &Track, extension: &str) -> String {
     track.id.hash(&mut hasher);
     let suffix = format!("{:08x}", hasher.finish() as u32);
 
-    format!("{safe_title} - {safe_artist} [{suffix}].{}", extension.trim_start_matches('.'))
+    format!(
+        "{safe_title} - {safe_artist} [{suffix}].{}",
+        extension.trim_start_matches('.')
+    )
 }
 
 /// Infer an audio file extension from the optional format string or the URL path.
@@ -81,8 +93,8 @@ pub fn guess_extension_from_url(format: Option<&str>, url: &str) -> String {
 
     let path = url.split('?').next().unwrap_or(url).to_ascii_lowercase();
     for ext in [
-        "m4a", "mp3", "ogg", "opus", "webm", "mp4", "flac", "wav", "aac", "ape",
-        "aiff", "wv", "mpc", "oga", "spx",
+        "m4a", "mp3", "ogg", "opus", "webm", "mp4", "flac", "wav", "aac", "ape", "aiff", "wv",
+        "mpc", "oga", "spx",
     ] {
         if path.ends_with(&format!(".{ext}")) {
             return normalize_audio_extension_hint(ext).unwrap_or_else(|| ext.to_string());
@@ -148,7 +160,10 @@ pub fn split_media_id(media_id: &str) -> Option<(String, String)> {
 /// For a 206 response, the `Content-Range` header gives the full size.
 /// For a 200 response, `Content-Length` gives the body size which we add
 /// to `existing_size` (the bytes already downloaded before the request).
-pub fn extract_total_bytes(headers: &reqwest::header::HeaderMap, existing_size: u64) -> Option<u64> {
+pub fn extract_total_bytes(
+    headers: &reqwest::header::HeaderMap,
+    existing_size: u64,
+) -> Option<u64> {
     if let Some(range) = headers.get(CONTENT_RANGE).and_then(|v| v.to_str().ok()) {
         if let Some(total_part) = range.split('/').nth(1) {
             if let Ok(total) = total_part.parse::<u64>() {

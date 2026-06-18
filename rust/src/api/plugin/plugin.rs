@@ -157,9 +157,10 @@ impl PluginManager {
         if let Ok(mut pending) = self.pending_events.lock() {
             if pending.len() >= Self::MAX_PENDING_EVENTS {
                 // Drop oldest storage events preferentially to preserve lifecycle events.
-                if let Some(pos) = pending.iter().position(|e| {
-                    matches!(e, PluginManagerEvent::StorageSet { .. })
-                }) {
+                if let Some(pos) = pending
+                    .iter()
+                    .position(|e| matches!(e, PluginManagerEvent::StorageSet { .. }))
+                {
                     pending.remove(pos);
                 } else {
                     pending.remove(0);
@@ -207,7 +208,10 @@ impl PluginManager {
             return Err(msg);
         }
 
-        match self.do_load_plugin(plugin_id, plugin_type.clone(), plugin_path).await {
+        match self
+            .do_load_plugin(plugin_id, plugin_type.clone(), plugin_path)
+            .await
+        {
             Ok(()) => {
                 self.emit(PluginManagerEvent::loaded(plugin_id, plugin_type))
                     .await;
@@ -447,7 +451,9 @@ impl PluginManager {
         let plugin_arc = self
             .plugins
             .read()
-            .map_err(|_| PluginError::WasmExecutionError("Plugin registry lock poisoned".to_string()))?
+            .map_err(|_| {
+                PluginError::WasmExecutionError("Plugin registry lock poisoned".to_string())
+            })?
             .get(plugin_id)
             .cloned()
             .ok_or_else(|| PluginError::PluginNotFound(plugin_id.to_string()))?;
@@ -464,9 +470,7 @@ impl PluginManager {
                 PluginRequest::ContentResolver(_) => PluginType::ContentResolver,
                 PluginRequest::ChartProvider(_) => PluginType::ChartProvider,
                 PluginRequest::LyricsProvider(_) => PluginType::LyricsProvider,
-                PluginRequest::SearchSuggestionProvider(_) => {
-                    PluginType::SearchSuggestionProvider
-                }
+                PluginRequest::SearchSuggestionProvider(_) => PluginType::SearchSuggestionProvider,
                 PluginRequest::ContentImporter(_) => PluginType::ContentImporter,
             };
 

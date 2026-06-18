@@ -44,7 +44,9 @@ pub fn read_audio_metadata(
     let properties = tagged_file.properties();
     let duration_ms = properties.duration().as_millis() as u64;
 
-    let tag = tagged_file.primary_tag().or_else(|| tagged_file.first_tag());
+    let tag = tagged_file
+        .primary_tag()
+        .or_else(|| tagged_file.first_tag());
 
     let (title, artists, album, album_artist, year, genre) = if let Some(t) = tag {
         let artist_list: Vec<String> = t
@@ -52,9 +54,7 @@ pub fn read_audio_metadata(
             .map(|s| s.to_string())
             .collect();
         let artist_list = if artist_list.is_empty() {
-            t.artist()
-                .map(|a| vec![a.to_string()])
-                .unwrap_or_default()
+            t.artist().map(|a| vec![a.to_string()]).unwrap_or_default()
         } else {
             artist_list
         };
@@ -63,8 +63,7 @@ pub fn read_audio_metadata(
             t.title().map(|s| s.to_string()),
             artist_list,
             t.album().map(|s| s.to_string()),
-            t.get_string(&ItemKey::AlbumArtist)
-                .map(|s| s.to_string()),
+            t.get_string(&ItemKey::AlbumArtist).map(|s| s.to_string()),
             t.year(),
             t.genre().map(|s| s.to_string()),
         )
@@ -101,10 +100,7 @@ pub fn read_audio_metadata(
 }
 
 #[frb]
-pub fn scan_audio_files(
-    directories: Vec<String>,
-    cover_cache_dir: String,
-) -> Vec<LocalTrackMeta> {
+pub fn scan_audio_files(directories: Vec<String>, cover_cache_dir: String) -> Vec<LocalTrackMeta> {
     let mut results = Vec::new();
 
     for dir in &directories {

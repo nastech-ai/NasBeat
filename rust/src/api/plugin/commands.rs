@@ -86,15 +86,9 @@ pub enum ChartProviderCommand {
 #[frb(mirror(LyricsProviderCommand))]
 #[derive(Debug)]
 pub enum LyricsProviderCommand {
-    GetLyrics {
-        metadata: TrackMetadata,
-    },
-    Search {
-        query: String,
-    },
-    GetLyricsById {
-        id: String,
-    },
+    GetLyrics { metadata: TrackMetadata },
+    Search { query: String },
+    GetLyricsById { id: String },
 }
 
 #[frb(mirror(SearchSuggestionCommand))]

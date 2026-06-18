@@ -1,3 +1,7 @@
+/// flutter_rust_bridge:ignore
+pub(crate) mod resolver;
+/// flutter_rust_bridge:ignore
+pub(crate) mod transfer;
 /// Download manager: public API + task lifecycle orchestration.
 ///
 /// Internal implementation is split across:
@@ -12,10 +16,6 @@
 pub(crate) mod types;
 /// flutter_rust_bridge:ignore
 pub(crate) mod utils;
-/// flutter_rust_bridge:ignore
-pub(crate) mod resolver;
-/// flutter_rust_bridge:ignore
-pub(crate) mod transfer;
 
 pub use types::{
     DownloadManagerEvent, DownloadTaskSnapshot, DownloadTaskState, EnqueueDownloadRequest,
@@ -23,8 +23,8 @@ pub use types::{
 
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
-use std::sync::{Arc, Mutex, RwLock};
 use std::sync::atomic::Ordering;
+use std::sync::{Arc, Mutex, RwLock};
 
 use reqwest::blocking::Client;
 use tokio::runtime::Handle;
@@ -34,10 +34,10 @@ use tokio::time::{sleep, Duration};
 use crate::api::plugin::plugin::PluginManager;
 use crate::frb_generated::StreamSink;
 
-use types::{EventHub, ManagedTask, PersistedDownloadTask, TransferOutcome};
-use utils::{atomic_write, generate_task_id, normalize_quality, remove_if_exists};
 use resolver::resolve_stream;
 use transfer::{download_task_blocking, ProgressUpdate};
+use types::{EventHub, ManagedTask, PersistedDownloadTask, TransferOutcome};
+use utils::{atomic_write, generate_task_id, normalize_quality, remove_if_exists};
 
 // ── DownloadManager ───────────────────────────────────────────────────────────
 
@@ -131,7 +131,10 @@ impl DownloadManager {
     pub async fn restore_tasks(&self) -> Result<Vec<DownloadTaskSnapshot>, String> {
         let path = Path::new(&self.manifest_path);
         if !path.exists() {
-            self.emit(DownloadManagerEvent::RecoverySummary { restored: 0, cleaned: 0 });
+            self.emit(DownloadManagerEvent::RecoverySummary {
+                restored: 0,
+                cleaned: 0,
+            });
             return Ok(Vec::new());
         }
 
@@ -139,8 +142,8 @@ impl DownloadManager {
             .await
             .map_err(|e| format!("Failed to read download manifest: {e}"))?;
 
-        let all_raw: Vec<PersistedDownloadTask> = serde_json::from_str(&raw)
-            .map_err(|e| format!("Corrupt download manifest: {e}"))?;
+        let all_raw: Vec<PersistedDownloadTask> =
+            serde_json::from_str(&raw).map_err(|e| format!("Corrupt download manifest: {e}"))?;
 
         // Deduplicate by task_id (first occurrence wins) to guard against
         // any manifest corruption that might produce repeated entries.
@@ -165,8 +168,7 @@ impl DownloadManager {
                 DownloadTaskState::CompletedPendingAck if target_ok => {}
 
                 // File is completely gone and task is terminal — clean up.
-                DownloadTaskState::CompletedPendingAck
-                | DownloadTaskState::Cancelled
+                DownloadTaskState::CompletedPendingAck | DownloadTaskState::Cancelled
                     if !target_ok && !temp_ok =>
                 {
                     cleaned += 1;
@@ -214,7 +216,9 @@ impl DownloadManager {
         for snapshot in &snapshots {
             match snapshot.state {
                 DownloadTaskState::CompletedPendingAck => {
-                    self.emit(DownloadManagerEvent::TaskCompletedPendingAck(snapshot.clone()));
+                    self.emit(DownloadManagerEvent::TaskCompletedPendingAck(
+                        snapshot.clone(),
+                    ));
                 }
                 _ => self.emit(DownloadManagerEvent::TaskUpdated(snapshot.clone())),
             }
@@ -253,7 +257,10 @@ impl DownloadManager {
         let snapshot = DownloadTaskSnapshot::from_persisted(&p);
 
         if let Ok(mut guard) = self.tasks.write() {
-            guard.insert(task_id.clone(), Arc::new(Mutex::new(ManagedTask::from_persisted(p))));
+            guard.insert(
+                task_id.clone(),
+                Arc::new(Mutex::new(ManagedTask::from_persisted(p))),
+            );
         }
         self.persist_manifest();
         self.emit(DownloadManagerEvent::TaskUpdated(snapshot));
@@ -263,7 +270,9 @@ impl DownloadManager {
 
     /// Snapshot all current tasks.
     pub fn get_snapshots(&self) -> Vec<DownloadTaskSnapshot> {
-        let Ok(guard) = self.tasks.read() else { return Vec::new() };
+        let Ok(guard) = self.tasks.read() else {
+            return Vec::new();
+        };
         guard
             .values()
             .filter_map(|t| t.lock().ok())
@@ -273,7 +282,9 @@ impl DownloadManager {
 
     /// Signal a running download to pause. Returns `false` if the task does not exist.
     pub async fn pause_task(&self, task_id: String) -> bool {
-        let Some(task) = self.get_task(&task_id) else { return false };
+        let Some(task) = self.get_task(&task_id) else {
+            return false;
+        };
         if let Ok(g) = task.lock() {
             g.pause_requested.store(true, Ordering::Release);
         }
@@ -282,7 +293,9 @@ impl DownloadManager {
 
     /// Queue a paused/failed task for another download attempt.
     pub async fn resume_task(&self, task_id: String) -> bool {
-        let Some(task) = self.get_task(&task_id) else { return false };
+        let Some(task) = self.get_task(&task_id) else {
+            return false;
+        };
 
         let should_spawn = {
             let mut g = match task.lock() {
@@ -317,7 +330,9 @@ impl DownloadManager {
     /// Request cancellation of a task.
     /// `delete_partial`: if `true`, remove the .part file too.
     pub async fn cancel_task(&self, task_id: String, delete_partial: bool) -> bool {
-        let Some(task) = self.get_task(&task_id) else { return false };
+        let Some(task) = self.get_task(&task_id) else {
+            return false;
+        };
 
         let (remove_now, temp_path, target_path) = {
             let mut g = match task.lock() {
@@ -325,14 +340,19 @@ impl DownloadManager {
                 Err(_) => return false,
             };
             g.cancel_requested.store(true, Ordering::Release);
-            g.delete_partial_on_cancel.store(delete_partial, Ordering::Release);
+            g.delete_partial_on_cancel
+                .store(delete_partial, Ordering::Release);
 
             let remove_now = !g.running;
             if remove_now {
                 g.persisted.state = DownloadTaskState::Cancelled;
                 g.persisted.message = Some("Cancelled".to_string());
             }
-            (remove_now, g.persisted.temp_path.clone(), g.persisted.target_path.clone())
+            (
+                remove_now,
+                g.persisted.temp_path.clone(),
+                g.persisted.target_path.clone(),
+            )
         };
 
         if remove_now {
@@ -354,7 +374,9 @@ impl DownloadManager {
     // ── Internal: task spawning / execution ───────────────────────────────────
 
     fn spawn_worker(&self, task_id: String) {
-        let Some(task) = self.get_task(&task_id) else { return };
+        let Some(task) = self.get_task(&task_id) else {
+            return;
+        };
 
         {
             let Ok(mut g) = task.lock() else { return };
@@ -364,14 +386,19 @@ impl DownloadManager {
             g.running = true;
             g.pause_requested.store(false, Ordering::Release);
             g.cancel_requested.store(false, Ordering::Release);
-            if matches!(g.persisted.state, DownloadTaskState::Failed | DownloadTaskState::Paused) {
+            if matches!(
+                g.persisted.state,
+                DownloadTaskState::Failed | DownloadTaskState::Paused
+            ) {
                 g.persisted.retry_attempt = 0;
             }
         }
 
         let manager = self.clone();
         self.runtime_handle.spawn(async move {
-            let Ok(_permit) = manager.semaphore.clone().acquire_owned().await else { return };
+            let Ok(_permit) = manager.semaphore.clone().acquire_owned().await else {
+                return;
+            };
             manager.run_task(task_id.clone()).await;
             if let Some(t) = manager.get_task(&task_id) {
                 if let Ok(mut g) = t.lock() {
@@ -383,7 +410,9 @@ impl DownloadManager {
 
     async fn run_task(&self, task_id: String) {
         for attempt in 0..=Self::MAX_RETRIES {
-            let Some(task) = self.get_task(&task_id) else { return };
+            let Some(task) = self.get_task(&task_id) else {
+                return;
+            };
 
             self.set_task_state(
                 &task_id,
@@ -417,12 +446,9 @@ impl DownloadManager {
                     .http_client
                     .as_ref()
                     .expect("http_client is None — DownloadManager already dropped");
-                download_task_blocking(
-                    &task_arc,
-                    &stream_clone,
-                    client,
-                    |update| manager.handle_progress_update(&tid, update),
-                )
+                download_task_blocking(&task_arc, &stream_clone, client, |update| {
+                    manager.handle_progress_update(&tid, update)
+                })
             })
             .await;
 
@@ -555,7 +581,9 @@ impl DownloadManager {
         };
         if removed {
             self.persist_manifest();
-            self.emit(DownloadManagerEvent::TaskRemoved { task_id: task_id.to_string() });
+            self.emit(DownloadManagerEvent::TaskRemoved {
+                task_id: task_id.to_string(),
+            });
         }
         removed
     }
@@ -587,7 +615,11 @@ impl DownloadManager {
     /// next `restore_tasks` call.
     fn persist_manifest(&self) {
         let tasks: Vec<PersistedDownloadTask> = match self.tasks.read() {
-            Ok(g) => g.values().filter_map(|t| t.lock().ok()).map(|g| g.persisted.clone()).collect(),
+            Ok(g) => g
+                .values()
+                .filter_map(|t| t.lock().ok())
+                .map(|g| g.persisted.clone())
+                .collect(),
             Err(_) => return,
         };
 
@@ -621,4 +653,3 @@ impl Drop for DownloadManager {
         }
     }
 }
-

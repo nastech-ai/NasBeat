@@ -374,7 +374,11 @@ fn stamp_id(pid: &str, id: &str) -> String {
 
 fn stamp_track(pid: &str, mut t: Track) -> Track {
     t.id = stamp_id(pid, &t.id);
-    t.artists = t.artists.into_iter().map(|a| stamp_artist(pid, a)).collect();
+    t.artists = t
+        .artists
+        .into_iter()
+        .map(|a| stamp_artist(pid, a))
+        .collect();
     t.album = t.album.map(|a| stamp_album(pid, a));
     t
 }
@@ -386,7 +390,11 @@ fn stamp_artist(pid: &str, mut a: ArtistSummary) -> ArtistSummary {
 
 fn stamp_album(pid: &str, mut a: AlbumSummary) -> AlbumSummary {
     a.id = stamp_id(pid, &a.id);
-    a.artists = a.artists.into_iter().map(|ar| stamp_artist(pid, ar)).collect();
+    a.artists = a
+        .artists
+        .into_iter()
+        .map(|ar| stamp_artist(pid, ar))
+        .collect();
     a
 }
 
@@ -416,10 +424,16 @@ fn stamp_chart_item(pid: &str, mut c: ChartItem) -> ChartItem {
 fn stamp_chart_response(plugin_id: &str, response: PluginResponse) -> PluginResponse {
     match response {
         PluginResponse::Charts(charts) => PluginResponse::Charts(
-            charts.into_iter().map(|c| stamp_chart_summary(plugin_id, c)).collect(),
+            charts
+                .into_iter()
+                .map(|c| stamp_chart_summary(plugin_id, c))
+                .collect(),
         ),
         PluginResponse::ChartDetails(items) => PluginResponse::ChartDetails(
-            items.into_iter().map(|c| stamp_chart_item(plugin_id, c)).collect(),
+            items
+                .into_iter()
+                .map(|c| stamp_chart_item(plugin_id, c))
+                .collect(),
         ),
         other => other,
     }
