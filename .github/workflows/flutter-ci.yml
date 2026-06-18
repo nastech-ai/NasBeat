@@ -100,12 +100,10 @@ jobs:
           flutter pub get
           flutter build apk --debug
 
-  build-ios:
-    name: iOS build (archive)
+  build-macos:
+    name: macOS build (release)
     runs-on: macos-latest
     needs: test-macos
-    # iOS CI is advisory — CocoaPods spec repo may be stale on hosted runners
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Set up Flutter
@@ -114,9 +112,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-      - name: Update CocoaPods spec repo
-        run: pod repo update || true
-      - name: Build iOS (no-codesign)
+      - name: Build macOS
         run: |
           flutter pub get
-          flutter build ios --no-codesign
+          flutter build macos --release
