@@ -55,24 +55,27 @@ android {
             val keystoreProperties = Properties()
             keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-            val keystorePath = keystoreProperties["nasbeat.jks"] as String?
             val keyAliasValue = keystoreProperties["keyAlias"] as String?
+            val storeTypeValue = (keystoreProperties["storeType"] as String?)
 
-            println("   Keystore file path: $keystorePath")
             println("   Key alias: $keyAliasValue")
+            println("   Store type: ${storeTypeValue ?: "(auto-detect)"}")
 
-            if (keystorePath != null) {
-                val keystoreFile = file(keystorePath)
-                println("   Keystore file exists: ${keystoreFile.exists()}")
-                println("   Keystore file path: ${keystoreFile.absolutePath}")
-            }
+            val ksFile = rootProject.file("nasbeat.jks")
+            println("   Keystore file exists: ${ksFile.exists()}")
+            println("   Keystore file path: ${ksFile.absolutePath}")
 
             create("release") {
                 keyAlias = keystoreProperties["keyAlias"] as String?
                 keyPassword = keystoreProperties["keyPassword"] as String?
-                storeFile = rootProject.file("nasbeat.jks")
+                storeFile = ksFile
                 storePassword = keystoreProperties["storePassword"] as String?
-                println("   ✅ Release signing config created successfully")
+                // storeType is written by CI after auto-detecting magic bytes (JKS vs PKCS12).
+                // If not set, Android Gradle uses the JVM default (PKCS12 on Java 17+).
+                if (storeTypeValue != null) {
+                    storeType = storeTypeValue
+                }
+                println("   ✅ Release signing config created (storeType=${storeType})")
             }
         } else {
             println("   ❌ key.properties not found - using debug signing")
