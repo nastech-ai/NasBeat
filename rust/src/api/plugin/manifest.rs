@@ -367,11 +367,13 @@ mod tests {
 
     #[test]
     fn rejects_manifest_with_invalid_version() {
+        // manifest_version "2.0" is accepted (forward-compat); the plugin
+        // `version` field "not-a-number" must be rejected by validate().
         let json = r#"{
             "manifest_version": "2.0",
             "id": "com.example.plugin",
             "name": "Example",
-            "version": "1",
+            "version": "not-a-number",
             "type": "content-resolver",
             "publisher": { "name": "Example Inc" },
             "description": "Example plugin"
