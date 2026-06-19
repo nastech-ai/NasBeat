@@ -281,9 +281,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _intentSub?.cancel();
     nasBeatPlayerCubit.close();
-    if (io.Platform.isWindows || io.Platform.isLinux || io.Platform.isMacOS) {
-      DiscordService.clearPresence();
-    }
+    // Clears presence AND shuts down the RPC connection cleanly.
+    DiscordService.dispose();
     super.dispose();
   }
 

@@ -447,6 +447,8 @@ class NasBeatMusicPlayer extends BaseAudioHandler
   void _updateCurrentTrack(Track track) {
     _currentTrack = track;
     mediaItem.add(trackToMediaItem(track));
+    // Reset elapsed timer so Discord shows time-into-this-song, not session time.
+    DiscordService.resetTimestamp();
   }
 
   // ─── Public Playback Controls ─────────────────────────────────────────────
