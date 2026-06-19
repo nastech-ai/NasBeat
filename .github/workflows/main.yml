@@ -169,9 +169,25 @@ jobs:
             STORE_TYPE="PKCS12"
           fi
           echo "ℹ️  Detected keystore format: $STORE_TYPE (magic=$MAGIC)"
-          printf 'keyPassword=%s\nstorePassword=%s\nkeyAlias=%s\nstoreType=%s\n' \
-            "$_KP" "$_SP" "$_KA" "$STORE_TYPE" > android/key.properties
-          echo "✅ key.properties written"
+
+          # Verify credentials BEFORE writing key.properties.
+          # "Given final block not properly padded" = wrong password → fall back to debug.
+          KEYTOOL_OUT=$(keytool -list \
+            -keystore android/nasbeat.jks \
+            -storepass "$_SP" \
+            -storetype "$STORE_TYPE" \
+            -noprompt 2>&1 || true)
+
+          if echo "$KEYTOOL_OUT" | grep -q "error\|exception\|failed\|invalid" -i; then
+            echo "⚠️  Keystore credential check failed — falling back to debug signing."
+            echo "   (Fix KEY_PASSWORD / STORE_PASSWORD / KEY_ALIAS secrets to enable release signing)"
+            echo "$KEYTOOL_OUT" | head -5
+            rm -f android/nasbeat.jks
+          else
+            printf 'keyPassword=%s\nstorePassword=%s\nkeyAlias=%s\nstoreType=%s\n' \
+              "$_KP" "$_SP" "$_KA" "$STORE_TYPE" > android/key.properties
+            echo "✅ key.properties written (credentials verified)"
+          fi
 
       - name: Build Android APKs (split-per-abi)
         run: flutter build apk --release --split-per-abi --build-number ${{ github.run_number }}
